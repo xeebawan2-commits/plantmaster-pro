@@ -1,4 +1,4 @@
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js';import{enqueue,flushQueue,allQueued}from'./offline.js';
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.0.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.0.1';
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),$=s=>document.querySelector(s),esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));let session,org,plant,role,view='dashboard',records=[],channel,formHandler;
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x.t);x.t=setTimeout(()=>x.classList.remove('show'),2500)}
 function setSync(){const x=$('#sync');x.textContent=navigator.onLine?'● Online':'● Offline';x.style.color=navigator.onLine?'#32d39a':'#fbbf24'}
@@ -27,4 +27,4 @@ async function uploadFiles(files){for(const file of files){const id=crypto.rando
 window.downloadFile=async path=>{const{data:d,error}=await sb.storage.from(FILE_BUCKET).createSignedUrl(path,120);if(error)return toast(error.message);open(d.signedUrl,'_blank')};
 function subscribe(){channel?.unsubscribe();channel=sb.channel(`plant-${plant.id}`).on('postgres_changes',{event:'*',schema:'public',table:'assets',filter:`plant_id=eq.${plant.id}`},()=>view==='assets'&&loadView()).on('postgres_changes',{event:'*',schema:'public',table:'work_orders',filter:`plant_id=eq.${plant.id}`},()=>view==='work'&&loadView()).subscribe()}
 async function flush(){setSync();const n=await flushQueue(sb);if(n)toast(`${n} offline action(s) synchronized`)}window.addEventListener('online',flush);window.addEventListener('offline',setSync);function setSync(){$('#sync').textContent=navigator.onLine?'● Online':'● Offline';$('#sync').style.color=navigator.onLine?'#32d39a':'#fbbf24'}
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.0.0',{updateViaCache:'none'});init();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.0.1',{updateViaCache:'none'});init();
