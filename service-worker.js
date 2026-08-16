@@ -1,5 +1,5 @@
-const C='plantmaster-v4-operations-v4.4.0';
-const F=['./','./index.html','./styles.css?v=4.4.0','./app.js?v=4.4.0','./config.js?v=4.3.1','./offline.js?v=4.4.0','./operations.js?v=4.4.0','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
+const C='plantmaster-v4-regression-fix-v4.4.1';
+const F=['./','./index.html','./styles.css?v=4.4.1','./app.js?v=4.4.1','./config.js?v=4.3.1','./offline.js?v=4.4.1','./operations.js?v=4.4.1','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(f=>c.add(f).catch(()=>null)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).hostname.endsWith('.supabase.co'))return;if(e.request.mode==='navigate')return e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));e.respondWith(caches.match(e.request).then(x=>x||fetch(e.request).then(r=>{if(r.ok)caches.open(C).then(c=>c.put(e.request,r.clone()));return r})))});
