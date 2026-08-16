@@ -9,3 +9,4 @@ create policy invites_manage on invitations for all to authenticated using(is_or
 create policy status_read on asset_status_history for select to authenticated using(is_org_member(organization_id));create policy status_insert on asset_status_history for insert to authenticated with check(is_org_member(organization_id));
 create policy reports_member on report_dispatches for all to authenticated using(is_org_member(organization_id)) with check(is_org_member(organization_id));
 grant select,insert,update,delete on organization_settings,invitations,asset_status_history,report_dispatches to authenticated;grant usage,select on all sequences in schema public to authenticated;
+alter table public.organization_settings add column if not exists pattern text default 'grid';
