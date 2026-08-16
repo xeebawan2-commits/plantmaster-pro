@@ -1,4 +1,4 @@
-const C='plantmaster-v4-phase1-flat-v4.0.5';
+const C='plantmaster-v4-phase1-flat-v4.0.6';
 const F=['./','./index.html','./styles.css?v=4.0.2','./app.js?v=4.0.2','./config.js?v=4.0.2','./offline.js?v=4.0.2','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(f=>c.add(f).catch(()=>null)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
