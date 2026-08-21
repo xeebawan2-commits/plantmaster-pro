@@ -1,4 +1,4 @@
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.3.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.7.1';import{createOperations}from'./operations.js?v=4.7.1';
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.3.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.7.2';import{createOperations}from'./operations.js?v=4.7.2';
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));let session,userId=null,org,plant,role,profile={},view='dashboard',records=[],channel,formHandler,viewHistory=[],handlingPop=false,lastHomeBack=0,onlineUsers=1,realtimeTimer,searchTimer,platformAdmin=false;
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x.t);x.t=setTimeout(()=>x.classList.remove('show'),2500)}
 function setSync(){const x=$('#sync'),online=navigator.onLine;x.textContent=online?`● Online${onlineUsers>1?` • ${onlineUsers}`:''}`:'● Offline';x.title=online?`${onlineUsers} active PlantMaster user${onlineUsers===1?'':'s'} in this plant`:'Changes will queue until connection returns';x.style.color=online?'#32d39a':'#fbbf24'}
@@ -80,7 +80,7 @@ function subscribe(){
   channel.subscribe(status=>{if(status==='SUBSCRIBED')channel.track({user_id:userId,name:profile.full_name||session?.user?.email,plant_id:plant.id,online_at:new Date().toISOString()});if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setSync()})
 }
 async function flush(){setSync();const n=await flushQueue(sb);if(n)toast(`${n} offline action(s) synchronized`)}window.addEventListener('online',flush);window.addEventListener('offline',setSync);window.addEventListener('popstate',async e=>{const target=e.state?.pmView;if(!target)return;handlingPop=true;try{view=target;renderNav();await loadView()}finally{handlingPop=false}});
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.7.1',{updateViaCache:'none'});init();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.7.2',{updateViaCache:'none'});init();
 
 /* Phase 2 modules */
 async function loadPhase2View(){

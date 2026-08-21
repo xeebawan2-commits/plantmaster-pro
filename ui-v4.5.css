@@ -29,3 +29,5 @@ body[data-theme="light"]{--pm-bg:#eef3f8;--pm-panel:#fff;--pm-panel-2:#f8fbff;--
 /* v4.7.1 mobile status and performance polish */
 @media(max-width:800px){#sync::first-letter{font-size:0!important}#sync{overflow:hidden!important;box-shadow:0 0 0 3px rgba(33,197,139,.14)!important}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* v4.7.2 low-power mobile scrolling */
+@media(max-width:800px){html,body{background-attachment:scroll!important;scroll-behavior:auto!important}header,#toolbar:has(.module-toolbar),.mobile-bottom{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.card,.record-card,.kpi,.dashboard-link,.usage-meter,.format-card{box-shadow:none!important}.card,.record-card,.dashboard-link{transition:none!important}.record-card,.dashboard-link,.usage-meter,.format-card{content-visibility:auto;contain-intrinsic-size:1px 150px}body[data-pattern="grid"],body[data-pattern="dots"],body[data-pattern="diagonal"],body[data-pattern="circuit"]{background-size:42px 42px!important}}
