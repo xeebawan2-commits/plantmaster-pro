@@ -1,5 +1,5 @@
-const C='plantmaster-v4-scanner-capture-fix-v4.9.5';
-const F=['./','./index.html','./styles.css?v=4.9.5','./ui-v4.5.css?v=4.9.5','./scanner-v4.8.css?v=4.9.5','./condition-v4.9.css?v=4.9.5','./app.js?v=4.9.5','./scanner.js?v=4.9.5','./condition.js?v=4.9.5','./config.js?v=4.3.1','./offline.js?v=4.9.5','./operations.js?v=4.9.5','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
+const C='plantmaster-v4-scanner-auto-complete-v4.9.6';
+const F=['./','./index.html','./styles.css?v=4.9.6','./ui-v4.5.css?v=4.9.6','./scanner-v4.8.css?v=4.9.6','./condition-v4.9.css?v=4.9.6','./app.js?v=4.9.6','./scanner.js?v=4.9.6','./condition.js?v=4.9.6','./config.js?v=4.3.1','./offline.js?v=4.9.6','./operations.js?v=4.9.6','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(f=>c.add(f).catch(()=>null)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).hostname.endsWith('.supabase.co'))return;if(e.request.mode==='navigate')return e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));e.respondWith(caches.match(e.request).then(x=>x||fetch(e.request).then(r=>{if(r.ok)caches.open(C).then(c=>c.put(e.request,r.clone()));return r})))});
