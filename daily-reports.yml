@@ -1,0 +1,23 @@
+name: Daily reports
+
+# Sends the per-company daily maintenance summary via Resend at 11:00
+# (Asia/Karachi) every day — matching the app's default report_time.
+# Secrets required (repo → Settings → Secrets and variables → Actions):
+#   DAILY_REPORTS_FN_URL   e.g. https://dpmmenwziplixrgylapy.supabase.co/functions/v1/daily-reports
+#   DAILY_REPORTS_TOKEN    (same value as the function's DAILY_REPORTS_TOKEN secret)
+
+on:
+  schedule:
+    # GitHub Actions cron is UTC: 05:30 UTC = 11:00 Pakistan (PKT)
+    - cron: '30 5 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call daily-reports /run
+        run: |
+          curl -sS -X POST "${{ secrets.DAILY_REPORTS_FN_URL }}/run" \
+            -H 'Content-Type: application/json' \
+            --data "{\"token\":\"${{ secrets.DAILY_REPORTS_TOKEN }}\"}" | head -c 800

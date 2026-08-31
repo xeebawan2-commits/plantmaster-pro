@@ -1,0 +1,25 @@
+name: Push poller
+
+# Picks up new rows in the `notifications` table and delivers them as
+# system push notifications. Free tier: minimum schedule = every 5 minutes.
+# Secrets required (repo → Settings → Secrets and variables → Actions):
+#   PUSH_FN_URL          e.g. https://dpmmenwziplixrgylapy.supabase.co/functions/v1/web-push
+#   PUSH_INTERNAL_TOKEN  (same value as the function's PUSH_INTERNAL_TOKEN secret)
+#   SUPABASE_ANON_KEY    the publishable key from app/config.js
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call web-push /poll
+        run: |
+          curl -sS -X POST "${{ secrets.PUSH_FN_URL }}/poll" \
+            -H 'Content-Type: application/json' \
+            -H "X-Internal-Token: ${{ secrets.PUSH_INTERNAL_TOKEN }}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            --data '{}' | head -c 500
