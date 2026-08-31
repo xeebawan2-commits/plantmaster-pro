@@ -86,7 +86,7 @@ function subscribe(){
   channel.subscribe(status=>{if(status==='SUBSCRIBED')channel.track({user_id:userId,name:profile.full_name||session?.user?.email,plant_id:plant.id,online_at:new Date().toISOString()});if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setSync()})
 }
 async function flush(){setSync();const n=await flushQueue(sb);if(n)toast(`${n} offline action(s) synchronized`)}window.addEventListener('online',flush);window.addEventListener('offline',setSync);window.addEventListener('popstate',async e=>{const target=e.state?.pmView;if(!target)return;handlingPop=true;try{view=target;renderNav();await loadView()}finally{handlingPop=false}});
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.7.2',{updateViaCache:'none'});init();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=4.12.0',{updateViaCache:'none'});init();
 
 /* Phase 2 modules */
 async function loadPhase2View(){
