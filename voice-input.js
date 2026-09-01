@@ -95,7 +95,7 @@ if (Rec && isSecureContext) {
     const r = await fetch(SUPABASE_URL + '/functions/v1/voice-translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + tok },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({ text, mode: 'ur' })
     });
     const d = await r.json().catch(() => ({}));
     if (!r.ok || d.error) throw new Error(d.error || 'translation-failed');
