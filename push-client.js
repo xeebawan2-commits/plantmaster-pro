@@ -1,4 +1,4 @@
-/* PlantMaster Pro — push-client v1.1.0 (exposes window.PMPush, silent auto-subscribe, no 24h dismiss trap)
+/* PlantMaster Pro — push-client v1.1.1 (v1.1.0 + fixed VAPID key decoding + error capture for diagnostics)
  * Independent module: registers a push subscription for the signed-in user
  * and shows a dismissible "Enable alerts" banner. Does NOT touch app.js —
  * reads the Supabase session from localStorage (same-origin, set by the app)
@@ -12,7 +12,7 @@ const VAPID_PUBLIC_KEY='BH9ogu3zE6LfOW6yp4oQs372lm61ySttCWXO4hYe6Rn5LGrwKL2jrZf1
 const FN_URL=SUPABASE_URL+'/functions/v1/web-push';
 let dismissedThisSession=false; // 'Later' only hides the banner for this page session
 
-const b64ToUint8array=b64=>{const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(atob(raw),c=>c.charCodeAt(0))};
+const b64ToUint8array=b64=>{const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))};
 const readToken=()=>{
   for(const k of Object.keys(localStorage)){
     if(!/sb-.*-auth-token$/.test(k))continue;
@@ -79,13 +79,15 @@ window.PMPush={
  ready:()=>'serviceWorker'in navigator&&'PushManager'in window&&'Notification'in window,
  status:async()=>{try{const reg=await navigator.serviceWorker.getRegistration();if(!reg)return'no-sw';const sub=await reg.pushManager.getSubscription();return sub?'subscribed':'not-subscribed'}catch(_){return'error'}},
  enable:async(token)=>{
-  if(!token)return false;
+  if(!token){window.__pmPushErr='no login token';return false}
   try{const reg=await navigator.serviceWorker.ready;
    let sub=await reg.pushManager.getSubscription();
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToUint8array(VAPID_PUBLIC_KEY)});
    const r=await fnCall('/subscribe',token,{subscription:sub.toJSON()});
-   return!!r.ok;
-  }catch(_){return false}
+   if(!r.ok){window.__pmPushErr='server: '+(r.error||JSON.stringify(r));return false}
+   window.__pmPushErr='';
+   return true;
+  }catch(e){window.__pmPushErr='local: '+((e&&e.message)||e);return false}
  }
 };
 document.addEventListener('DOMContentLoaded',init);
