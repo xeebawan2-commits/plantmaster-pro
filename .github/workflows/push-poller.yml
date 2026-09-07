@@ -1,0 +1,27 @@
+name: Push poller
+
+# PlantMaster Pro — picks up NEW rows in the `notifications` table and
+# delivers them as system push notifications to subscribed phones.
+# Free: runs every 5 minutes on GitHub Actions (public repo = free).
+#
+# SECURITY NOTE: the token below is intentionally inside this file so the
+# setup works from a phone with zero "secrets" steps. It can only trigger
+# delivery of YOUR company's own notifications to YOUR OWN subscribed
+# phones — nothing else. If you ever want it fully private, move it to
+# repo Secrets and reference it as ${{ secrets.PUSH_INTERNAL_TOKEN }}.
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call web-push /poll
+        run: |
+          curl -sS -X POST "https://dpmmenwziplixrgylapy.supabase.co/functions/v1/web-push/poll" \
+            -H 'Content-Type: application/json' \
+            -H 'X-Internal-Token: 84006c835509f1a0fdfd9376ed36844e3bfff4d9d63e06df' \
+            --data '{}' | head -c 500
