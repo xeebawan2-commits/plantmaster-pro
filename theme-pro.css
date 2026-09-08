@@ -1,5 +1,5 @@
 /* ============================================================
-   PlantMaster Pro — Charcoal & Ember (theme v2.2)
+   PlantMaster Pro — Charcoal & Ember (theme v2.3)
    Full premium reskin. Loads AFTER all other stylesheets.
    - Charcoal glass surfaces, single warm ember accent
    - Semantic status colours (green/amber/red/blue) are preserved
@@ -9,13 +9,13 @@
    ============================================================ */
 
 :root{
-  --pro-bg:#0a0c0f;
-  --pro-surface:#12151a;
-  --pro-surface-2:#0d1015;
-  --pro-line:#232933;
-  --pro-line-2:#333c49;
-  --pro-text:#f2f5f9;
-  --pro-muted:#98a3b3;
+  --pro-bg:#0a0a0b;
+  --pro-surface:#141416;
+  --pro-surface-2:#0e0e10;
+  --pro-line:#27272b;
+  --pro-line-2:#3a3a40;
+  --pro-text:#f4f4f5;
+  --pro-muted:#9d9da6;
   --pro-accent:#fbbf24;
   --pro-accent-2:#f97316;
   --pro-radius:18px;
@@ -28,10 +28,11 @@
 /* ---------- base ---------- */
 body{
   background:
-    radial-gradient(1000px 520px at 82% -12%, rgba(249,115,22,.10), transparent 60%),
-    radial-gradient(760px 420px at -8% 108%, rgba(251,191,36,.05), transparent 60%),
+    radial-gradient(1000px 520px at 82% -12%, rgba(249,115,22,.08), transparent 60%),
+    radial-gradient(760px 420px at -8% 108%, rgba(251,191,36,.04), transparent 60%),
     var(--pro-bg);
   background-attachment:fixed;
+  background-color:var(--pro-bg)!important;
   color:var(--pro-text);
   font-size:15px;
   letter-spacing:.01em;
@@ -58,7 +59,7 @@ h2{font-size:1.24rem;letter-spacing:-.02em;font-weight:750}
 }
 #auth .panel,#onboard .panel{
   position:relative;
-  background:linear-gradient(165deg, rgba(22,26,32,.94), rgba(10,12,16,.97));
+  background:linear-gradient(165deg, rgba(25,25,27,.96), rgba(11,11,12,.98));
   border:1px solid rgba(251,191,36,.22);
   border-radius:24px;
   padding:36px 30px 30px;
@@ -90,7 +91,7 @@ h2{font-size:1.24rem;letter-spacing:-.02em;font-weight:750}
 @keyframes pmin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 #auth .panel p,.auth-help{color:var(--pro-muted);font-size:12.5px}
 #auth .panel input,#onboard .panel input{
-  background:rgba(6,8,11,.78);
+  background:rgba(8,8,9,.8);
   border:1px solid var(--pro-line-2);
   border-radius:14px;
   text-align:left;
@@ -130,7 +131,7 @@ h2{font-size:1.24rem;letter-spacing:-.02em;font-weight:750}
 
 /* ---------- header ---------- */
 header{
-  background:rgba(10,12,15,.85);
+  background:rgba(10,10,11,.88);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border-bottom:1px solid var(--pro-line);
@@ -151,7 +152,7 @@ header{
 #logout:hover{color:#fecaca;border-color:#7f1d1d;background:rgba(127,29,29,.18)}
 
 /* ---------- drawer ---------- */
-aside{background:rgba(10,12,15,.94);backdrop-filter:blur(8px);border-right:1px solid var(--pro-line)}
+aside{background:rgba(10,10,11,.95);backdrop-filter:blur(8px);border-right:1px solid var(--pro-line)}
 aside nav{gap:4px;padding:4px}
 aside button{
   border-radius:12px;background:transparent;border:1px solid transparent;
@@ -189,7 +190,7 @@ main{padding:18px}
 .card:hover{border-color:var(--pro-line-2);transform:translateY(-1px)}
 .kpis{gap:13px}
 .kpi{
-  background:linear-gradient(160deg, #161a20, var(--pro-surface-2));
+  background:linear-gradient(160deg, #18181b, var(--pro-surface-2));
   border:1px solid var(--pro-line-2);
   border-radius:var(--pro-radius);
   position:relative;overflow:hidden;
@@ -211,10 +212,10 @@ main{padding:18px}
 .kpis .kpi:nth-child(5)::after{background:radial-gradient(120px 60px at 85% 0, rgba(192,132,252,.13), transparent 70%)}
 .kpi strong{font-size:38px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
   text-shadow:0 0 26px color-mix(in srgb,currentColor 55%,transparent)}
-.kpi:hover{transform:translateY(-2px);border-color:#3d4856;box-shadow:var(--pro-shadow),var(--pro-glow)}
+.kpi:hover{transform:translateY(-2px);border-color:#45454c;box-shadow:var(--pro-shadow),var(--pro-glow)}
 .dashboard-link{font-weight:700}
 .dashboard-link p{font-size:12.5px;line-height:1.45}
-.dashboard-link:hover{transform:translateY(-2px);border-color:#3d4856;box-shadow:var(--pro-shadow),var(--pro-glow)}
+.dashboard-link:hover{transform:translateY(-2px);border-color:#45454c;box-shadow:var(--pro-shadow),var(--pro-glow)}
 .dashboard-link>span{color:var(--pro-accent);font-weight:700;font-size:12.5px;letter-spacing:.02em}
 .module-head{margin-bottom:18px}
 .module-head h1{letter-spacing:-.025em}
@@ -229,7 +230,7 @@ main{padding:18px}
 
 /* ---------- forms (dialog & inline) ---------- */
 dialog{
-  background:linear-gradient(165deg,#151920,#0c0f13);
+  background:linear-gradient(165deg,#1a1a1d,#101012);
   border:1px solid var(--pro-line-2);
   border-radius:20px;
   box-shadow:0 40px 100px rgba(0,0,0,.7);
@@ -239,7 +240,7 @@ dialog h2{font-size:1.15rem}
 #fields label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--pro-muted)}
 #fields input,#fields select,#fields textarea,
 .form-field input,.form-field select,.form-field textarea{
-  background:rgba(6,8,11,.7);border:1px solid var(--pro-line);
+  background:rgba(8,8,9,.72);border:1px solid var(--pro-line);
   border-radius:12px;min-height:46px;font-size:15px;
 }
 #fields input:focus,#fields select:focus,#fields textarea:focus,
@@ -271,14 +272,14 @@ button.danger:hover{background:rgba(127,29,29,.35)}
 /* ---------- tables ---------- */
 .table-wrap{border-color:var(--pro-line);border-radius:14px;overflow:hidden}
 table{min-width:640px}
-th{background:linear-gradient(180deg,#181d24,#12151a);color:#b8c4d4;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
-tr:nth-child(even) td{background:rgba(18,21,26,.5)}
+th{background:linear-gradient(180deg,#1c1c20,#141416);color:#c2c2cc;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
+tr:nth-child(even) td{background:rgba(28,28,32,.5)}
 tr:hover td{background:rgba(251,191,36,.045)}
 td{border-bottom:1px solid var(--pro-line)}
 
 /* ---------- toast ---------- */
 #toast{
-  background:linear-gradient(155deg,#181d24,#0c0f13);
+  background:linear-gradient(155deg,#1c1c20,#101012);
   border:1px solid rgba(251,191,36,.5);
   border-radius:14px;
   box-shadow:0 14px 40px rgba(0,0,0,.6), 0 0 0 4px rgba(251,191,36,.07);
@@ -290,7 +291,7 @@ td{border-bottom:1px solid var(--pro-line)}
 
 /* ---------- mobile bottom nav ---------- */
 .mobile-bottom{
-  background:rgba(10,12,15,.92);
+  background:rgba(10,10,11,.93);
   backdrop-filter:blur(12px);
   border-top:1px solid var(--pro-line);
   padding-bottom:env(safe-area-inset-bottom);
@@ -308,7 +309,7 @@ td{border-bottom:1px solid var(--pro-line)}
   position:fixed;left:16px;bottom:16px;z-index:60;
   display:flex;align-items:center;gap:12px;
   max-width:min(400px,calc(100vw - 32px));
-  background:linear-gradient(155deg,#181d24,#0c0f13);
+  background:linear-gradient(155deg,#1c1c20,#101012);
   border:1px solid rgba(251,191,36,.4);
   border-radius:18px;padding:14px 16px;
   box-shadow:0 20px 60px rgba(0,0,0,.6), 0 0 0 5px rgba(249,115,22,.06);
@@ -338,11 +339,11 @@ body:not([data-theme="light"]) .scanner-modes button.active i,
 body:not([data-theme="light"]) .scanner-modes button.active b,
 body:not([data-theme="light"]) .scanner-modes button.active small{color:var(--pro-ink)}
 body:not([data-theme="light"]) .scan-stage{
-  background:linear-gradient(165deg,rgba(22,26,32,.94),rgba(10,12,16,.97));
+  background:linear-gradient(165deg,rgba(25,25,27,.96),rgba(11,11,12,.98));
   border:1px solid var(--pro-line-2);border-radius:22px;box-shadow:var(--pro-shadow);
 }
 body:not([data-theme="light"]) .scan-result-panel{
-  background:linear-gradient(180deg,rgba(18,21,26,.92),rgba(10,12,16,.96));
+  background:linear-gradient(180deg,rgba(24,24,27,.94),rgba(11,11,12,.97));
   border:1px solid var(--pro-line);border-radius:22px;
 }
 body:not([data-theme="light"]) .secure-chip{
@@ -352,13 +353,13 @@ body:not([data-theme="light"]) .secure-chip{
 }
 body:not([data-theme="light"]) .vision-preview img,
 body:not([data-theme="light"]) .page-preview img{border-radius:14px;border:1px solid var(--pro-line-2)}
-body:not([data-theme="light"]) .scanner-empty{border:1px dashed var(--pro-line-2);border-radius:18px;background:rgba(18,21,26,.5)}
+body:not([data-theme="light"]) .scanner-empty{border:1px dashed var(--pro-line-2);border-radius:18px;background:rgba(24,24,27,.5)}
 body:not([data-theme="light"]) .scan-actions button{border-radius:12px}
 body:not([data-theme="light"]) .scanner-complete-banner{
   background:linear-gradient(92deg,rgba(249,115,22,.14),transparent 70%);
   border:1px solid rgba(249,115,22,.35);border-radius:18px;
 }
-body:not([data-theme="light"]) .result-section{background:rgba(18,21,26,.6);border:1px solid var(--pro-line);border-radius:14px}
+body:not([data-theme="light"]) .result-section{background:rgba(24,24,27,.6);border:1px solid var(--pro-line);border-radius:14px}
 body:not([data-theme="light"]) .result-section.safety{border-color:#78350f;background:rgba(120,53,15,.16)}
 body:not([data-theme="light"]) .confidence{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.3);color:var(--pro-accent);border-radius:99px;padding:5px 12px;font-size:11.5px;font-weight:700}
 
@@ -369,12 +370,12 @@ body:not([data-theme="light"]) .solver-modes button{
   transition:background .15s,color .15s,border-color .15s,box-shadow .15s;
 }
 body:not([data-theme="light"]) .solver-modes button.active{background:var(--pro-grad);color:var(--pro-ink);border-color:transparent;box-shadow:var(--pro-glow)}
-.answer-text{background:rgba(18,21,26,.7);border:1px solid var(--pro-line);border-radius:14px;padding:16px;line-height:1.65}
-.source-box{background:rgba(18,21,26,.55);border:1px solid var(--pro-line);border-radius:12px}
+.answer-text{background:rgba(24,24,27,.72);border:1px solid var(--pro-line);border-radius:14px;padding:16px;line-height:1.65}
+.source-box{background:rgba(24,24,27,.55);border:1px solid var(--pro-line);border-radius:12px}
 .safety-note{background:rgba(120,53,15,.16);border:1px solid #78350f;border-radius:12px;color:#fcd34d}
 
 /* ---------- states & loading ---------- */
-.empty-state{border:1px dashed var(--pro-line-2);border-radius:16px;background:rgba(18,21,26,.4);color:var(--pro-muted)}
+.empty-state{border:1px dashed var(--pro-line-2);border-radius:16px;background:rgba(24,24,27,.4);color:var(--pro-muted)}
 .loading-card{position:relative;overflow:hidden}
 .loading-card::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(251,191,36,.06) 50%,transparent 70%);animation:pmshimmer 1.4s linear infinite}
 @keyframes pmshimmer{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
