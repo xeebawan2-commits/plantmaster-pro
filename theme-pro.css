@@ -1,5 +1,5 @@
 /* ============================================================
-   PlantMaster Pro — Beaver (theme v2.6)
+   PlantMaster Pro — Beaver (theme v2.7 — full coverage + designed headings)
    Warm Beaver palette (#9F8170 family) + professional forms.
    Loads AFTER all other stylesheets. Override layer with
    targeted !important where base sheets force their own colors.
@@ -52,11 +52,23 @@ body[data-pattern]{background-image:none!important}
   color:var(--pro-text);
 }
 h1,h2,h3,h4{
-  color:var(--pro-text)!important;
+  color:#4a3526!important;
   background:transparent!important;
   -webkit-background-clip:initial!important;
   background-clip:initial!important;
 }
+.module-head h1{
+  background:linear-gradient(95deg,#3a2a1c 25%,#7d5f4b 90%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  position:relative;
+}
+.module-head h1::after{
+  content:"";display:block;width:64px;height:5px;border-radius:99px;
+  background:linear-gradient(92deg,#7d5f4b,#c9ab8d);
+  margin-top:10px;
+  box-shadow:0 2px 10px rgba(125,95,75,.35);
+}
+#content h1:not(:empty), #content h2{letter-spacing:-.02em}
 p, li, small, dt, dd, legend, summary{color:inherit}
 .dashboard-link p{color:var(--pro-muted)}
 .module-head p{color:var(--pro-muted)}
@@ -146,9 +158,12 @@ header{
 .brand-block small{color:var(--pro-muted)!important;font-size:11.5px}
 .brand-block img{border-radius:12px;box-shadow:0 2px 10px rgba(93,72,55,.18)}
 #sync{
-  color:#059669!important;background:rgba(5,150,105,.08)!important;
-  border:1px solid rgba(5,150,105,.3)!important;
-  border-radius:99px;padding:5px 11px;font-size:11px;font-weight:700;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+  color:#047857!important;background:#d1fae5!important;
+  border:1px solid #34d399!important;
+  border-radius:99px;padding:6px 13px;font-size:11.5px;font-weight:800!important;
+  white-space:nowrap;
+  box-shadow:0 0 12px rgba(16,185,129,.30);
 }
 .icon-btn{border-radius:12px;background:#ffffff!important;border:1px solid var(--pro-line)!important;color:var(--pro-text)!important;font-size:17px}
 .icon-btn:hover{border-color:var(--pro-accent)!important}
@@ -188,20 +203,21 @@ main{padding:18px}
 
 /* ---------- cards & KPIs — uniform ---------- */
 .card{
-  background:linear-gradient(155deg,#ffffff,#faf7f2)!important;
+  background:linear-gradient(168deg,#ffffff 0%,#faf6ef 62%,#f3ecdf 100%)!important;
   border:1px solid var(--pro-line)!important;
   border-radius:var(--pro-radius);
-  box-shadow:var(--pro-shadow);
+  box-shadow:var(--pro-shadow), inset 0 1px 0 rgba(255,255,255,.85);
   transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
   color:var(--pro-text);
 }
 .card:hover{border-color:var(--pro-line-2)!important;transform:translateY(-1px)}
 .kpis{gap:13px}
 .kpi{
-  background:linear-gradient(160deg,#ffffff,#f7f3ec)!important;
-  border:1px solid var(--pro-line)!important;
+  background:linear-gradient(170deg,#ffffff 0%,#f8f3ea 55%,#f0e8d9 100%)!important;
+  border:1px solid #dccfba!important;
   border-radius:var(--pro-radius);
   position:relative;
+  box-shadow:var(--pro-shadow), inset 0 1px 0 rgba(255,255,255,.9);
   transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
 }
 .kpi::before{content:none}
@@ -314,6 +330,67 @@ dialog menu button:last-child{
   box-shadow:0 8px 22px rgba(125,95,75,.28);
 }
 .form-error, .form-error-inline{color:#b91c1c!important;background:#fef2f2!important;border:1px solid #fecaca!important}
+
+
+/* ---------- FULL COVERAGE (reports / plan / email / solver / settings) ---------- */
+#content label{
+  font-size:11.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--pro-muted);
+}
+#content input, #content select, #content textarea,
+dialog input, dialog select, dialog textarea{
+  background:#ffffff!important;
+  border:1px solid var(--pro-line-2)!important;
+  color:var(--pro-text)!important;
+  border-radius:12px;min-height:46px;padding:12px 14px;
+  font-size:15px;font-weight:500;letter-spacing:normal;text-transform:none;
+  box-shadow:inset 0 1px 2px rgba(93,72,55,.04);
+  transition:border-color .15s, box-shadow .15s;
+}
+#content input::placeholder, #content select::placeholder, #content textarea::placeholder{color:#a2937f}
+#content input:focus, #content select:focus, #content textarea:focus{
+  border-color:var(--pro-accent)!important;
+  box-shadow:0 0 0 3px rgba(159,129,112,.18);outline:none;
+}
+#content input[type=checkbox], #content input[type=radio]{min-height:auto;accent-color:var(--pro-accent-2)}
+#content input[type=color]{padding:6px;min-height:44px}
+#content button:not(.primary):not(.secondary):not(.danger):not(.whatsapp-btn):not(.email-btn):not(.icon-btn):not(#closeRecord){
+  background:#ffffff!important;border:1px solid var(--pro-line-2)!important;
+  color:var(--pro-text)!important;border-radius:12px;min-height:42px;padding:9px 15px;font-weight:600;
+  transition:border-color .15s,transform .12s;
+}
+#content button:not(.primary):not(.secondary):not(.danger):not(.whatsapp-btn):not(.email-btn):not(.icon-btn):not(#closeRecord):hover{border-color:var(--pro-accent)!important}
+dl div{background:#faf7f2!important;border:1px solid var(--pro-line)!important;border-radius:12px;padding:10px 13px}
+dl dt{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--pro-muted)}
+dl dd{font-size:16px;font-weight:700;color:var(--pro-text)!important;margin-top:2px}
+.meter{height:9px;background:#e9dfcf!important;border-radius:99px;overflow:hidden;margin:9px 0 6px}
+.meter i{display:block;height:100%;background:linear-gradient(92deg,#7d5f4b,#9f8170)!important;border-radius:99px}
+.usage-meter, .plan-card, .format-card{
+  background:linear-gradient(165deg,#ffffff,#f6f0e5)!important;
+  border:1px solid var(--pro-line)!important;border-radius:18px;
+  box-shadow:var(--pro-shadow), inset 0 1px 0 rgba(255,255,255,.8);
+}
+.usage-meter b{color:var(--pro-text)!important;font-size:14px}
+.usage-meter span{color:var(--pro-text)!important;font-weight:700;font-size:14px}
+.usage-meter small{color:var(--pro-muted)!important;font-size:12px}
+.feature-list span{display:block;padding:7px 11px;border-radius:9px;background:#faf7f2;border:1px solid var(--pro-line);color:var(--pro-text);font-weight:600;font-size:13.5px;margin-bottom:7px}
+.feature-list span.disabled{color:var(--pro-muted);opacity:.75}
+.format-card h3{color:var(--pro-accent-2)!important;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.format-card p{color:var(--pro-muted)!important}
+.format-card button{background:#ffffff!important;border:1px solid var(--pro-line-2)!important;color:var(--pro-text)!important;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700}
+.report-controls label{display:grid;gap:7px;margin-bottom:14px;font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--pro-muted)}
+#content pre{
+  background:#faf7f2!important;border:1px solid var(--pro-line)!important;border-radius:12px;
+  padding:14px;color:var(--pro-text)!important;font-size:13px;line-height:1.55;
+  max-height:420px;overflow:auto;white-space:pre-wrap;
+}
+.result-section pre{background:#ffffff!important;border:1px solid var(--pro-line)!important;color:var(--pro-text)!important}
+.solver-source-strip b{background:#faf7f2!important;border:1px solid var(--pro-line)!important;color:var(--pro-text)!important;border-radius:99px;padding:8px 13px;font-weight:600;font-size:12.5px}
+.solver-source-strip b.active, .solver-source-strip b.on{background:#d1fae5!important;border-color:#34d399!important;color:#047857!important}
+.pending-card{background:#fffbeb!important;border:1px dashed #fcd34d!important;border-radius:14px}
+.pending-label{color:#b45309!important}
+.lifecycle{background:#d1fae5!important;border:1px solid #34d399!important;color:#047857!important;font-weight:700;border-radius:99px;padding:6px 13px;font-size:11.5px}
+.conversation{background:transparent!important}
 
 /* ---------- records & status chips ---------- */
 .record-card{
