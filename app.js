@@ -1,4 +1,4 @@
-import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.3.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.11.1';import{createOperations}from'./operations.js?v=4.24.0';import{createScanner}from'./scanner.js?v=4.11.1';import{createConditionMonitor}from'./condition.js?v=4.11.1';import{createUnifiedSolver}from'./solver.js?v=4.11.1';import{createAnalytics}from'./analytics.js';
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.3.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.11.1';import{createOperations}from'./operations.js?v=4.25.0';import{createScanner}from'./scanner.js?v=4.11.1';import{createConditionMonitor}from'./condition.js?v=4.11.1';import{createUnifiedSolver}from'./solver.js?v=4.11.1';import{createAnalytics}from'./analytics.js';
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));let session,userId=null,org,plant,role,profile={},view='dashboard',records=[],channel,formHandler,viewHistory=[],handlingPop=false,lastHomeBack=0,onlineUsers=1,realtimeTimer,searchTimer,platformAdmin=false,appStarted=false;
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x.t);x.t=setTimeout(()=>x.classList.remove('show'),2500)}
 function setSync(){const x=$('#sync'),online=navigator.onLine;x.textContent=online?`● Online${onlineUsers>1?` • ${onlineUsers}`:''}`:'● Offline';x.title=online?`${onlineUsers} active PlantMaster user${onlineUsers===1?'':'s'} in this plant`:'Changes will queue until connection returns';x.style.color=online?'#32d39a':'#fbbf24'}
@@ -41,7 +41,7 @@ function startApp(){appStarted=true;$('#auth').hidden=$('#onboard').hidden=true;
 $('#logout').onclick=()=>sb.auth.signOut();$('#menu').onclick=()=>{$('#drawer').classList.toggle('open');renderNav()};$('#search').oninput=()=>{clearTimeout(searchTimer);if(view==='dashboard')searchTimer=setTimeout(()=>globalSearch($('#search').value),350);else renderList()};$('#add').onclick=()=>openRecordForm();$('#cancelRecord').onclick=$('#closeRecord').onclick=()=>{const m=$('#modal');if(typeof m.close==='function'&&m.open){m.close();m.style.removeProperty('display')}else{m.removeAttribute('open');m.style.display='none'}};
 function renderNav(){$$('#drawer [data-view],.mobile-bottom [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));$('#mobileMore')?.classList.toggle('active',$('#drawer')?.classList.contains('open'))}
 async function go(v,replace=false){if(!v)return;if(view!==v){viewHistory.push(view);if(!handlingPop){if(replace)history.replaceState({pmView:v},'');else history.pushState({pmView:v},'')}}view=v;$('#drawer').classList.remove('open');const currentSearch=$('#search')||$('#opsSearch');if(currentSearch)currentSearch.value='';renderNav();$('#content').innerHTML=`<div class="card"><h3>Opening ${v==='work'?'Work Orders':v[0].toUpperCase()+v.slice(1)}…</h3></div>`;try{await loadView()}catch(error){console.error(error);$('#content').innerHTML=`<div class="card"><h3>Navigation error</h3><p>${esc(error.message||error)}</p></div>`}}window.go=go;window.openPeopleSection=async section=>{await go('people');await window.PMOps?.openPeopleTab(section)};
-async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);ensureCoreToolbar();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
+async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);ensureCoreToolbar();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
 window.retryCurrentView=()=>loadView();
 let pushSaveFailed=false;
 function notifBar(sub){if(!('Notification'in window))return'';const p=Notification.permission;
@@ -354,4 +354,77 @@ window.logMeter=id=>{
     loadView();
   };
   const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m);
+};
+
+
+window.closeCustomModal = () => {
+  const m=$('#modal'); if(typeof m.close==='function') m.close(); else { m.removeAttribute('open'); m.style.display='none'; }
+};
+
+window.manageSafety = id => {
+  const r = records.find(x => x.id === id); if(!r) return;
+  const activeLoto = (r.loto_procedures || []).find(x => !x.removed_at);
+  const activePermit = (r.permits || []).find(x => x.status !== 'closed');
+  
+  let html = `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2)"><h3>🔒 Lockout / Tagout (LOTO)</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Isolate energy sources before beginning maintenance.</p>`;
+  if(activeLoto) {
+    html += `<div style="padding:12px;background:rgba(220,38,38,0.1);border:1px solid #dc2626;border-radius:10px;margin-top:12px"><b style="color:#fca5a5;display:block;margin-bottom:4px">LOTO Applied</b><small style="color:var(--pro-muted)">At ${new Date(activeLoto.applied_at).toLocaleString()}</small><br><button class="danger" style="margin-top:12px" type="button" onclick="removeLoto('${activeLoto.id}')">Remove LOTO</button></div>`;
+  } else {
+    html += `<button class="primary" style="margin-top:10px" type="button" onclick="applyLoto('${id}', '${r.asset_id||''}')">Apply LOTO</button>`;
+  }
+  html += `</div>`;
+  
+  html += `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2);margin-top:15px"><h3>📝 Safety Permits</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Require management approval for high-risk work.</p>`;
+  if(activePermit) {
+    html += `<div style="padding:12px;background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:10px;margin-top:12px"><b style="color:#fcd34d;display:block;margin-bottom:4px">${esc(activePermit.permit_type.replaceAll('_',' ').toUpperCase())}</b> <small style="color:var(--pro-muted)">Status: ${esc(activePermit.status.toUpperCase())}</small><br>`;
+    if(activePermit.status === 'pending') {
+      if(['owner','manager','supervisor'].includes(role)) {
+        html += `<button class="success" style="margin-top:12px" type="button" onclick="approvePermit('${activePermit.id}')">✓ Approve Permit</button> `;
+      } else {
+        html += `<small style="display:block;margin-top:12px;color:var(--pro-muted)">Waiting for supervisor approval...</small>`;
+      }
+    } else if (activePermit.status === 'approved') {
+      html += `<button class="primary" style="margin-top:12px" type="button" onclick="closePermit('${activePermit.id}')">Close Permit</button>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div style="display:flex;gap:10px;margin-top:12px"><select id="newPermitType" style="flex:1;background:var(--pro-bg);border:1px solid var(--pro-line);color:var(--pro-text);border-radius:10px;padding:10px"><option value="hot_work">Hot Work</option><option value="confined_space">Confined Space</option><option value="heights">Working at Heights</option></select><button class="secondary" type="button" onclick="requestPermit('${id}')">Request</button></div>`;
+  }
+  html += `</div>`;
+  
+  $('#modalTitle').textContent = `Safety & Compliance`;
+  $('#fields').innerHTML = html;
+  
+  // Override form submission so pressing enter doesn't trigger the default work order save
+  $('#recordForm').onsubmit = e => { e.preventDefault(); closeCustomModal(); };
+  
+  const m=$('#modal'); m.style.removeProperty('display'); m.showModal ? m.showModal() : m.setAttribute('open','');
+};
+
+window.applyLoto = async (woId, assetId) => {
+  if(!assetId || assetId==='null') return toast('This Work Order has no specific asset assigned.');
+  const r = await sb.from('loto_procedures').insert({plant_id: plant.id, asset_id: assetId, work_order_id: woId, applied_by: userId});
+  if(r.error) return toast(r.error.message);
+  toast('LOTO Applied'); loadView(); closeCustomModal();
+};
+window.removeLoto = async (lotoId) => {
+  const r = await sb.from('loto_procedures').update({removed_at: new Date().toISOString(), removed_by: userId}).eq('id', lotoId);
+  if(r.error) return toast(r.error.message);
+  toast('LOTO Removed'); loadView(); closeCustomModal();
+};
+window.requestPermit = async (woId) => {
+  const pType = $('#newPermitType').value;
+  const r = await sb.from('permits').insert({plant_id: plant.id, work_order_id: woId, permit_type: pType, requested_by: userId});
+  if(r.error) return toast(r.error.message);
+  toast('Permit Requested'); loadView(); closeCustomModal();
+};
+window.approvePermit = async (permitId) => {
+  const r = await sb.from('permits').update({status: 'approved', approved_by: userId, approved_at: new Date().toISOString()}).eq('id', permitId);
+  if(r.error) return toast(r.error.message);
+  toast('Permit Approved'); loadView(); closeCustomModal();
+};
+window.closePermit = async (permitId) => {
+  const r = await sb.from('permits').update({status: 'closed'}).eq('id', permitId);
+  if(r.error) return toast(r.error.message);
+  toast('Permit Closed'); loadView(); closeCustomModal();
 };
