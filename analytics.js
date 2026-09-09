@@ -66,11 +66,11 @@ export function createAnalytics({ sb, $, esc, state, toast }) {
         <div class="grid dashboard-grid">
           <div class="card" style="padding: 20px; grid-column: span 1;">
             <h3>Work Order Status</h3>
-            <canvas id="woChart" width="100" height="100"></canvas>
+            <div style="position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 15px;"><canvas id="woChart"></canvas></div>
           </div>
           <div class="card" style="padding: 20px; grid-column: span 1;">
             <h3>Asset States</h3>
-            <canvas id="assetChart" width="100" height="100"></canvas>
+            <div style="position: relative; height: 220px; width: 100%; display: flex; justify-content: center; margin-top: 15px;"><canvas id="assetChart"></canvas></div>
           </div>
         </div>
       `;
@@ -91,7 +91,7 @@ export function createAnalytics({ sb, $, esc, state, toast }) {
           }]
         },
         options: {
-          responsive: true,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#f3f4f6' } } }
         }
       }));
@@ -111,7 +111,7 @@ export function createAnalytics({ sb, $, esc, state, toast }) {
           }]
         },
         options: {
-          responsive: true,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#f3f4f6' } } }
         }
       }));
