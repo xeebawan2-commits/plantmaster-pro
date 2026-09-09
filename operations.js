@@ -163,10 +163,6 @@ export function createOperations(ctx){
   function saveDownload(data,type,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
   function downloadCSV(filename,rows){if(!rows.length)return toast('Nothing to download');const keys=[...new Set(rows.flatMap(x=>Object.keys(x).filter(k=>typeof x[k]!=='object')))],csv=[keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=filename;a.click();URL.revokeObjectURL(a.href);toast('CSV downloaded')}
 
-  return{handles:v=>['people','checklists','maintenance','inventory','recovery'].includes(v),render,enhanceVoice,audit};
-}
-
-
   window.PMOps.requestSpare = id => {
     const s = cache.find(x => x.id === id);
     if(!s) return;
@@ -248,5 +244,5 @@ export function createOperations(ctx){
     window.PMOps.loadMaterialRequests();
   };
 
-  return { handles, render, openPeopleTab, enhanceVoice, audit };
+  return { handles: v => ['people','checklists','maintenance','inventory','recovery'].includes(v), render, openPeopleTab: section => { tab = section; return render('people'); }, enhanceVoice, audit };
 }
