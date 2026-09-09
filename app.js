@@ -86,7 +86,38 @@ window.editRecord=id=>openRecordForm(records.find(r=>r.id===id));window.removeRe
 function field(name,label,value='',type='text'){return`<label class="form-field"><span>${label}</span><input name="${name}" type="${type}" value="${esc(value)}" required></label>`}
 function openRecordForm(r={}){if(view==='files')return $('#fileInput')?.click()||createFileInput();$('#modalTitle').textContent=r.id?'Edit record':`Add ${view==='assets'?'asset':'work order'}`;if(view==='assets')$('#fields').innerHTML=field('asset_code','Asset code',r.asset_code)+field('name','Name',r.name)+field('asset_type','Type',r.asset_type)+field('location','Location',r.location)+field('manufacturer','Manufacturer',r.manufacturer)+field('model','Model',r.model)+field('serial_number','Serial number',r.serial_number)+field('rating','Rating / capacity',r.rating)+field('status','Status',r.status||'operational')+field('running_state','Running state',r.running_state||'shutdown');else $('#fields').innerHTML=field('title','Title',r.title)+`<label class="form-field"><span>Description</span><textarea name="description" required>${esc(r.description)}</textarea></label>`+field('priority','Priority',r.priority||'medium')+field('status','Status',r.status||'open')+field('due_at','Due date',r.due_at?.slice(0,16)||'','datetime-local');formHandler=async values=>{const table=view==='assets'?'assets':'work_orders',base={...r};delete base.assets;const record={...base,...values,id:r.id||crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,created_by:r.created_by||userId,updated_at:new Date().toISOString()};if(navigator.onLine){const{error}=await sb.from(table).upsert(record);if(error)throw error}else await enqueue({table,action:'upsert',record});await operations.audit(r.id?'record_updated':'record_created',table,record.id,{name:record.name||record.title});records=[record,...records.filter(item=>item.id!==record.id)];renderList();toast('Saved successfully');setTimeout(()=>loadView(),250)};const modal=$('#modal');modal.style.removeProperty('display');if(typeof modal.showModal==='function')modal.showModal();else{modal.setAttribute('open','');modal.style.display='block'}}
 $('#recordForm').onsubmit=async e=>{e.preventDefault();try{if(!userId){const result=await sb.auth.getUser();userId=result.data.user?.id;if(!userId)throw Error('Your session expired. Please sign in again.')}await formHandler(Object.fromEntries(new FormData(e.target)));if(typeof $('#modal').close==='function')$('#modal').close();else{$('#modal').removeAttribute('open');$('#modal').style.display='none'}}catch(x){console.error('Save failed',x);let box=$('#recordForm .form-error-inline');if(!box){box=document.createElement('div');box.className='form-error-inline';box.style.cssText='grid-column:1/-1;color:#fda4af;padding:9px;border:1px solid #9f1239;border-radius:9px;background:#3b0a19';$('#fields').prepend(box)}box.textContent=x.message||String(x);toast(x.message||String(x))}};
-window.completeWork=id=>{const r=records.find(x=>x.id===id);if(!r)return;$('#modalTitle').textContent=`Work Done — ${r.title}`;$('#fields').innerHTML=`<label class="form-field"><span>Work done</span><textarea name="work_done" required></textarea></label>${field('shift_name','Shift',profile.default_shift||'General Shift')}${field('designation','Designation',profile.designation||role)}<label class="form-field"><span>Tools used</span><textarea name="tools_used"></textarea></label><label class="form-field"><span>Parts used</span><textarea name="parts_used"></textarea></label><label class="form-field"><span>Measurements / readings</span><textarea name="measurements_text"></textarea></label><label class="form-field"><span>Root cause</span><textarea name="root_cause"></textarea></label><label class="form-field"><span>Corrective action</span><textarea name="corrective_action"></textarea></label>${field('downtime_minutes','Downtime minutes','0','number')}`;formHandler=async values=>{const completed_at=new Date().toISOString(),measurements={text:values.measurements_text||''};delete values.measurements_text;const update={...values,measurements,downtime_minutes:Number(values.downtime_minutes)||0,status:'completed',completed_by:userId,completed_at,updated_at:completed_at};const q=await sb.from('work_orders').update(update).eq('id',id);if(q.error)throw q.error;await operations.audit('work_order_completed','work_order',id,{title:r.title,shift_name:update.shift_name,designation:update.designation,downtime_minutes:update.downtime_minutes});toast('Work completion recorded');loadView()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m)};
+window.completeWork=async id=>{
+  const r=records.find(x=>x.id===id);if(!r)return;
+  
+  let currentMins = r.labor_minutes || 0;
+  if (r.started_at) {
+     const start = new Date(r.started_at).getTime();
+     const now = new Date().getTime();
+     currentMins += Math.floor((now - start) / 60000);
+  }
+
+  $('#modalTitle').textContent=`Work Done — ${r.title}`;
+  $('#fields').innerHTML=`<label class="form-field"><span>Work done</span><textarea name="work_done" required></textarea></label>${field('shift_name','Shift',profile.default_shift||'General Shift')}${field('designation','Designation',profile.designation||role)}<label class="form-field"><span>Tools used</span><textarea name="tools_used"></textarea></label><label class="form-field"><span>Parts used</span><textarea name="parts_used"></textarea></label><label class="form-field"><span>Measurements / readings</span><textarea name="measurements_text"></textarea></label><label class="form-field"><span>Root cause</span><textarea name="root_cause"></textarea></label><label class="form-field"><span>Corrective action</span><textarea name="corrective_action"></textarea></label>${field('downtime_minutes','Downtime minutes','0','number')}${field('labor_minutes','Total Labor (minutes)',currentMins,'number')}`;
+  
+  formHandler=async values=>{
+    const completed_at=new Date().toISOString(),measurements={text:values.measurements_text||''};
+    delete values.measurements_text;
+    
+    const finalMins = Number(values.labor_minutes) || 0;
+    const rate = profile.labor_rate_hourly || 0;
+    const totalCost = Number(((finalMins / 60) * rate).toFixed(2));
+
+    const update={...values, measurements, downtime_minutes:Number(values.downtime_minutes)||0, labor_minutes: finalMins, total_cost: totalCost, started_at: null, status:'completed', completed_by:userId, completed_at, updated_at:completed_at};
+    
+    const q=await sb.from('work_orders').update(update).eq('id',id);
+    if(q.error)throw q.error;
+    
+    await operations.audit('work_order_completed','work_order',id,{title:r.title,shift_name:update.shift_name,designation:update.designation,downtime_minutes:update.downtime_minutes,labor_minutes:update.labor_minutes,total_cost:update.total_cost});
+    toast('Work completion recorded. Cost calculated.');
+    loadView();
+  };
+  const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m);
+};
 window.reopenWork=async id=>{if(!['owner','manager','supervisor'].includes(role))return toast('Supervisor permission required to reopen work');if(!confirm('Reopen this completed work order?'))return;const q=await sb.from('work_orders').update({status:'open',updated_at:new Date().toISOString()}).eq('id',id);if(q.error)return toast(q.error.message);await operations.audit('work_order_reopened','work_order',id);toast('Work order reopened');loadView()};
 function createFileInput(){const i=document.createElement('input');i.type='file';i.id='fileInput';i.multiple=true;i.hidden=true;i.onchange=()=>uploadFiles(i.files);document.body.append(i);i.click()}
 async function uploadFiles(files){for(const file of files){const reserve=await sb.rpc('reserve_storage_upload',{p_organization_id:org.id,p_bytes:file.size,p_file_name:file.name,p_mime_type:file.type||'application/octet-stream'});if(reserve.error){toast(`${file.name}: ${reserve.error.message}`);continue}const reservationId=reserve.data,id=crypto.randomUUID(),path=`${org.id}/${plant.id}/${id}-${file.name.replace(/[^\w.-]/g,'_')}`;const upload=await sb.storage.from(FILE_BUCKET).upload(path,file);if(upload.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});toast(upload.error.message);continue}const meta=await sb.from('file_metadata').insert({id,organization_id:org.id,plant_id:plant.id,bucket:FILE_BUCKET,object_path:path,file_name:file.name,mime_type:file.type,size_bytes:file.size,category:'manual',uploaded_by:userId}).select('id').single();if(meta.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});toast(meta.error.message);continue}const finish=await sb.rpc('finalize_storage_upload',{p_reservation_id:reservationId,p_object_path:path,p_file_metadata_id:id});if(finish.error)toast(`Uploaded; usage recording warning: ${finish.error.message}`)}toast('Upload complete');loadView()}
@@ -282,3 +313,20 @@ async function globalSearch(q){if(!q.trim())return dashboard();const pattern=`%$
 async function loadQRLib(url,test){if(test())return true;return new Promise(ok=>{const s=document.createElement('script');s.src=url;s.onload=()=>ok(test());s.onerror=()=>ok(false);document.head.append(s)})}
 window.generateQR=async()=>{if(!await loadQRLib('https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',()=>!!window.QRCode))return toast('QR library unavailable');$('#qrOutput').innerHTML='';new QRCode($('#qrOutput'),{text:$('#qrText').value||location.href,width:220,height:220})};
 window.startQRScanner=async()=>{if(!isSecureContext)return toast('Camera requires HTTPS');if(!await loadQRLib('https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',()=>!!window.Html5Qrcode))return toast('Scanner unavailable');$('#qrReader').innerHTML='';const q=new Html5Qrcode('qrReader');q.start({facingMode:'environment'},{fps:10,qrbox:220},text=>{toast(`Scanned: ${text}`);q.stop()},()=>{}).catch(e=>toast(String(e)))};
+
+window.toggleTimer=async(id, isRunning)=>{
+  const r=records.find(x=>x.id===id); if(!r)return;
+  let update={};
+  if(!isRunning){
+    update={started_at:new Date().toISOString(), status: r.status==='open'?'in_progress':r.status};
+  } else {
+    const start = new Date(r.started_at).getTime();
+    const now = new Date().getTime();
+    const mins = Math.floor((now - start) / 60000);
+    update={started_at:null, labor_minutes: (r.labor_minutes||0) + mins};
+  }
+  const q=await sb.from('work_orders').update(update).eq('id',id);
+  if(q.error)return toast(q.error.message);
+  toast(isRunning ? 'Timer paused. Time logged.' : 'Timer started.');
+  loadView();
+};
