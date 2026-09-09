@@ -102,9 +102,53 @@ export function createOperations(ctx){
   window.PMOps.completeMaintenance=mid=>{const p=cache.find(x=>x.id===mid);dialog(`Complete — ${p.title}`,select('shift_name','Shift',shifts,actor().shift_name)+field('downtime_minutes','Downtime (minutes)','number','0',false,'min="0"')+area('work_done','Work done')+area('tools_used','Tools used','',false)+area('parts_used','Parts used','',false)+area('measurements','Measurements / readings','',false)+area('root_cause','Root cause','',false)+area('corrective_action','Corrective action','',false),async fd=>{const rec={id:id(),organization_id:S().org.id,plant_id:S().plant.id,plan_id:mid,work_done:value(fd,'work_done'),worker_id:S().userId,...actor(),shift_name:value(fd,'shift_name'),tools_used:value(fd,'tools_used')||null,parts_used:value(fd,'parts_used')||null,measurements:{text:value(fd,'measurements')},root_cause:value(fd,'root_cause')||null,corrective_action:value(fd,'corrective_action')||null,downtime_minutes:Number(value(fd,'downtime_minutes'))||0,completed_at:now()};let q=await sb.from('maintenance_completions').insert(rec);if(q.error)throw q.error;q=await sb.from('maintenance_plans').update({status:'completed',last_completed_at:rec.completed_at,last_completed_by:S().userId,updated_at:now()}).eq('id',mid);if(q.error)throw q.error;await audit('maintenance_completed','maintenance_completion',rec.id,{plan_id:mid,title:p.title,shift_name:rec.shift_name,downtime_minutes:rec.downtime_minutes});toast('Maintenance completion recorded');await loadMaintenance()}, {submit:'Record Work Done'})};
   async function maintenanceHistory(){try{const rows=await query(sb.from('maintenance_completions').select('*,maintenance_plans(title)').eq('plant_id',S().plant.id).order('completed_at',{ascending:false}).limit(100));dialog('Maintenance completion history',`<div class="span-2 table-wrap"><table><thead><tr><th>Date</th><th>Plan</th><th>Worker</th><th>Shift</th><th>Work done</th><th>Downtime</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${new Date(r.completed_at).toLocaleString()}</td><td>${esc(r.maintenance_plans?.title)}</td><td>${esc(r.worker_name)}<small>${esc(r.designation||'')}</small></td><td>${esc(r.shift_name)}</td><td>${esc(r.work_done)}</td><td>${r.downtime_minutes||0} min</td></tr>`).join('')}</tbody></table></div>`,async()=>{}, {submit:'Close'});const d=$('#opsDialog');d.querySelector('form').onsubmit=e=>{e.preventDefault();d.close()}}catch(e){toast(e.message)}}
 
-  async function loadInventory(){toolbar('Spares & Tools','Add Item');const [a,b]=await Promise.all([query(sb.from('spares').select('*').eq('plant_id',S().plant.id).is('removed_at',null)),query(sb.from('tools').select('*').eq('plant_id',S().plant.id).is('removed_at',null))]);cache=[...a.map(x=>({...x,_kind:'spare'})),...b.map(x=>({...x,_kind:'tool'}))];$('#opsAdd').onclick=inventoryAdd;paintInventory()}
-  function paintInventory(){$('#content').innerHTML=`<section class="module-head"><div><h1>Spares & Tools</h1><p>Stock movements, custody and calibration records</p></div><button class="secondary" id="inventoryHistory">Transaction History</button></section><div class="record-grid">${cache.filter(matches).map(x=>x._kind==='spare'?`<article class="record-card"><div class="record-title"><div><h3>${esc(x.description)}</h3><p>${esc(x.part_number||'No part number')} • ${esc(x.bin_location||'No bin')}</p></div>${stateBadge(Number(x.stock)<=Number(x.min_stock)?'Low stock':'In stock')}</div><dl><div><dt>Stock</dt><dd>${x.stock} ${esc(x.unit||'')}</dd></div><div><dt>Minimum</dt><dd>${x.min_stock}</dd></div><div><dt>Supplier</dt><dd>${esc(x.supplier||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.spareTransaction('${x.id}')">Receive / Issue</button>${owner()?`<button class="danger" onclick="PMOps.remove('spares','${x.id}')">Remove</button>`:''}</div></article>`:`<article class="record-card"><div class="record-title"><div><h3>${esc(x.name)}</h3><p>${esc(x.tool_code||'No code')} • ${esc(x.specification||'')}</p></div>${stateBadge(x.status)}</div><dl><div><dt>Condition</dt><dd>${esc(x.condition||'—')}</dd></div><div><dt>Calibration due</dt><dd>${esc(x.calibration_due||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.toolTransaction('${x.id}')">Checkout / Return</button>${owner()?`<button class="danger" onclick="PMOps.remove('tools','${x.id}')">Remove</button>`:''}</div></article>`).join('')||empty('Add spare parts or tools to begin tracking.')}</div>`;$('#inventoryHistory').onclick=inventoryHistory}
-  function inventoryAdd(){dialog('Add inventory item',select('kind','Item type',['spare','tool'],'spare')+field('code','Part / tool code','text','',false)+field('name','Description / name')+field('stock','Opening stock','number','0',false,'step="any"')+field('minimum','Minimum stock','number','0',false,'step="any"')+field('unit','Unit','text','pcs',false)+field('location','Bin / location','text','',false)+field('specification','Specification','text','',false)+field('calibration_due','Calibration due','date','',false),async fd=>{const kind=value(fd,'kind'),rec={id:id(),organization_id:S().org.id,plant_id:S().plant.id,updated_at:now()};if(kind==='spare')Object.assign(rec,{part_number:value(fd,'code')||null,description:value(fd,'name'),stock:Number(value(fd,'stock'))||0,min_stock:Number(value(fd,'minimum'))||0,unit:value(fd,'unit')||null,bin_location:value(fd,'location')||null});else Object.assign(rec,{tool_code:value(fd,'code')||null,name:value(fd,'name'),specification:value(fd,'specification')||null,condition:'good',calibration_due:value(fd,'calibration_due')||null,status:'available'});const q=await sb.from(kind==='spare'?'spares':'tools').insert(rec);if(q.error)throw q.error;await audit(`${kind}_created`,kind,rec.id,{name:value(fd,'name')});toast(`${kind} added`);await loadInventory()})}
+  async function loadInventory(){toolbar('Spares & Tools','Add Item');const [a,b]=await Promise.all([query(sb.from('spares').select('*, assets(name)').eq('plant_id',S().plant.id).is('removed_at',null)),query(sb.from('tools').select('*').eq('plant_id',S().plant.id).is('removed_at',null))]);cache=[...a.map(x=>({...x,_kind:'spare'})),...b.map(x=>({...x,_kind:'tool'}))];$('#opsAdd').onclick=inventoryAdd;paintInventory()}
+  function paintInventory(){$('#content').innerHTML=`<section class="module-head"><div><h1>Spares & Tools</h1><p>Stock movements, custody and calibration records</p></div><button class="secondary" onclick="PMOps.loadMaterialRequests()">🛒 Purchase Requests</button><button class="secondary" id="inventoryHistory">History</button></section><div class="record-grid">${cache.filter(matches).map(x=>x._kind==='spare'?`<article class="record-card"><div class="record-title"><div><h3>${esc(x.description)}</h3><p>${esc(x.assets?.name||'General Spares')} • ${esc(x.part_number||'No part number')} • ${esc(x.bin_location||'No bin')}</p></div>${stateBadge(Number(x.stock)<=Number(x.min_stock)?'Low stock':'In stock')}</div><dl><div><dt>Stock</dt><dd>${x.stock} ${esc(x.unit||'')}</dd></div><div><dt>Minimum</dt><dd>${x.min_stock}</dd></div><div><dt>Supplier</dt><dd>${esc(x.supplier||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.spareTransaction('${x.id}')">Receive / Issue</button>${owner()?`<button class="danger" onclick="PMOps.remove('spares','${x.id}')">Remove</button>`:''}</div></article>`:`<article class="record-card"><div class="record-title"><div><h3>${esc(x.name)}</h3><p>${esc(x.tool_code||'No code')} • ${esc(x.specification||'')}</p></div>${stateBadge(x.status)}</div><dl><div><dt>Condition</dt><dd>${esc(x.condition||'—')}</dd></div><div><dt>Calibration due</dt><dd>${esc(x.calibration_due||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.toolTransaction('${x.id}')">Checkout / Return</button>${owner()?`<button class="danger" onclick="PMOps.remove('tools','${x.id}')">Remove</button>`:''}</div></article>`).join('')||empty('Add spare parts or tools to begin tracking.')}</div>`;$('#inventoryHistory').onclick=inventoryHistory}
+  async function inventoryAdd(){
+    const aRes = await sb.from('assets').select('id,name').eq('plant_id',S().plant.id).is('removed_at',null);
+    const assetChoices = [['', 'General Spares (No specific machine)']];
+    if(aRes.data) aRes.data.forEach(a=>assetChoices.push([a.id, a.name]));
+
+    dialog('Add inventory item',
+      select('kind','Item type',['spare','tool'],'spare')+
+      field('code','Part / tool code','text','',false)+
+      field('name','Description / name')+
+      select('asset_id','Linked Asset (For Spares)',assetChoices,'')+
+      field('stock','Opening stock','number','0',false,'step="any"')+
+      field('minimum','Minimum stock','number','0',false,'step="any"')+
+      field('unit','Unit','text','pcs',false)+
+      field('location','Bin / location','text','',false)+
+      field('specification','Specification (Tools only)','text','',false)+
+      field('calibration_due','Calibration due (Tools only)','date','',false),
+    async fd=>{
+      const kind=value(fd,'kind'), rec={id:id(),organization_id:S().org.id,plant_id:S().plant.id,updated_at:now()};
+      if(kind==='spare'){
+         Object.assign(rec,{
+           part_number:value(fd,'code')||null,
+           description:value(fd,'name'),
+           asset_id:value(fd,'asset_id')||null,
+           stock:Number(value(fd,'stock'))||0,
+           min_stock:Number(value(fd,'minimum'))||0,
+           unit:value(fd,'unit')||null,
+           bin_location:value(fd,'location')||null
+         });
+      } else {
+         Object.assign(rec,{
+           tool_code:value(fd,'code')||null,
+           name:value(fd,'name'),
+           specification:value(fd,'specification')||null,
+           condition:'good',
+           calibration_due:value(fd,'calibration_due')||null,
+           status:'available'
+         });
+      }
+      const q=await sb.from(kind==='spare'?'spares':'tools').insert(rec);
+      if(q.error)throw q.error;
+      await audit(`${kind}_created`,kind,rec.id,{name:value(fd,'name')});
+      toast(`${kind} added`);
+      await loadInventory();
+    });
+  }
   window.PMOps.spareTransaction=sid=>{const x=cache.find(y=>y.id===sid);dialog(`Stock transaction — ${x.description}`,select('transaction_type','Transaction',['receive','issue','adjustment'],'receive')+field('quantity','Quantity','number','1',true,'step="any" min="0.001"')+field('reference','Reference / work order','text','',false)+select('shift_name','Shift',shifts,actor().shift_name),async fd=>{const type=value(fd,'transaction_type'),qty=Number(value(fd,'quantity'));const q=await sb.rpc('transact_spare',{p_spare_id:sid,p_type:type,p_quantity:qty,p_reference:value(fd,'reference')||null,p_worker_name:actor().worker_name,p_designation:actor().designation,p_shift_name:value(fd,'shift_name')});if(q.error)throw q.error;toast(`Stock updated to ${q.data}`);await loadInventory()})};
   window.PMOps.toolTransaction=tid=>{const x=cache.find(y=>y.id===tid);dialog(`Tool transaction — ${x.name}`,select('transaction_type','Action',['checkout','return','inspection','calibration'],'checkout')+field('holder_id','Holder user ID','text','',false)+field('condition','Condition','text',x.condition||'good',false)+select('shift_name','Shift',shifts,actor().shift_name)+area('notes','Notes','',false),async fd=>{const holder=value(fd,'holder_id')||null;if(holder&&!/^[0-9a-f-]{36}$/i.test(holder))throw Error('Holder user ID must be a valid UUID');const q=await sb.rpc('transact_tool',{p_tool_id:tid,p_type:value(fd,'transaction_type'),p_holder_id:holder,p_condition:value(fd,'condition')||null,p_notes:value(fd,'notes')||null,p_worker_name:actor().worker_name,p_designation:actor().designation,p_shift_name:value(fd,'shift_name')});if(q.error)throw q.error;toast(`Tool status: ${q.data}`);await loadInventory()})};
   async function inventoryHistory(){try{const [sp,tools]=await Promise.all([query(sb.from('inventory_transactions').select('*,spares(description)').order('created_at',{ascending:false}).limit(100)),query(sb.from('tool_transactions').select('*,tools(name)').eq('plant_id',S().plant.id).order('created_at',{ascending:false}).limit(100))]);dialog('Inventory transaction history',`<div class="span-2 table-wrap"><table><thead><tr><th>Date</th><th>Item</th><th>Action</th><th>Quantity / Worker</th><th>Reference</th></tr></thead><tbody>${sp.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString()}</td><td>${esc(r.spares?.description)}</td><td>${esc(r.transaction_type)}</td><td>${r.quantity}</td><td>${esc(r.reference||'')}</td></tr>`).join('')}${tools.map(r=>`<tr><td>${new Date(r.created_at).toLocaleString()}</td><td>${esc(r.tools?.name)}</td><td>${esc(r.transaction_type)}</td><td>${esc(r.worker_name)}</td><td>${esc(r.notes||'')}</td></tr>`).join('')}</tbody></table></div>`,async()=>{}, {submit:'Close'});const d=$('#opsDialog');d.querySelector('form').onsubmit=e=>{e.preventDefault();d.close()}}catch(e){toast(e.message)}}
@@ -121,3 +165,85 @@ export function createOperations(ctx){
 
   return{handles:v=>['people','checklists','maintenance','inventory','recovery'].includes(v),render,enhanceVoice,audit};
 }
+
+
+  window.PMOps.requestSpare = id => {
+    const s = cache.find(x => x.id === id);
+    if(!s) return;
+    dialog(`Request Purchase: ${s.description}`, 
+      field('quantity', 'Quantity needed', '1', 'number', true) + 
+      select('urgency', 'Urgency', ['low', 'normal', 'high', 'critical'], 'normal') + 
+      area('notes', 'Notes / Reason for request', '', false),
+      async fd => {
+        const rec = {
+          id: crypto.randomUUID(), organization_id: S().org.id, plant_id: S().plant.id,
+          spare_id: s.id, requested_by: S().userId,
+          quantity: Number(value(fd, 'quantity')) || 1,
+          urgency: value(fd, 'urgency'), notes: value(fd, 'notes'),
+          status: 'pending', created_at: now(), updated_at: now()
+        };
+        const q = await sb.from('material_requests').insert(rec);
+        if (q.error) throw q.error;
+        await audit('material_requested', 'material_request', rec.id, { spare: s.description, quantity: rec.quantity });
+        toast('Purchase request submitted to management');
+      }
+    );
+  };
+
+  window.PMOps.loadMaterialRequests = async () => {
+    $('#toolbar').hidden = true;
+    $('#content').innerHTML = '<div class="card"><h3>Loading requests...</h3></div>';
+    try {
+      const {data, error} = await sb.from('material_requests').select('*, spares(description, part_number)').eq('plant_id', S().plant.id).order('created_at', {ascending: false});
+      if(error) throw error;
+      
+      $('#content').innerHTML = `
+        <section class="module-head">
+          <div><h1>Purchase Requests</h1><p>Internal material requisitions sent to Management / Owners</p></div>
+          <button class="secondary" onclick="window.go('inventory')">Back to Inventory</button>
+        </section>
+        <div class="record-grid">
+          ${data.map(r => `
+            <article class="record-card">
+              <div class="record-title">
+                <div>
+                  <h3>${esc(r.spares?.description)}</h3>
+                  <p>Requested Qty: ${r.quantity} • Urgency: ${esc(r.urgency)}</p>
+                </div>
+                <span class="state ${r.status==='pending'?'warning':r.status==='received'?'operational':'standby'}">${esc(r.status)}</span>
+              </div>
+              <dl>
+                <div><dt>Date</dt><dd>${new Date(r.created_at).toLocaleDateString()}</dd></div>
+                <div><dt>Notes</dt><dd>${esc(r.notes||'--')}</dd></div>
+              </dl>
+              <div class="actions">
+                ${(owner() || leader()) && r.status === 'pending' ? `<button class="primary" onclick="PMOps.updateRequest('${r.id}', 'ordered')">Mark Ordered</button><button class="danger" onclick="PMOps.updateRequest('${r.id}', 'rejected')">Reject</button>` : ''}
+                ${(owner() || leader()) && r.status === 'ordered' ? `<button class="success" onclick="PMOps.receiveRequest('${r.id}', '${r.spare_id}', ${r.quantity})">✓ Mark Received (Adds to Stock)</button>` : ''}
+              </div>
+            </article>
+          `).join('') || '<div class="empty-state">No purchase requests pending.</div>'}
+        </div>
+      `;
+    } catch(e) {
+      toast(e.message);
+    }
+  };
+
+  window.PMOps.updateRequest = async (id, status) => {
+    const q = await sb.from('material_requests').update({status, managed_by: S().userId, updated_at: now()}).eq('id', id);
+    if(q.error) return toast(q.error.message);
+    toast('Request updated to ' + status);
+    window.PMOps.loadMaterialRequests();
+  };
+
+  window.PMOps.receiveRequest = async (reqId, spareId, qty) => {
+    let q = await sb.from('material_requests').update({status: 'received', managed_by: S().userId, updated_at: now()}).eq('id', reqId);
+    if(q.error) return toast(q.error.message);
+    
+    const {data: spare} = await sb.from('spares').select('stock').eq('id', spareId).maybeSingle();
+    if(spare) {
+      await sb.from('spares').update({stock: Number(spare.stock||0) + Number(qty), updated_at: now()}).eq('id', spareId);
+    }
+    toast('Part received! Stock automatically updated.');
+    window.PMOps.loadMaterialRequests();
+  };
