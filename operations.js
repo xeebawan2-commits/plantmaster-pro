@@ -106,14 +106,15 @@ export function createOperations(ctx){
   function paintInventory(){$('#content').innerHTML=`<section class="module-head"><div><h1>Spares & Tools</h1><p>Stock movements, custody and calibration records</p></div><button class="secondary" onclick="PMOps.loadMaterialRequests()">🛒 Purchase Requests</button><button class="secondary" id="inventoryHistory">History</button></section><div class="record-grid">${cache.filter(matches).map(x=>x._kind==='spare'?`<article class="record-card"><div class="record-title"><div><h3>${esc(x.description)}</h3><p>${esc(x.assets?.name||'General Spares')} • ${esc(x.part_number||'No part number')} • ${esc(x.bin_location||'No bin')}</p></div>${stateBadge(Number(x.stock)<=Number(x.min_stock)?'Low stock':'In stock')}</div><dl><div><dt>Stock</dt><dd>${x.stock} ${esc(x.unit||'')}</dd></div><div><dt>Minimum</dt><dd>${x.min_stock}</dd></div><div><dt>Supplier</dt><dd>${esc(x.supplier||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.spareTransaction('${x.id}')">Receive / Issue</button>${owner()?`<button class="danger" onclick="PMOps.remove('spares','${x.id}')">Remove</button>`:''}</div></article>`:`<article class="record-card"><div class="record-title"><div><h3>${esc(x.name)}</h3><p>${esc(x.tool_code||'No code')} • ${esc(x.specification||'')}</p></div>${stateBadge(x.status)}</div><dl><div><dt>Condition</dt><dd>${esc(x.condition||'—')}</dd></div><div><dt>Calibration due</dt><dd>${esc(x.calibration_due||'—')}</dd></div></dl><div class="actions"><button class="primary" onclick="PMOps.toolTransaction('${x.id}')">Checkout / Return</button>${owner()?`<button class="danger" onclick="PMOps.remove('tools','${x.id}')">Remove</button>`:''}</div></article>`).join('')||empty('Add spare parts or tools to begin tracking.')}</div>`;$('#inventoryHistory').onclick=inventoryHistory}
   async function inventoryAdd(){
     const aRes = await sb.from('assets').select('id,name').eq('plant_id',S().plant.id).is('removed_at',null);
-    const assetChoices = [['', 'General Spares (No specific machine)']];
-    if(aRes.data) aRes.data.forEach(a=>assetChoices.push([a.id, a.name]));
+    let assetHtml = '<option value="">General Spares (No specific machine)</option>';
+    if(aRes.data) aRes.data.forEach(a => assetHtml += `<option value="${a.id}">${esc(a.name)}</option>`);
+    const assetSelect = `<label class="form-field"><span>Linked Asset (For Spares)</span><select name="asset_id">${assetHtml}</select></label>`;
 
     dialog('Add inventory item',
       select('kind','Item type',['spare','tool'],'spare')+
       field('code','Part / tool code','text','',false)+
       field('name','Description / name')+
-      select('asset_id','Linked Asset (For Spares)',assetChoices,'')+
+      assetSelect+
       field('stock','Opening stock','number','0',false,'step="any"')+
       field('minimum','Minimum stock','number','0',false,'step="any"')+
       field('unit','Unit','text','pcs',false)+
@@ -167,7 +168,7 @@ export function createOperations(ctx){
     const s = cache.find(x => x.id === id);
     if(!s) return;
     dialog(`Request Purchase: ${s.description}`, 
-      field('quantity', 'Quantity needed', '1', 'number', true) + 
+      field('quantity', 'Quantity needed', 'number', '1', true, 'min=\"1\"') + 
       select('urgency', 'Urgency', ['low', 'normal', 'high', 'critical'], 'normal') + 
       area('notes', 'Notes / Reason for request', '', false),
       async fd => {
