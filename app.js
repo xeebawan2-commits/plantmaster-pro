@@ -45,7 +45,7 @@ window.retryCurrentView=()=>loadView();
 let pushSaveFailed=false;
 function notifBar(sub){if(!('Notification'in window))return'';const p=Notification.permission;
  if(p==='denied')return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;border-color:#7f1d1d;background:#2b0d0d">🔕 <span><b style="color:#f87171">Notifications are blocked</b> for this site in your browser — allow them (Phone Settings → Chrome → Site settings → Notifications) to receive plant alerts.</span></div>';
- if(p==='granted'&&sub===true&&!pushSaveFailed)return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;border-color:#14532d;background:#0d2b1e">🔔 <span><b style="color:#4ade80">Push alerts enabled</b> — work orders and alarms will notify this phone even when the app is closed.</span></div>';
+ if(p==='granted'&&sub===true&&!pushSaveFailed)return '';
  const label=sub===false?'Finish setup':(pushSaveFailed?'Retry server save':'Enable alerts');
  return '<div class="card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border-color:#78520f;background:#2a2108">🔔 <span style="flex:1;min-width:200px"><b style="color:#fbbf24">Push alerts are not fully on yet.</b> <span style="color:var(--mut,#9db2cc);font-size:13px">Turn them on to get work orders and alarms even when the app is closed.</span></span><button class="primary" style="padding:9px 16px;font-size:13.5px" onclick="window.enablePushAlerts()">'+label+'</button></div>'}
 async function renderNotifBar(){const wrap=$('#notifBarWrap');if(!wrap)return;let sub=null;try{if(window.PMPush&&window.PMPush.status)sub=(await window.PMPush.status())==='subscribed'}catch(_){sub=null}wrap.innerHTML=notifBar(sub)}
