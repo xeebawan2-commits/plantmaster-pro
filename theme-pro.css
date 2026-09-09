@@ -1,29 +1,29 @@
-/* PlantMaster Pro - 2-ocean Theme */
+/* PlantMaster Pro - 3-forest Theme */
 :root{
-  --pro-bg:#e0f2f1;
+  --pro-bg:#e8f5e9;
   --pro-surface:#ffffff;
-  --pro-surface-2:#f0fbfb;
-  --pro-line:#b2dfdb;
-  --pro-line-2:#80cbc4;
-  --pro-text:#004d40;
-  --pro-muted:#00796b;
-  --pro-accent:#00897b;
-  --pro-accent-2:#00695c;
-  --pro-radius:24px;
-  --pro-shadow:0 4px 12px rgba(0,105,92,0.1);
-  --pro-glow:0 0 15px rgba(0, 137, 123, 0.4);
-  --pro-grad:linear-gradient(92deg, #00695c, #00897b);
+  --pro-surface-2:#f1f8e9;
+  --pro-line:#c8e6c9;
+  --pro-line-2:#a5d6a7;
+  --pro-text:#1b5e20;
+  --pro-muted:#388e3c;
+  --pro-accent:#2e7d32;
+  --pro-accent-2:#1b5e20;
+  --pro-radius:16px;
+  --pro-shadow:0 4px 16px rgba(27,94,32,0.08);
+  --pro-glow:0 0 15px rgba(46, 125, 50, 0.4);
+  --pro-grad:linear-gradient(92deg, #1b5e20, #2e7d32);
   --pro-ink:#ffffff;
 }
 :root{
   --pm-bg:var(--pro-bg); --pm-panel:var(--pro-surface); --pm-panel-2:var(--pro-surface-2);
-  --pm-panel-3:#e0f2f1; --pm-line:var(--pro-line); --pm-text:var(--pro-text);
-  --pm-muted:var(--pro-muted); --pm-header:#ccedea; --pm-danger:#e53935;
-  --pm-warn:#fb8c00; --pm-ok:#43a047; --pm-radius:var(--pro-radius);
+  --pm-panel-3:#dcedc8; --pm-line:var(--pro-line); --pm-text:var(--pro-text);
+  --pm-muted:var(--pro-muted); --pm-header:#c5e1a5; --pm-danger:#d32f2f;
+  --pm-warn:#f57c00; --pm-ok:#2e7d32; --pm-radius:var(--pro-radius);
   --pm-shadow:var(--pro-shadow); --line:var(--pro-line); --muted:var(--pro-muted);
   --text:var(--pro-text); --surface:var(--pro-surface); --surface-2:var(--pro-surface-2);
   --primary:var(--pro-accent); --primary-strong:var(--pro-accent-2);
-  --success:#43a047; --danger:#e53935; --brand-primary:var(--pro-accent);
+  --success:#2e7d32; --danger:#d32f2f; --brand-primary:var(--pro-accent);
   --brand-secondary:var(--pro-accent-2);
 }
 
