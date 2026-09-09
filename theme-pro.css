@@ -10,20 +10,20 @@
    ============================================================ */
 
 :root{
-  --pro-bg:#121212;
-  --pro-surface:#1e1e1e;
-  --pro-surface-2:#2a2a2a;
-  --pro-line:#333333;
-  --pro-line-2:#444444;
-  --pro-text:#e0e0e0;
-  --pro-muted:#a0a0a0;
-  --pro-accent:#00d4ff;
-  --pro-accent-2:#0099cc;
-  --pro-radius:12px;
-  --pro-shadow:0 4px 12px rgba(0,0,0,0.5);
-  --pro-glow:0 0 15px rgba(0, 212, 255, 0.4);
-  --pro-grad:linear-gradient(92deg, #0099cc, #00d4ff);
-  --pro-ink:#000000;
+  --pro-bg:#e0f2f1;
+  --pro-surface:#ffffff;
+  --pro-surface-2:#f0fbfb;
+  --pro-line:#b2dfdb;
+  --pro-line-2:#80cbc4;
+  --pro-text:#004d40;
+  --pro-muted:#00796b;
+  --pro-accent:#00897b;
+  --pro-accent-2:#00695c;
+  --pro-radius:24px;
+  --pro-shadow:0 4px 12px rgba(0,105,92,0.1);
+  --pro-glow:0 0 15px rgba(0, 137, 123, 0.4);
+  --pro-grad:linear-gradient(92deg, #00695c, #00897b);
+  --pro-ink:#ffffff;
 }
 
 /* ---------- ROOT-CAUSE FIX: override base CSS variables ---------- */
@@ -31,14 +31,14 @@
   --pm-bg:var(--pro-bg);
   --pm-panel:var(--pro-surface);
   --pm-panel-2:var(--pro-surface-2);
-  --pm-panel-3:#333333;
+  --pm-panel-3:#e0f2f1;
   --pm-line:var(--pro-line);
   --pm-text:var(--pro-text);
   --pm-muted:var(--pro-muted);
-  --pm-header:#1a1a1a;
-  --pm-danger:#ff4b4b;
-  --pm-warn:#f5a623;
-  --pm-ok:#00e676;
+  --pm-header:#ccedea;
+  --pm-danger:#e53935;
+  --pm-warn:#fb8c00;
+  --pm-ok:#43a047;
   --pm-radius:var(--pro-radius);
   --pm-shadow:var(--pro-shadow);
   --line:var(--pro-line);
@@ -48,8 +48,8 @@
   --surface-2:var(--pro-surface-2);
   --primary:var(--pro-accent);
   --primary-strong:var(--pro-accent-2);
-  --success:#00e676;
-  --danger:#ff4b4b;
+  --success:#43a047;
+  --danger:#e53935;
   --brand-primary:var(--pro-accent);
   --brand-secondary:var(--pro-accent-2);
 }
