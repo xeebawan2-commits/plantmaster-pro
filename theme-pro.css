@@ -10,48 +10,48 @@
    ============================================================ */
 
 :root{
-  --pro-bg:#f3ede6;
-  --pro-surface:#ffffff;
-  --pro-surface-2:#f8f4ee;
-  --pro-line:#e5dbcd;
-  --pro-line-2:#cbb9a6;
-  --pro-text:#2b211a;
-  --pro-muted:#7d6c5e;
-  --pro-accent:#9f8170;
-  --pro-accent-2:#7d5f4b;
-  --pro-radius:18px;
-  --pro-shadow:0 1px 2px rgba(93,72,55,.05),0 10px 28px rgba(93,72,55,.08),0 28px 64px rgba(93,72,55,.10);
-  --pro-glow:0 8px 30px rgba(159,129,112,.20);
-  --pro-grad:linear-gradient(92deg,#7d5f4b,#9f8170);
-  --pro-ink:#ffffff;
+  --pro-bg:#121212;
+  --pro-surface:#1e1e1e;
+  --pro-surface-2:#2a2a2a;
+  --pro-line:#333333;
+  --pro-line-2:#444444;
+  --pro-text:#e0e0e0;
+  --pro-muted:#a0a0a0;
+  --pro-accent:#00d4ff;
+  --pro-accent-2:#0099cc;
+  --pro-radius:12px;
+  --pro-shadow:0 4px 12px rgba(0,0,0,0.5);
+  --pro-glow:0 0 15px rgba(0, 212, 255, 0.4);
+  --pro-grad:linear-gradient(92deg, #0099cc, #00d4ff);
+  --pro-ink:#000000;
 }
 
 /* ---------- ROOT-CAUSE FIX: override base CSS variables ---------- */
 :root{
-  --pm-bg:#f3ede6;
-  --pm-panel:#ffffff;
-  --pm-panel-2:#faf7f2;
-  --pm-panel-3:#f1e9db;
-  --pm-line:#e5dbcd;
-  --pm-text:#2b211a;
-  --pm-muted:#7a6a5c;
-  --pm-header:#f6f0e8;
-  --pm-danger:#e11d48;
-  --pm-warn:#d97706;
-  --pm-ok:#059669;
-  --pm-radius:18px;
-  --pm-shadow:0 10px 28px rgba(93,72,55,.08);
-  --line:#e5dbcd;
-  --muted:#7a6a5c;
-  --text:#2b211a;
-  --surface:#ffffff;
-  --surface-2:#faf7f2;
-  --primary:#9f8170;
-  --primary-strong:#7d5f4b;
-  --success:#059669;
-  --danger:#e11d48;
-  --brand-primary:#9f8170;
-  --brand-secondary:#7d5f4b;
+  --pm-bg:var(--pro-bg);
+  --pm-panel:var(--pro-surface);
+  --pm-panel-2:var(--pro-surface-2);
+  --pm-panel-3:#333333;
+  --pm-line:var(--pro-line);
+  --pm-text:var(--pro-text);
+  --pm-muted:var(--pro-muted);
+  --pm-header:#1a1a1a;
+  --pm-danger:#ff4b4b;
+  --pm-warn:#f5a623;
+  --pm-ok:#00e676;
+  --pm-radius:var(--pro-radius);
+  --pm-shadow:var(--pro-shadow);
+  --line:var(--pro-line);
+  --muted:var(--pro-muted);
+  --text:var(--pro-text);
+  --surface:var(--pro-surface);
+  --surface-2:var(--pro-surface-2);
+  --primary:var(--pro-accent);
+  --primary-strong:var(--pro-accent-2);
+  --success:#00e676;
+  --danger:#ff4b4b;
+  --brand-primary:var(--pro-accent);
+  --brand-secondary:var(--pro-accent-2);
 }
 
 /* ---------- base: plain warm beige, no lines ---------- */
