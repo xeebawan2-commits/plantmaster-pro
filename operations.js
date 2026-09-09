@@ -247,3 +247,6 @@ export function createOperations(ctx){
     toast('Part received! Stock automatically updated.');
     window.PMOps.loadMaterialRequests();
   };
+
+  return { handles, render, openPeopleTab, enhanceVoice, audit };
+}
