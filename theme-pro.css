@@ -9,12 +9,12 @@
 
 :root{
   --pro-bg:#000000;
-  --pro-surface:#0a0a0a;
-  --pro-surface-2:#111111;
-  --pro-line:#1f1f1f;
-  --pro-line-2:#333333;
-  --pro-text:#e6eef8;
-  --pro-muted:#8fa3bd;
+  --pro-surface:#181818;
+  --pro-surface-2:#202020;
+  --pro-line:#2e2e2e;
+  --pro-line-2:#3d3d3d;
+  --pro-text:#f3f4f6;
+  --pro-muted:#9ca3af;
   --pro-accent:#22d3ee;
   --pro-accent-2:#0ea5e9;
   --pro-radius:14px;
@@ -34,7 +34,7 @@ h1{font-size:1.55rem;letter-spacing:-.02em;font-weight:800}
 h2{letter-spacing:-.01em;font-weight:750}
 ::selection{background:rgba(34,211,238,.28)}
 *::-webkit-scrollbar{width:10px;height:10px}
-*::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:99px;border:2px solid var(--pro-bg)}
+*::-webkit-scrollbar-thumb{background:var(--pro-line-2);border-radius:99px;border:2px solid var(--pro-bg)}
 *::-webkit-scrollbar-track{background:transparent}
 :focus-visible{outline:2px solid var(--pro-accent);outline-offset:2px}
 
@@ -104,7 +104,7 @@ h2{letter-spacing:-.01em;font-weight:750}
 
 /* ---------- header ---------- */
 header{
-  background:rgba(7,16,28,.82);
+  background:var(--pro-surface);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
   border-bottom:1px solid var(--pro-line);
@@ -129,7 +129,7 @@ aside{background:rgba(7,16,28,.92);backdrop-filter:blur(8px);border-right:1px so
 aside nav{gap:4px;padding:4px}
 aside button{
   border-radius:11px;background:transparent;border:1px solid transparent;
-  color:#c3d2e4;font-weight:600;font-size:13.5px;
+  color:var(--pro-text);font-weight:600;font-size:13.5px;
   padding:11px 13px;min-height:44px;transition:background .12s,color .12s;
 }
 aside button:hover{background:var(--pro-surface-2);color:var(--pro-text)}
@@ -160,7 +160,7 @@ main{padding:18px}
 }
 .card:hover{border-color:color-mix(in srgb, var(--brand-primary,#0ea5e9) 55%, var(--pro-line));transform:translateY(-1px)}
 .kpi{
-  background:linear-gradient(150deg, #10233c, var(--pro-surface-2));
+  background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
   border:1px solid var(--pro-line-2);
   border-radius:var(--pro-radius);
   position:relative;overflow:hidden;
@@ -204,7 +204,7 @@ button.secondary,button.danger{border-radius:11px}
 /* ---------- tables ---------- */
 .table-wrap{border-color:var(--pro-line);border-radius:12px;overflow:hidden}
 table{min-width:640px}
-th{background:#10213a;color:#b8d7f5;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
+th{background:var(--pro-surface-2);color:var(--pro-muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
 tr:nth-child(even) td{background:rgba(16,33,58,.25)}
 tr:hover td{background:rgba(34,211,238,.05)}
 td{border-bottom:1px solid var(--pro-line)}
@@ -215,7 +215,7 @@ td{border-bottom:1px solid var(--pro-line)}
 
 /* ---------- toast ---------- */
 #toast{
-  background:linear-gradient(150deg,#10233c,#0a1422);
+  background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
   border:1px solid var(--pro-accent);
   border-radius:12px;
   box-shadow:0 14px 40px rgba(0,0,0,.5), 0 0 0 4px rgba(34,211,238,.08);
@@ -240,7 +240,7 @@ td{border-bottom:1px solid var(--pro-line)}
   position:fixed;left:16px;bottom:16px;z-index:60;
   display:flex;align-items:center;gap:12px;
   max-width:min(400px,calc(100vw - 32px));
-  background:linear-gradient(150deg,#10233c,#0a1422);
+  background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
   border:1px solid rgba(34,211,238,.4);
   border-radius:16px;padding:14px 16px;
   box-shadow:0 20px 60px rgba(0,0,0,.55), 0 0 0 5px rgba(14,165,233,.06);
@@ -248,7 +248,7 @@ td{border-bottom:1px solid var(--pro-line)}
 }
 @keyframes pmup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 #pushBanner .pb-ico{font-size:22px}
-#pushBanner .pb-txt{font-size:13px;line-height:1.4;color:#c3d2e4}
+#pushBanner .pb-txt{font-size:13px;line-height:1.4;color:var(--pro-text)}
 #pushBanner .pb-txt b{display:block;color:#fff;font-size:13.5px;margin-bottom:2px}
 #pushBanner button{border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;min-height:38px}
 #pushBanner .pb-yes{background:var(--pro-grad)!important;border:none!important;color:var(--pro-ink)!important;font-weight:800}
@@ -258,4 +258,9 @@ td{border-bottom:1px solid var(--pro-line)}
 /* Force override of grid lines to ensure polished black background */
 body[data-pattern] {
   background-image: none !important;
+}
+
+/* Force KPI text to match the new neutral text */
+.kpi span {
+  color: var(--pro-text) !important;
 }
