@@ -8,11 +8,11 @@
    ============================================================ */
 
 :root{
-  --pro-bg:#07101c;
-  --pro-surface:#0d1a2b;
-  --pro-surface-2:#0b1523;
-  --pro-line:#1c2c42;
-  --pro-line-2:#27405f;
+  --pro-bg:#000000;
+  --pro-surface:#0a0a0a;
+  --pro-surface-2:#111111;
+  --pro-line:#1f1f1f;
+  --pro-line-2:#333333;
   --pro-text:#e6eef8;
   --pro-muted:#8fa3bd;
   --pro-accent:#22d3ee;
@@ -23,10 +23,7 @@
 
 /* ---------- base ---------- */
 body{
-  background:
-    radial-gradient(900px 420px at 78% -10%, rgba(14,165,233,.14), transparent 60%),
-    radial-gradient(700px 380px at 8% 110%, rgba(34,211,238,.07), transparent 60%),
-    var(--pro-bg);
+  background:var(--pro-bg)!important;
   background-attachment:fixed;
   color:var(--pro-text);
   font-size:14.5px;
@@ -257,3 +254,8 @@ td{border-bottom:1px solid var(--pro-line)}
 #pushBanner .pb-yes{background:var(--pro-grad)!important;border:none!important;color:var(--pro-ink)!important;font-weight:800}
 #pushBanner .pb-no{background:transparent;border:1px solid var(--pro-line-2);color:var(--pro-muted)}
 @media(max-width:700px){#pushBanner{bottom:86px;left:12px}}
+
+/* Force override of grid lines to ensure polished black background */
+body[data-pattern] {
+  background-image: none !important;
+}
