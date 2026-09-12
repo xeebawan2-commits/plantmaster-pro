@@ -12,6 +12,23 @@
 
 export function createCsvImport(ctx){
   const {sb,$,esc,toast}=ctx;
+
+  // Shares the procurement stylesheet; inject a minimal fallback if that
+  // module has not been opened yet this session.
+  if(!document.getElementById('pmProcCss')&&!document.getElementById('pmCsvCss')){
+    const st=document.createElement('style');
+    st.id='pmCsvCss';
+    st.textContent=`
+      .data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+      .data-table th,.data-table td{padding:9px 10px;text-align:left;
+        border-bottom:1px solid var(--pm-line,#2b4a68)}
+      .data-table th{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--pm-muted,#8aa2ba)}
+      #fields .form-field.wide{grid-column:1/-1}
+      @media(max-width:700px){.data-table{display:block;overflow-x:auto;white-space:nowrap}}
+    `;
+    document.head.appendChild(st);
+  }
+
   const S=()=>ctx.state();
   const now=()=>new Date().toISOString();
 

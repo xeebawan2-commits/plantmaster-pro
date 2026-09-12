@@ -14,6 +14,37 @@
 
 export function createProcurement(ctx){
   const {sb,$,esc,toast}=ctx;
+
+  // Self-contained styles — avoids adding a 7th CSS file to index.html.
+  if(!document.getElementById('pmProcCss')){
+    const st=document.createElement('style');
+    st.id='pmProcCss';
+    st.textContent=`
+      .list{display:grid;gap:14px}
+      .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+      .card-head h3{margin:0;font-size:16px}
+      .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;
+        background:color-mix(in srgb,var(--brand-primary) 22%,transparent);
+        border:1px solid color-mix(in srgb,var(--brand-primary) 45%,var(--pm-line,#2b4a68));color:#dbeafe}
+      .data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+      .data-table th,.data-table td{padding:9px 10px;text-align:left;
+        border-bottom:1px solid var(--pm-line,#2b4a68)}
+      .data-table th{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--pm-muted,#8aa2ba)}
+      .data-table tbody tr:last-child td{border-bottom:none}
+      .totals{display:grid;gap:6px;margin:10px 0 0;max-width:320px;margin-left:auto}
+      .totals div{display:flex;justify-content:space-between;gap:18px;padding:7px 11px;
+        background:#071422;border-radius:9px}
+      .totals dt{color:var(--pm-muted,#8aa2ba);font-size:12.5px;margin:0}
+      .totals dd{margin:0;font-weight:700}
+      #fields .form-field.wide{grid-column:1/-1}
+      @media(max-width:700px){
+        .data-table{display:block;overflow-x:auto;white-space:nowrap}
+        .totals{max-width:none}
+      }
+    `;
+    document.head.appendChild(st);
+  }
+
   const S=()=>ctx.state();
   const audit=ctx.audit||(async()=>{});
   const enhanceVoice=ctx.enhanceVoice||(()=>{});
@@ -140,10 +171,10 @@ export function createProcurement(ctx){
     const totalOpen=cache.filter(p=>!['received','cancelled'].includes(p.status))
                          .reduce((a,b)=>a+Number(b.total||0),0);
 
-    const head=`<div class="summary-row">
-      <article class="stat"><b>${cache.length}</b><span>Purchase orders</span></article>
-      <article class="stat"><b>${cache.filter(p=>p.status==='pending_approval').length}</b><span>Awaiting approval</span></article>
-      <article class="stat"><b>${money(totalOpen)}</b><span>Open commitment</span></article>
+    const head=`<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <article class="kpi"><span>Purchase orders</span><strong>${cache.length}</strong></article>
+      <article class="kpi"><span>Awaiting approval</span><strong>${cache.filter(p=>p.status==='pending_approval').length}</strong></article>
+      <article class="kpi"><span>Open commitment</span><strong style="font-size:20px">${money(totalOpen)}</strong></article>
     </div>`;
 
     if(!rows.length) return $('#content').innerHTML=head+empty('No purchase orders yet. Tap Add to raise one.');
