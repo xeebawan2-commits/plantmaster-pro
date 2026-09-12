@@ -81,10 +81,29 @@ export function createProcurement(ctx){
     `<label class="form-field"><span>${esc(label)}${required?' *':''}</span><select name="${name}" ${required?'required':''}>${options(items,selected)}</select></label>`;
 
   // dialog() mirrors the helper in operations.js — uses the existing #modal element
+  // Renders an error strip INSIDE the modal. Required because #toast is not in
+  // the top layer and is therefore invisible while a modal dialog is open.
+  function showDialogError(msg){
+    const f=$('#recordForm'); if(!f)return;
+    let box=f.querySelector('#pmDialogErr');
+    if(!msg){ if(box)box.remove(); return; }
+    if(!box){
+      box=document.createElement('div');
+      box.id='pmDialogErr';
+      box.style.cssText='margin:10px 0;padding:11px 13px;border-radius:10px;'+
+        'background:#2b0d0d;border:1px solid #7f1d1d;color:#fca5a5;'+
+        'font-size:13px;line-height:1.45;white-space:pre-wrap';
+      $('#fields').insertAdjacentElement('beforebegin',box);
+    }
+    box.textContent='⚠ '+msg;
+    box.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+
   function dialog(title,html,onSave){
     const m=$('#modal'),f=$('#recordForm');
     $('#modalTitle').textContent=title;
     $('#fields').innerHTML=html;
+    showDialogError('');
     enhanceVoice($('#fields'));
     // app.js's Cancel/X handler can leave an inline display:none on the dialog.
     m.style.removeProperty('display');
@@ -104,8 +123,18 @@ export function createProcurement(ctx){
         return;
       }
       const btn=$('#saveRecord');btn.disabled=true;
+      showDialogError('');
       try{ await onSave(new FormData(f)); m.close(); }
-      catch(err){ console.error('Save failed',err); toast(err.message||'Save failed'); }
+      catch(err){
+        console.error('Save failed',err);
+        // A <dialog> opened with showModal() sits in the browser top layer, so a
+        // position:fixed #toast renders UNDERNEATH it and is never seen.
+        // Show the error inside the dialog instead.
+        const msg=[err.message,err.details,err.hint].filter(Boolean).join(' — ')
+                  ||'Save failed';
+        showDialogError(msg+(err.code?` (code ${err.code})`:''));
+        toast(msg);
+      }
       finally{ btn.disabled=false; }
     };
     m.showModal();
