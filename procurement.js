@@ -37,6 +37,9 @@ export function createProcurement(ctx){
       .totals dt{color:var(--pm-muted,#8aa2ba);font-size:12.5px;margin:0}
       .totals dd{margin:0;font-weight:700}
       #fields .form-field.wide{grid-column:1/-1}
+      .pm-invalid input,.pm-invalid select,.pm-invalid textarea,
+      input.pm-invalid,select.pm-invalid,textarea.pm-invalid{
+        border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.22)!important}
       @media(max-width:700px){
         .data-table{display:block;overflow-x:auto;white-space:nowrap}
         .totals{max-width:none}
@@ -83,14 +86,32 @@ export function createProcurement(ctx){
     $('#modalTitle').textContent=title;
     $('#fields').innerHTML=html;
     enhanceVoice($('#fields'));
+    // app.js's Cancel/X handler can leave an inline display:none on the dialog.
+    m.style.removeProperty('display');
     f.onsubmit=async e=>{
       e.preventDefault();
+      // A required field that is scrolled out of view shows its native
+      // validation bubble off-screen, so the Save button looks dead.
+      // Surface the problem explicitly instead.
+      const bad=f.querySelector(':invalid');
+      if(bad){
+        bad.scrollIntoView({block:'center',behavior:'smooth'});
+        bad.focus({preventScroll:true});
+        bad.classList.add('pm-invalid');
+        setTimeout(()=>bad.classList.remove('pm-invalid'),2200);
+        const lbl=bad.closest('.form-field')?.querySelector('span')?.textContent||'A required field';
+        toast(`${lbl.replace(' *','')} is required`);
+        return;
+      }
       const btn=$('#saveRecord');btn.disabled=true;
       try{ await onSave(new FormData(f)); m.close(); }
-      catch(err){ toast(err.message||'Save failed'); }
+      catch(err){ console.error('Save failed',err); toast(err.message||'Save failed'); }
       finally{ btn.disabled=false; }
     };
     m.showModal();
+    // Always start at the top so required fields are not hidden above the fold.
+    $('#fields').scrollTop=0;
+    f.querySelector('input,select,textarea')?.focus({preventScroll:true});
   }
 
   // ---------------------------------------------------------------- data

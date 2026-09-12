@@ -213,6 +213,7 @@ export function createCsvImport(ctx){
       }
     };
 
+    m.style.removeProperty('display');
     m.showModal();
   }
 
