@@ -85,16 +85,22 @@ export function createProcurement(ctx){
   // ---------------------------------------------------------------- render
   async function render(v){
     module=v;
-    $('#toolbar').hidden=false;
+    const bar=$('#toolbar');
+    if(bar){
+      bar.hidden=false;
+      // operations.js replaces the toolbar with its own markup (#opsSearch/#opsAdd),
+      // which destroys #search and #add. Rebuild them if they are missing.
+      if(!$('#add')||!$('#search')){
+        bar.innerHTML='<input id="search" placeholder="Search current module…"><button id="add">＋ Add</button>';
+      }
+    }
     const add=$('#add');
     if(v==='suppliers'){
-      add.hidden=!leader();
-      add.onclick=()=>supplierForm();
+      if(add){add.hidden=!leader();add.onclick=()=>supplierForm();}
       await loadSuppliers();
       return renderSuppliers();
     }
-    add.hidden=!leader();
-    add.onclick=()=>poForm();
+    if(add){add.hidden=!leader();add.onclick=()=>poForm();}
     await Promise.all([loadPOs(),loadSuppliers()]);
     return renderPOs();
   }
