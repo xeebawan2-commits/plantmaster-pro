@@ -224,7 +224,8 @@ export function createOperations(ctx){
               </dl>
               <div class="actions">
                 ${(owner() || leader()) && r.status === 'pending' ? `<button class="primary" onclick="PMOps.updateRequest('${r.id}', 'ordered')">Mark Ordered</button><button class="danger" onclick="PMOps.updateRequest('${r.id}', 'rejected')">Reject</button>` : ''}
-                ${(owner() || leader()) && r.status === 'ordered' ? `<button class="success" onclick="PMOps.receiveRequest('${r.id}', '${r.spare_id}', ${r.quantity})">✓ Mark Received (Adds to Stock)</button>` : ''}
+                ${(owner() || leader()) && r.status === 'ordered' && !r.purchase_order_id ? `<button class="success" onclick="PMOps.receiveRequest('${r.id}', '${r.spare_id}', ${r.quantity})">✓ Mark Received (Adds to Stock)</button>` : ''}
+                ${r.purchase_order_id ? `<button class="secondary" onclick="window.go('procurement')">Receive on ${esc(r.purchase_orders?.po_number||'the PO')} →</button>` : ''}
               </div>
             </article>
           `).join('') || '<div class="empty-state">No purchase requests pending.</div>'}
@@ -243,6 +244,12 @@ export function createOperations(ctx){
   };
 
   window.PMOps.receiveRequest = async (reqId, spareId, qty) => {
+    // Refuse if this request was converted to a PO. Receiving the PO line is
+    // what moves stock; doing it here as well would count the quantity twice.
+    const {data: link} = await sb.from('material_requests').select('purchase_order_id').eq('id', reqId).maybeSingle();
+    if(link && link.purchase_order_id){
+      return toast('This request is on a purchase order — receive it there so stock is only counted once');
+    }
     let q = await sb.from('material_requests').update({status: 'received', managed_by: S().userId, updated_at: now()}).eq('id', reqId);
     if(q.error) return toast(q.error.message);
     
