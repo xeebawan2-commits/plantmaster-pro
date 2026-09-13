@@ -83,21 +83,8 @@ async function dashboard() {
       <button type="button" class="card dashboard-link" onclick="window.go('checklists')"><h3>✅ Checklists</h3><p>Templates and completed runs</p><span>Open Checklists →</span></button>
       <button type="button" class="card dashboard-link" onclick="window.go('maintenance')"><h3>🛠 Maintenance</h3><p>Weekly, monthly and yearly plans</p><span>Open Maintenance →</span></button>
       <button type="button" class="card dashboard-link" onclick="window.go('inventory')"><h3>📦 Spares & Tools</h3><p>Stock, custody and calibration</p><span>Open Inventory →</span></button>
-    </div>
-
-    <div style="display:flex; justify-content:space-around; align-items:center; background:var(--pro-surface-2); padding:18px 5px; border-radius:var(--pro-radius); border:1px solid var(--pro-line); margin-top:20px;">
-      <button type="button" onclick="window.go('commercial')" style="flex:1;background:transparent;border:none;color:var(--pro-muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
-        <span style="font-size:26px;">◈</span>
-        <span style="font-size:12.5px;font-weight:600;">Plan & Usage</span>
-      </button>
-      <button type="button" onclick="window.go('appsupport')" style="flex:1;background:transparent;border:none;color:var(--pro-muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border-left:1px solid var(--pro-line);border-right:1px solid var(--pro-line);">
-        <span style="font-size:26px;">◉</span>
-        <span style="font-size:12.5px;font-weight:600;">App Complaints</span>
-      </button>
-      <button type="button" onclick="window.go('support')" style="flex:1;background:transparent;border:none;color:var(--pro-muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;">
-        <span style="font-size:26px;">💬</span>
-        <span style="font-size:12.5px;font-weight:600;">Technical Support</span>
-      </button>
+      <button type="button" class="card dashboard-link" onclick="window.go('procurement')"><h3>🧾 Purchase Orders</h3><p>Requests, approvals and goods receipt</p><span>Open Purchase Orders →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('suppliers')"><h3>🏷 Suppliers</h3><p>Vendors, NTN/STRN and payment terms</p><span>Open Suppliers →</span></button>
     </div>
   `;
   renderNotifBar();
