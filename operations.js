@@ -191,13 +191,21 @@ export function createOperations(ctx){
     $('#toolbar').hidden = true;
     $('#content').innerHTML = '<div class="card"><h3>Loading requests...</h3></div>';
     try {
-      const {data, error} = await sb.from('material_requests').select('*, spares(description, part_number)').eq('plant_id', S().plant.id).order('created_at', {ascending: false});
+      // The purchase_orders embed needs the FK added by 01-schema-procurement.sql.
+      // If that migration has not been run, fall back rather than break the screen.
+      let {data, error} = await sb.from('material_requests').select('*, spares(description, part_number), purchase_orders(po_number,status)').eq('plant_id', S().plant.id).order('created_at', {ascending: false});
+      if(error){
+        ({data, error} = await sb.from('material_requests').select('*, spares(description, part_number)').eq('plant_id', S().plant.id).order('created_at', {ascending: false}));
+      }
       if(error) throw error;
       
       $('#content').innerHTML = `
         <section class="module-head">
           <div><h1>Purchase Requests</h1><p>Internal material requisitions sent to Management / Owners</p></div>
-          <button class="secondary" onclick="window.go('inventory')">Back to Inventory</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${(owner()||leader())?`<button class="primary" onclick="window.PMProc.convertRequests()">\u2192 Convert to PO</button>`:''}
+            <button class="secondary" onclick="window.go('inventory')">Back to Inventory</button>
+          </div>
         </section>
         <div class="record-grid">
           ${data.map(r => `
@@ -212,6 +220,7 @@ export function createOperations(ctx){
               <dl>
                 <div><dt>Date</dt><dd>${new Date(r.created_at).toLocaleDateString()}</dd></div>
                 <div><dt>Notes</dt><dd>${esc(r.notes||'--')}</dd></div>
+                ${r.purchase_orders?`<div><dt>Purchase order</dt><dd>${esc(r.purchase_orders.po_number)} (${esc(r.purchase_orders.status)})</dd></div>`:''}
               </dl>
               <div class="actions">
                 ${(owner() || leader()) && r.status === 'pending' ? `<button class="primary" onclick="PMOps.updateRequest('${r.id}', 'ordered')">Mark Ordered</button><button class="danger" onclick="PMOps.updateRequest('${r.id}', 'rejected')">Reject</button>` : ''}

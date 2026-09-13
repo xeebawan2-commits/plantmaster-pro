@@ -471,6 +471,91 @@ export function createProcurement(ctx){
       });
   };
 
+  // ---------------------------------------------------------------- convert
+  // Turn pending material_requests into a real PO. Staff raise requests from a
+  // spare card; this is the owner/manager side that closes the loop.
+  window.PMProc.convertRequests=async ()=>{
+    if(!leader())return toast('Only an owner or manager can raise a purchase order');
+
+    const {data:reqs,error}=await sb.from('material_requests')
+      .select('*, spares(id,description,part_number,unit,supplier)')
+      .eq('plant_id',S().plant.id)
+      .eq('status','pending')
+      .is('purchase_order_id',null)
+      .order('created_at');
+    if(error)return toast(error.message);
+    if(!reqs||!reqs.length)return toast('No pending requests to convert');
+
+    await loadSuppliers();
+    if(!suppliers.length){
+      toast('Add a supplier first');
+      return supplierForm();
+    }
+
+    const rows=reqs.map(r=>{
+      const label=`${r.spares?.part_number?r.spares.part_number+' · ':''}${r.spares?.description||'Item'}`;
+      return `<label class="form-field wide" style="flex-direction:row;align-items:center;gap:10px">
+        <input type="checkbox" name="req_${r.id}" checked style="width:auto;flex:0 0 auto">
+        <span style="flex:1">${esc(label)} — ${esc(String(r.quantity))} ${esc(r.spares?.unit||'pcs')}
+          <small style="display:block;opacity:.7">${esc(r.urgency||'normal')}${r.notes?' · '+esc(r.notes):''}</small>
+        </span>
+      </label>`;
+    }).join('');
+
+    const supNames=suppliers.map(x=>x.name);
+
+    dialog(`Convert ${reqs.length} request${reqs.length>1?'s':''} to PO`,
+      select('supplier','Supplier',supNames,supNames[0])+
+      field('expected_date','Expected delivery','date','',false)+
+      field('tax_percent','Tax / GST %','number','18',false,'step="0.01" min="0"')+
+      `<div class="form-field wide"><span>Requests to include</span><div>${rows}</div></div>`,
+      async fd=>{
+        const chosen=reqs.filter(r=>fd.get('req_'+r.id));
+        if(!chosen.length)throw new Error('Select at least one request');
+
+        const sup=suppliers[supNames.indexOf(value(fd,'supplier'))];
+        const {data:poNum,error:nErr}=await sb.rpc('next_po_number',{p_org:S().org.id});
+        if(nErr)throw nErr;
+
+        const poId=id();
+        const po={
+          id:poId,organization_id:S().org.id,plant_id:S().plant.id,
+          po_number:poNum,supplier_id:sup?.id||null,
+          status:'draft',currency:sup?.currency||'PKR',
+          tax_percent:fd.get('tax_percent')?num(fd,'tax_percent'):18,
+          expected_date:value(fd,'expected_date')||null,
+          notes:`Raised from ${chosen.length} material request(s)`,
+          requested_by:S().userId,created_at:now(),updated_at:now()
+        };
+        let q=await sb.from('purchase_orders').insert(po);
+        if(q.error)throw q.error;
+
+        // Lines carry spare_id, so receiving them increments stock.
+        const lines=chosen.map(r=>({
+          id:id(),purchase_order_id:poId,
+          spare_id:r.spare_id||null,
+          description:`${r.spares?.part_number?r.spares.part_number+' · ':''}${r.spares?.description||'Item'}`,
+          quantity:Number(r.quantity)||1,
+          unit:r.spares?.unit||'pcs',
+          unit_price:0,
+          created_at:now()
+        }));
+        q=await sb.from('purchase_order_lines').insert(lines);
+        if(q.error)throw q.error;
+
+        // Link the requests back so they cannot be converted twice.
+        q=await sb.from('material_requests')
+          .update({purchase_order_id:poId,status:'ordered',updated_at:now()})
+          .in('id',chosen.map(r=>r.id));
+        if(q.error)throw q.error;
+
+        await audit('po_from_requests','purchase_order',poId,
+          {po:poNum,requests:chosen.length});
+        toast(`${poNum} created — add unit prices, then submit`);
+        if(window.go)window.go('procurement');
+      });
+  };
+
   window.PMProc.printPO=pid=>{
     const p=cache.find(x=>x.id===pid);
     if(!p)return;
