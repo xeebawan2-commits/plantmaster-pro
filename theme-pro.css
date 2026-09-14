@@ -288,3 +288,23 @@ body[data-pattern] {
   display:block;margin:1px 0 0;line-height:1.2;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
+
+/* ---------- audit trail (v4.39.0) ---------- */
+.audit-list{display:flex;flex-direction:column;gap:1px;background:var(--pro-line,#1e3147);
+  border:1px solid var(--pro-line,#1e3147);border-radius:11px;overflow:hidden}
+.audit-row{display:flex;align-items:flex-start;gap:12px;padding:11px 13px;
+  background:var(--pro-surface,#0f1c2e)}
+.audit-row .ar-when{flex:0 0 72px;display:flex;flex-direction:column;line-height:1.25}
+.audit-row .ar-when b{font-size:12px;font-weight:700}
+.audit-row .ar-when small{color:var(--pro-muted,#8ba3c0);font-size:10.5px}
+.audit-row .ar-main{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.audit-row .ar-main b{font-size:13px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.audit-row .ar-main small{color:var(--pro-muted,#8ba3c0);font-size:11.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.audit-row .ar-type{flex:0 0 auto;align-self:center;background:rgba(34,211,197,.12);
+  color:var(--pro-accent,#22d3c5);font-size:9.5px;font-weight:750;letter-spacing:.5px;
+  text-transform:uppercase;padding:4px 8px;border-radius:20px;white-space:nowrap}
+@media(max-width:560px){
+  .audit-row{flex-wrap:wrap;gap:8px}
+  .audit-row .ar-type{order:3;align-self:flex-start}
+}

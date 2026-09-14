@@ -41,7 +41,7 @@ function startApp(){appStarted=true;$('#auth').hidden=$('#onboard').hidden=true;
 $('#logout').onclick=()=>{try{sessionStorage.removeItem('pmView')}catch(_){}sb.auth.signOut()};$('#menu').onclick=e=>{e.stopPropagation();$('#drawer').classList.toggle('open');renderNav()};document.addEventListener('pointerdown',e=>{const d=$('#drawer');if(!d||!d.classList.contains('open'))return;if(d.contains(e.target))return;if(e.target.closest('#menu,#mobileMore'))return;d.classList.remove('open');renderNav()},true);document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const d=$('#drawer');if(d&&d.classList.contains('open')){d.classList.remove('open');renderNav()}});$('#search').oninput=()=>{clearTimeout(searchTimer);if(view==='dashboard')searchTimer=setTimeout(()=>globalSearch($('#search').value),350);else renderList()};$('#add').onclick=()=>openRecordForm();$('#cancelRecord').onclick=$('#closeRecord').onclick=()=>{const m=$('#modal');if(typeof m.close==='function'&&m.open){m.close();m.style.removeProperty('display')}else{m.removeAttribute('open');m.style.display='none'}};
 function renderNav(){$$('#drawer [data-view],.mobile-bottom [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));$('#mobileMore')?.classList.toggle('active',$('#drawer')?.classList.contains('open'))}
 async function go(v,replace=false){if(!v)return;if(view!==v){viewHistory.push(view);if(!handlingPop){if(replace)history.replaceState({pmView:v},'');else history.pushState({pmView:v},'')}}view=v;try{sessionStorage.setItem('pmView',v)}catch(_){}$('#drawer').classList.remove('open');const currentSearch=$('#search')||$('#opsSearch');if(currentSearch)currentSearch.value='';renderNav();$('#content').innerHTML=`<div class="card"><h3>Opening ${v==='work'?'Work Orders':v[0].toUpperCase()+v.slice(1)}…</h3></div>`;try{await loadView()}catch(error){console.error(error);$('#content').innerHTML=`<div class="card"><h3>Navigation error</h3><p>${esc(error.message||error)}</p></div>`}}window.go=go;window.openPeopleSection=async section=>{await go('people');await window.PMOps?.openPeopleTab(section)};
-async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);if(procurement.handles(view)){ensureCoreToolbar();return procurement.render(view);}ensureCoreToolbar();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
+async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);if(procurement.handles(view)){ensureCoreToolbar();return procurement.render(view);}ensureCoreToolbar();if(view==='audit')return renderAudit();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
 window.retryCurrentView=()=>loadView();
 let pushSaveFailed=false;
 function notifBar(sub){if(!('Notification'in window))return'';const p=Notification.permission;
@@ -51,6 +51,134 @@ function notifBar(sub){if(!('Notification'in window))return'';const p=Notificati
  return '<div class="card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border-color:#78520f;background:#2a2108">🔔 <span style="flex:1;min-width:200px"><b style="color:#fbbf24">Push alerts are not fully on yet.</b> <span style="color:var(--pro-muted);font-size:13px">Turn them on to get work orders and alarms even when the app is closed.</span></span><button class="primary" style="padding:9px 16px;font-size:13.5px" onclick="window.enablePushAlerts()">'+label+'</button></div>'}
 async function renderNotifBar(){const wrap=$('#notifBarWrap');if(!wrap)return;let sub=null;try{if(window.PMPush&&window.PMPush.status)sub=(await window.PMPush.status())==='subscribed'}catch(_){sub=null}wrap.innerHTML=notifBar(sub)}
 window.enablePushAlerts=async()=>{if(!('Notification'in window))return toast('This browser does not support notifications');const p=await Notification.requestPermission();if(p!=='granted'){renderNotifBar();return toast('Permission was not granted — alerts stay off')}if(window.PMPush&&window.PMPush.enable){let tok=session?.access_token;try{const rs=await sb.auth.refreshSession();if(rs.data?.session?.access_token)tok=rs.data.session.access_token}catch(_){}const ok=await window.PMPush.enable(tok);pushSaveFailed=!ok;toast(ok?'✓ Alerts enabled on this phone':'Could not enable alerts — '+(window.__pmPushErr||'unknown error')+'. Try again.')}else{pushSaveFailed=true;toast('Alert module is still loading — try again in a moment')}renderNotifBar()};
+
+// ---------- audit trail viewer (v4.39.0) ----------
+// audit_logs was write-only: operations.js inserted, nothing ever read it back.
+// Reuses the report exporters (CSV / Excel / Word / PDF) by loading rows into
+// reportRows + reportTable, so all four formats work with no new export code.
+let auditRows=[],auditActions=[];
+async function renderAudit(){
+  $('#toolbar').hidden=true; $('#add').hidden=true;
+  const today=new Date().toISOString().slice(0,10);
+  const monthAgo=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+  $('#content').innerHTML=`
+    <section class="module-head">
+      <div><h1>Audit Trail</h1><p>Every change made in this plant — who, what and when.</p></div>
+      <button class="secondary" onclick="window.go('dashboard')">Dashboard</button>
+    </section>
+    <div class="report-controls card">
+      <label>From date<input id="auditFrom" type="date" value="${monthAgo}"></label>
+      <label>To date<input id="auditTo" type="date" value="${today}"></label>
+      <label>Action<select id="auditAction"><option value="">All actions</option></select></label>
+      <label>Search<input id="auditSearch" type="search" placeholder="Person, record or ID"></label>
+      <button class="primary" onclick="loadAudit()">Show activity</button>
+    </div>
+    <div class="format-grid">
+      ${['csv','excel','word','pdf'].map(t=>`<article class="format-card">
+        <div><b>${t.toUpperCase()}</b><small>${t==='csv'?'Data table':t==='excel'?'Spreadsheet':t==='word'?'Document':'Print-ready report'}</small></div>
+        <button onclick="viewAudit('${t}')">View</button>
+        <button class="primary" onclick="exportAudit('${t}')">Download</button>
+      </article>`).join('')}
+    </div>
+    <div id="auditPreview">${emptyReport('Choose a date range and tap Show activity.')}</div>`;
+  loadAudit();
+}
+
+window.loadAudit=async()=>{
+  const from=$('#auditFrom')?.value, to=$('#auditTo')?.value;
+  const act=$('#auditAction')?.value||'', term=($('#auditSearch')?.value||'').trim().toLowerCase();
+  $('#auditPreview').innerHTML='<div class="card loading-card"><span class="spinner"></span><div><h3>Loading activity</h3><p>Reading the audit trail…</p></div></div>';
+  try{
+    let q=sb.from('audit_logs').select('*')
+      .eq('organization_id',org.id).eq('plant_id',plant.id)
+      .order('created_at',{ascending:false}).limit(1000);
+    if(from) q=q.gte('created_at',from+'T00:00:00');
+    if(to)   q=q.lte('created_at',to+'T23:59:59');
+    if(act)  q=q.eq('action',act);
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(Error('Request timed out. Check the connection and retry.')),15000));
+    const r=await Promise.race([q,timeout]);
+    if(r.error) throw r.error;
+    let rows=r.data||[];
+    if(term) rows=rows.filter(x=>JSON.stringify(x).toLowerCase().includes(term));
+    auditRows=rows;
+    // keep the action filter populated from what actually exists
+    if(!auditActions.length){
+      auditActions=[...new Set((r.data||[]).map(x=>x.action))].sort();
+      const sel=$('#auditAction');
+      if(sel) sel.innerHTML='<option value="">All actions</option>'+
+        auditActions.map(a=>`<option value="${esc(a)}">${esc(a.replaceAll('_',' '))}</option>`).join('');
+    }
+    paintAudit();
+    toast(`${rows.length} ${rows.length===1?'entry':'entries'}`);
+  }catch(x){
+    $('#auditPreview').innerHTML=`<div class="empty-state">${esc(x.message||String(x))}</div>`;
+    toast(x.message||String(x));
+  }
+};
+
+function auditWho(r){ return r.details?.worker_name || r.details?.email || 'Unknown user'; }
+function auditWhat(r){
+  const a=(r.action||'').replaceAll('_',' ');
+  const d=r.details||{};
+  const label=d.name||d.title||d.subject||d.po_number||d.part_number||d.asset_code||r.entity_id||'';
+  return label ? `${a} — ${label}` : a;
+}
+
+function paintAudit(){
+  if(!auditRows.length){
+    $('#auditPreview').innerHTML=emptyReport('No activity in this range.');
+    return;
+  }
+  $('#auditPreview').innerHTML=`
+    <div class="card">
+      <h3 style="margin-bottom:10px">${auditRows.length} entr${auditRows.length===1?'y':'ies'}</h3>
+      <div class="audit-list">
+        ${auditRows.slice(0,300).map(r=>`
+          <div class="audit-row">
+            <div class="ar-when">
+              <b>${new Date(r.created_at).toLocaleDateString()}</b>
+              <small>${new Date(r.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</small>
+            </div>
+            <div class="ar-main">
+              <b>${esc(auditWhat(r))}</b>
+              <small>${esc(auditWho(r))}${r.details?.designation?' · '+esc(r.details.designation):''}</small>
+            </div>
+            <span class="ar-type">${esc((r.entity_type||'').replaceAll('_',' '))}</span>
+          </div>`).join('')}
+      </div>
+      ${auditRows.length>300?`<p class="muted" style="margin-top:10px">Showing the newest 300 on screen. Downloads include all ${auditRows.length}.</p>`:''}
+    </div>`;
+}
+
+// flatten for export: one clean row per entry, no raw jsonb blobs
+function auditExportRows(){
+  return auditRows.map(r=>({
+    date:new Date(r.created_at).toLocaleDateString(),
+    time:new Date(r.created_at).toLocaleTimeString(),
+    person:auditWho(r),
+    designation:r.details?.designation||'',
+    action:(r.action||'').replaceAll('_',' '),
+    record_type:(r.entity_type||'').replaceAll('_',' '),
+    record:r.details?.name||r.details?.title||r.details?.subject||r.details?.po_number||'',
+    record_id:r.entity_id||'',
+    shift:r.details?.shift_name||''
+  }));
+}
+
+// borrow the report exporters by swapping the globals they read
+function withAuditRows(fn){
+  const keepRows=reportRows, keepTable=reportTable;
+  reportRows=auditExportRows(); reportTable='audit_trail';
+  try{ return fn(); } finally { reportRows=keepRows; reportTable=keepTable; }
+}
+window.exportAudit=type=>{
+  if(!auditRows.length) return toast('Show the activity first');
+  withAuditRows(()=>window.exportReport(type));
+};
+window.viewAudit=type=>{
+  if(!auditRows.length) return toast('Show the activity first');
+  withAuditRows(()=>window.viewReport(type));
+};
 
 async function dashboard() {
   ensureCoreToolbar();
