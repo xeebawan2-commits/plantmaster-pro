@@ -270,3 +270,31 @@ body[data-pattern] {
   background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s}
 #drawer.open:after{opacity:1}
 @media(min-width:1100px){#drawer:after{display:none}}
+
+/* ---------- plant switcher v4.35.0 ---------- */
+#plantSwitch{position:relative;display:inline-block}
+#plantBtn{
+  background:none;border:none;padding:0;margin:0;cursor:pointer;
+  display:flex;align-items:center;gap:5px;font:inherit;color:inherit;
+}
+#plantBtn small{color:var(--pro-muted);font-size:11.5px;letter-spacing:.3px}
+#plantBtn i{color:var(--pro-accent,#22d3c5);font-size:10px;font-style:normal;line-height:1}
+#plantBtn:active small{opacity:.6}
+#plantMenu{
+  position:absolute;top:calc(100% + 8px);left:0;z-index:1200;min-width:200px;
+  background:var(--pro-surface-2,#152436);border:1px solid var(--pro-line,#1e3147);
+  border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.55);overflow:hidden;
+}
+#plantMenu .pm-head{
+  padding:9px 13px;font-size:9.5px;font-weight:800;letter-spacing:1.3px;
+  color:var(--pro-muted,#8ba3c0);border-bottom:1px solid var(--pro-line,#1e3147);
+}
+.plant-opt{
+  width:100%;background:none;border:none;cursor:pointer;text-align:left;
+  padding:12px 13px;font-size:13.5px;color:var(--pro-text,#eaf2ff);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:inherit;
+}
+.plant-opt:hover{background:rgba(255,255,255,.06)}
+.plant-opt.on{color:var(--pro-accent,#22d3c5);font-weight:650}
+.plant-opt b{color:var(--pro-accent,#22d3c5)}
+.plant-opt+.plant-opt{border-top:1px solid var(--pro-line,#1e3147)}
