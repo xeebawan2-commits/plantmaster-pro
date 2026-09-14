@@ -37,11 +37,11 @@ sb.auth.onAuthStateChange(async(event,s)=>{session=s;if(event==='SIGNED_OUT'){ap
 let canViewManuals=true;let indexChain=Promise.resolve();const indexingIds=new Set();
 async function loadWorkspace(){let authUser=session?.user;if(!authUser){const result=await sb.auth.getUser();authUser=result.data.user;}const uid=authUser?.id;if(!uid){showAuth();return}userId=uid;await sb.from('profiles').upsert({id:uid,full_name:authUser.user_metadata?.full_name||authUser.email||''},{onConflict:'id',ignoreDuplicates:true});const inviteToken=new URLSearchParams(location.search).get('invite');if(inviteToken){const accepted=await sb.rpc('accept_invitation',{invite_token:inviteToken});if(accepted.error)toast(accepted.error.message);else{toast('Invitation accepted — workspace joined');const clean=new URL(location.href);clean.searchParams.delete('invite');history.replaceState({},'',clean.pathname+clean.search+clean.hash)}}const{data:profileRow}=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();profile=profileRow||{id:uid,full_name:authUser.email||''};const{data:m,error}=await sb.from('organization_members').select('organization_id,role,permissions,organizations(id,name,logo_path)').eq('user_id',uid).eq('active',true).limit(1).maybeSingle();if(error)return toast(error.message);if(!m){$('#auth').hidden=true;$('#onboard').hidden=false;return}org=m.organizations;role=m.role;canViewManuals=(role==='owner'||role==='manager')||((m.permissions||{})['manuals.view']!==false);const _mb=document.querySelector('[data-view="manuals"]');if(_mb)_mb.hidden=!canViewManuals;const adminCheck=await sb.rpc('is_platform_admin');platformAdmin=!!adminCheck.data;const{data:plantRows}=await sb.from('plants').select('*').eq('organization_id',m.organization_id).order('created_at');allPlants=plantRows||[];let _savedPlant=null;try{_savedPlant=localStorage.getItem('pmPlantId')}catch(_){}plant=allPlants.find(x=>x.id===_savedPlant)||allPlants[0]||null;const settingsResult=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();if(settingsResult.data)await applyBranding(settingsResult.data);startApp()}
 $('#orgForm').onsubmit=async e=>{e.preventDefault();const{data:r,error}=await sb.rpc('create_organization',{org_name:$('#orgName').value,plant_name:$('#plantName').value});if(error)return toast(error.message);await loadWorkspace()};
-function startApp(){appStarted=true;$('#auth').hidden=$('#onboard').hidden=true;$('#app').hidden=false;$('#brand').textContent=org.name;if(!$('#plantLabel').textContent)$('#plantLabel').textContent=plant?.name||'';renderPlantSwitch();history.replaceState({pmView:'dashboard'},'');renderNav();const _pmr=new URLSearchParams(location.search).get('pmroute');let _restore=null;try{_restore=sessionStorage.getItem('pmView')}catch(_){}const _valid=v=>!!v&&v!=='dashboard'&&(['assets','work','files','people','checklists','maintenance','inventory','notifications','support','manuals','solver','reports','profile','invites','email','qr','analytics','condition','commercial','appsupport','recovery','settings','procurement','suppliers'].includes(v));if(_pmr){const _cu=new URL(location.href);_cu.searchParams.delete('pmroute');history.replaceState({pmView:_pmr},_cu.pathname);go(_pmr,true)}else if(_valid(history.state?.pmView)){go(history.state.pmView,true)}else if(_valid(_restore)){go(_restore,true)}else{go('dashboard',true)}subscribe();flush();setTimeout(checkRequiredLegal,500)}
+function startApp(){appStarted=true;$('#auth').hidden=$('#onboard').hidden=true;$('#app').hidden=false;$('#brand').textContent=org.name;if(!$('#plantLabel').textContent)$('#plantLabel').textContent=plant?.name||'';history.replaceState({pmView:'dashboard'},'');renderNav();const _pmr=new URLSearchParams(location.search).get('pmroute');let _restore=null;try{_restore=sessionStorage.getItem('pmView')}catch(_){}const _valid=v=>!!v&&v!=='dashboard'&&(['assets','work','files','people','checklists','maintenance','inventory','notifications','support','manuals','solver','reports','profile','invites','email','qr','analytics','condition','commercial','appsupport','recovery','settings','procurement','suppliers'].includes(v));if(_pmr){const _cu=new URL(location.href);_cu.searchParams.delete('pmroute');history.replaceState({pmView:_pmr},_cu.pathname);go(_pmr,true)}else if(_valid(history.state?.pmView)){go(history.state.pmView,true)}else if(_valid(_restore)){go(_restore,true)}else{go('dashboard',true)}subscribe();flush();setTimeout(checkRequiredLegal,500)}
 $('#logout').onclick=()=>{try{sessionStorage.removeItem('pmView')}catch(_){}sb.auth.signOut()};$('#menu').onclick=e=>{e.stopPropagation();$('#drawer').classList.toggle('open');renderNav()};document.addEventListener('pointerdown',e=>{const d=$('#drawer');if(!d||!d.classList.contains('open'))return;if(d.contains(e.target))return;if(e.target.closest('#menu,#mobileMore'))return;d.classList.remove('open');renderNav()},true);document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const d=$('#drawer');if(d&&d.classList.contains('open')){d.classList.remove('open');renderNav()}});$('#search').oninput=()=>{clearTimeout(searchTimer);if(view==='dashboard')searchTimer=setTimeout(()=>globalSearch($('#search').value),350);else renderList()};$('#add').onclick=()=>openRecordForm();$('#cancelRecord').onclick=$('#closeRecord').onclick=()=>{const m=$('#modal');if(typeof m.close==='function'&&m.open){m.close();m.style.removeProperty('display')}else{m.removeAttribute('open');m.style.display='none'}};
 function renderNav(){$$('#drawer [data-view],.mobile-bottom [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));$('#mobileMore')?.classList.toggle('active',$('#drawer')?.classList.contains('open'))}
 async function go(v,replace=false){if(!v)return;if(view!==v){viewHistory.push(view);if(!handlingPop){if(replace)history.replaceState({pmView:v},'');else history.pushState({pmView:v},'')}}view=v;try{sessionStorage.setItem('pmView',v)}catch(_){}$('#drawer').classList.remove('open');const currentSearch=$('#search')||$('#opsSearch');if(currentSearch)currentSearch.value='';renderNav();$('#content').innerHTML=`<div class="card"><h3>Opening ${v==='work'?'Work Orders':v[0].toUpperCase()+v.slice(1)}…</h3></div>`;try{await loadView()}catch(error){console.error(error);$('#content').innerHTML=`<div class="card"><h3>Navigation error</h3><p>${esc(error.message||error)}</p></div>`}}window.go=go;window.openPeopleSection=async section=>{await go('people');await window.PMOps?.openPeopleTab(section)};
-async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);if(procurement.handles(view)){ensureCoreToolbar();return procurement.render(view);}ensureCoreToolbar();if(view==='plants')return plantsView();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
+async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);if(procurement.handles(view)){ensureCoreToolbar();return procurement.render(view);}ensureCoreToolbar();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
 window.retryCurrentView=()=>loadView();
 let pushSaveFailed=false;
 function notifBar(sub){if(!('Notification'in window))return'';const p=Notification.permission;
@@ -51,139 +51,6 @@ function notifBar(sub){if(!('Notification'in window))return'';const p=Notificati
  return '<div class="card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border-color:#78520f;background:#2a2108">🔔 <span style="flex:1;min-width:200px"><b style="color:#fbbf24">Push alerts are not fully on yet.</b> <span style="color:var(--pro-muted);font-size:13px">Turn them on to get work orders and alarms even when the app is closed.</span></span><button class="primary" style="padding:9px 16px;font-size:13.5px" onclick="window.enablePushAlerts()">'+label+'</button></div>'}
 async function renderNotifBar(){const wrap=$('#notifBarWrap');if(!wrap)return;let sub=null;try{if(window.PMPush&&window.PMPush.status)sub=(await window.PMPush.status())==='subscribed'}catch(_){sub=null}wrap.innerHTML=notifBar(sub)}
 window.enablePushAlerts=async()=>{if(!('Notification'in window))return toast('This browser does not support notifications');const p=await Notification.requestPermission();if(p!=='granted'){renderNotifBar();return toast('Permission was not granted — alerts stay off')}if(window.PMPush&&window.PMPush.enable){let tok=session?.access_token;try{const rs=await sb.auth.refreshSession();if(rs.data?.session?.access_token)tok=rs.data.session.access_token}catch(_){}const ok=await window.PMPush.enable(tok);pushSaveFailed=!ok;toast(ok?'✓ Alerts enabled on this phone':'Could not enable alerts — '+(window.__pmPushErr||'unknown error')+'. Try again.')}else{pushSaveFailed=true;toast('Alert module is still loading — try again in a moment')}renderNotifBar()};
-// ---------- plant switcher (v4.36.0) ----------
-function isLeader(){ return role==='owner'||role==='manager'; }
-function renderPlantSwitch(){
-  const host=$('#plantLabel'); if(!host) return;
-  const wrap=$('#plantSwitch');
-  if(!plant){ if(wrap) wrap.hidden=true; return; }
-  host.textContent=plant.name||'';
-  if(!wrap) return;
-  // only offer the control when there is something to switch to
-  if(allPlants.length<2){
-    wrap.hidden=false;                 // still show the name, just not the arrow
-    const ar=$('#plantBtn i'); if(ar) ar.style.display='none';
-    $('#plantBtn').style.pointerEvents='none';
-    return;
-  }
-  const ar=$('#plantBtn i'); if(ar) ar.style.display='';
-  $('#plantBtn').style.pointerEvents='';
-  wrap.hidden=false;
-  host.style.cursor='pointer';
-  $('#plantList').innerHTML=allPlants.map(p=>
-    `<button type="button" class="plant-opt${p.id===plant.id?' on':''}" onclick="window.switchPlant('${p.id}')">
-       <span>${esc(p.name)}</span>${p.id===plant.id?'<b>&#10003;</b>':''}
-     </button>`).join('')
-    + (isLeader() ? `<div class="pm-foot"><button type="button" class="plant-opt"
-         onclick="window.togglePlantMenu(false);window.go('plants')">
-         <span>&#9881; Manage plants</span></button></div>` : '');
-}
-
-window.togglePlantMenu=(force)=>{
-  const m=$('#plantMenu'); if(!m) return;
-  const open = force===undefined ? m.hidden : force;
-  m.hidden=!open;
-  $('#plantSwitch')?.classList.toggle('open',open);
-};
-
-window.switchPlant=async id=>{
-  const next=allPlants.find(p=>p.id===id);
-  window.togglePlantMenu(false);
-  if(!next||next.id===plant?.id) return;
-  plant=next;
-  try{localStorage.setItem('pmPlantId',plant.id)}catch(_){}
-  $('#plantLabel').textContent=plant.name||'';
-  renderPlantSwitch();
-  subscribe();                       // re-bind realtime to the new plant channel
-  try{ await operations.audit('plant_switched','plant',plant.id,{name:plant.name}); }catch(_){}
-  toast('Switched to '+plant.name);
-  loadView();                        // reload the current module with the new plant
-};
-
-// close the menu on outside tap / Escape
-document.addEventListener('pointerdown',e=>{
-  const m=$('#plantMenu');
-  if(m&&!m.hidden&&!e.target.closest('#plantSwitch')) window.togglePlantMenu(false);
-},true);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') window.togglePlantMenu(false); });
-
-// ---------- plants & sites view (v4.36.0) ----------
-async function plantsView(){
-  $('#toolbar').hidden=true; $('#add').hidden=true;
-  const leader=isLeader();
-  const {data:rows}=await sb.from('plants').select('*')
-    .eq('organization_id',org.id).order('created_at');
-  allPlants=rows||[];
-  renderPlantSwitch();
-
-  $('#content').innerHTML=`
-    <div class="view-head">
-      <h2>Plants &amp; Sites</h2>
-      <p class="muted">Each plant keeps its own assets, work orders, stores and team.
-      Switch between them from the plant name in the top bar.</p>
-    </div>
-    ${allPlants.map(p=>`
-      <div class="plant-row">
-        <div class="pr-main">
-          <b>${esc(p.name)}</b>
-          <small>${esc(p.location||'No location set')}</small>
-        </div>
-        ${p.id===plant?.id?'<span class="pr-cur">CURRENT</span>':''}
-        <div class="pr-acts">
-          ${p.id!==plant?.id?`<button onclick="window.switchPlant('${p.id}')">Open</button>`:''}
-          ${leader?`<button onclick="window.editPlant('${p.id}')">Edit</button>`:''}
-        </div>
-      </div>`).join('')}
-    ${leader?`<button class="btn-primary" style="width:100%;margin-top:8px"
-        onclick="window.editPlant()">＋ Add a plant</button>`:''}
-    ${!leader?'<p class="muted" style="margin-top:14px">Only an owner or manager can add or rename a plant.</p>':''}
-  `;
-}
-
-window.editPlant=async id=>{
-  const row=id?allPlants.find(p=>p.id===id):null;
-  const m=$('#modal'),f=$('#recordForm');
-  $('#modalTitle').textContent=row?'Edit plant':'Add a plant';
-  $('#fields').innerHTML=`
-    <div class="form-field wide"><label>Plant name *</label>
-      <input name="name" required maxlength="80" value="${esc(row?.name||'')}"
-             placeholder="e.g. Spinning Unit 2"></div>
-    <div class="form-field wide"><label>Location</label>
-      <input name="location" maxlength="120" value="${esc(row?.location||'')}"
-             placeholder="e.g. Port Qasim, Karachi"></div>`;
-  m.style.removeProperty('display');
-  f.onsubmit=async e=>{
-    e.preventDefault();
-    const fd=Object.fromEntries(new FormData(f));
-    const name=(fd.name||'').trim();
-    if(!name) return;
-    const btn=$('#saveRecord'); if(btn){btn.disabled=true;btn.textContent='Saving…';}
-    try{
-      if(row){
-        const{error}=await sb.from('plants').update({name,location:fd.location||null}).eq('id',row.id);
-        if(error) throw error;
-        await operations.audit('plant_updated','plant',row.id,{name});
-        if(plant?.id===row.id){plant.name=name;plant.location=fd.location||null;}
-        toast('Plant updated');
-      }else{
-        const{data,error}=await sb.from('plants')
-          .insert({organization_id:org.id,name,location:fd.location||null})
-          .select().single();
-        if(error) throw error;
-        await operations.audit('plant_created','plant',data.id,{name});
-        toast('Plant added');
-      }
-      m.close(); loadView();
-    }catch(err){
-      toast(/row-level security|permission/i.test(err.message||'')
-        ? 'Not allowed. Ask the account owner to add the plant.'
-        : 'Could not save: '+(err.message||'unknown error'));
-    }finally{
-      const b=$('#saveRecord'); if(b){b.disabled=false;b.textContent='Save';}
-    }
-  };
-  m.showModal();
-};
 
 async function dashboard() {
   ensureCoreToolbar();
