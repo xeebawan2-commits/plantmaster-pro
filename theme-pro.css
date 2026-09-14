@@ -271,30 +271,40 @@ body[data-pattern] {
 #drawer.open:after{opacity:1}
 @media(min-width:1100px){#drawer:after{display:none}}
 
-/* ---------- plant switcher v4.36.0 ---------- */
-/* the text column must be an explicit vertical stack, or the inline-block
-   switcher sits on a baseline and drags the company name off-centre */
-.brand-block>div{display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1.15}
-.brand-block>div>b{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#plantSwitch{position:relative;display:block;min-width:0;margin-top:2px}
-#plantBtn{
-  background:none;border:none;padding:0;margin:0;cursor:pointer;
-  display:flex;align-items:center;gap:5px;font:inherit;color:inherit;
-  max-width:100%;min-width:0;
+/* ---------- plant switcher v4.37.0 ---------- */
+/* ui-v4.5.css sets ".brand-block #plantLabel{margin-top:3px}" — (0,1,1,1).
+   Anything weaker loses and the 3px pushes the company name off centre.
+   These selectors match or beat it, so the label sits flush in its row. */
+.brand-block>div{
+  display:flex;flex-direction:column;justify-content:center;
+  min-width:0;line-height:1.15;
 }
-#plantBtn small{
-  margin-top:0!important;min-width:0;
+.brand-block>div>b{
+  display:block;min-width:0;line-height:1.2;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-#plantBtn i{
-  flex:0 0 auto;color:var(--pro-accent,#22d3c5);font-size:9px;
-  font-style:normal;line-height:1;transition:transform .18s;
+.brand-block #plantSwitch{
+  position:relative;display:flex;min-width:0;margin:1px 0 0;
 }
-#plantSwitch.open #plantBtn i{transform:rotate(180deg)}
-#plantBtn:active small{opacity:.6}
+.brand-block #plantBtn{
+  background:none;border:none;padding:0;margin:0;cursor:pointer;
+  display:flex;align-items:center;gap:5px;min-width:0;max-width:100%;
+  font:inherit;color:inherit;text-align:left;line-height:1.15;
+}
+.brand-block #plantBtn #plantLabel{
+  margin:0;                       /* kill the inherited margin-top:3px */
+  display:block;min-width:0;line-height:1.15;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.brand-block #plantBtn i{
+  flex:0 0 auto;font-style:normal;font-size:9px;line-height:1;
+  color:var(--pro-accent,#22d3c5);transition:transform .18s;
+}
+.brand-block #plantSwitch.open #plantBtn i{transform:rotate(180deg)}
+.brand-block #plantBtn:active #plantLabel{opacity:.6}
 #plantMenu{
-  position:absolute;top:calc(100% + 9px);left:0;z-index:1200;
-  min-width:216px;max-width:78vw;
+  position:absolute;top:calc(100% + 10px);left:0;z-index:1200;
+  min-width:216px;max-width:76vw;
   background:var(--pro-surface-2,#152436);border:1px solid var(--pro-line,#1e3147);
   border-radius:12px;box-shadow:0 18px 44px rgba(0,0,0,.55);overflow:hidden;
 }
@@ -305,7 +315,8 @@ body[data-pattern] {
 .plant-opt{
   width:100%;background:none;border:none;cursor:pointer;text-align:left;
   padding:12px 13px;font-size:13.5px;color:var(--pro-text,#eaf2ff);
-  display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:inherit;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-family:inherit;text-transform:none;letter-spacing:normal;
 }
 .plant-opt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plant-opt:hover{background:rgba(255,255,255,.06)}

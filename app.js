@@ -451,7 +451,7 @@ window.buildDailyReport=async()=>{
   chips.push([t.length+' alerts today',t.length?'warn':'ok']);
   sections.push(['ALARMS & NOTIFICATIONS (today): '+t.length,...t.slice(0,6).map(x=>'  • '+(x.title||'alert')),'  (see Alerts section for details)'].join('\n'));
  }catch(e){}
- try{const cr=(await sb.from('checklist_runs').select('*').eq('organization_id',org.id).limit(200)).data||[];
+ try{const cr=(await sb.from('checklist_runs').select('*').eq('organization_id',org.id).eq('plant_id',plant.id).limit(200)).data||[];
   const t=cr.filter(x=>[x.completed_at,x.created_at,x.run_date,x.work_date].some(todayRows));
   const fail=t.filter(x=>/fail|miss|overdue|alarm/i.test(x.status||''));
   chips.push([t.length+' checklist runs','ok']);
