@@ -308,3 +308,18 @@ body[data-pattern] {
   .audit-row{flex-wrap:wrap;gap:8px}
   .audit-row .ar-type{order:3;align-self:flex-start}
 }
+
+/* ---------- smart select: type-or-pick fields (v4.41.0) ----------
+   A converted <select> is now an <input list=…>. Browsers give it no dropdown
+   arrow, so it reads as a plain text box and nobody realises there is a list.
+   The chevron below restores the affordance. */
+input[data-pm-smart="1"]{
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2322d3c5' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  padding-right:34px !important;
+}
+/* Chrome on Android draws its own list button; hide it so there is one arrow */
+input[data-pm-smart="1"]::-webkit-calendar-picker-indicator{
+  opacity:0;width:26px;margin-right:-26px;cursor:pointer;
+}

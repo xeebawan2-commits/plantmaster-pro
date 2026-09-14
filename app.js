@@ -84,6 +84,18 @@ async function renderAudit(){
   loadAudit();
 }
 
+async function refreshAuditActions(){
+  const sel=$('#auditAction'); if(!sel) return;
+  const keep=sel.value;
+  const r=await sb.from('audit_logs').select('action')
+    .eq('organization_id',org.id).eq('plant_id',plant.id)
+    .order('created_at',{ascending:false}).limit(1000);
+  auditActions=[...new Set((r.data||[]).map(x=>x.action).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All actions</option>'+
+    auditActions.map(a=>`<option value="${esc(a)}"${a===keep?' selected':''}>${esc(a.replaceAll('_',' '))}</option>`).join('');
+  sel.value=keep;
+}
+
 window.loadAudit=async()=>{
   const from=$('#auditFrom')?.value, to=$('#auditTo')?.value;
   const act=$('#auditAction')?.value||'', term=($('#auditSearch')?.value||'').trim().toLowerCase();
@@ -101,13 +113,10 @@ window.loadAudit=async()=>{
     let rows=r.data||[];
     if(term) rows=rows.filter(x=>JSON.stringify(x).toLowerCase().includes(term));
     auditRows=rows;
-    // keep the action filter populated from what actually exists
-    if(!auditActions.length){
-      auditActions=[...new Set((r.data||[]).map(x=>x.action))].sort();
-      const sel=$('#auditAction');
-      if(sel) sel.innerHTML='<option value="">All actions</option>'+
-        auditActions.map(a=>`<option value="${esc(a)}">${esc(a.replaceAll('_',' '))}</option>`).join('');
-    }
+    // Populate the action filter from a dedicated unfiltered query, not from the
+    // current result. Building it from filtered rows meant a new action could
+    // never appear, and picking one collapsed the list to that single action.
+    await refreshAuditActions();
     paintAudit();
     toast(`${rows.length} ${rows.length===1?'entry':'entries'}`);
   }catch(x){
