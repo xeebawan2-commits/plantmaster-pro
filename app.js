@@ -2,7 +2,7 @@ import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+e
 const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));let session,userId=null,org,plant,allPlants=[],role,profile={},view='dashboard',records=[],channel,formHandler,viewHistory=[],handlingPop=false,lastHomeBack=0,onlineUsers=1,realtimeTimer,searchTimer,platformAdmin=false,appStarted=false,procurement,csvImport;
 function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('show');clearTimeout(x.t);x.t=setTimeout(()=>x.classList.remove('show'),2500)}
 function setSync(){const x=$('#sync'),online=navigator.onLine;x.textContent=online?`● Online${onlineUsers>1?` • ${onlineUsers}`:''}`:'● Offline';x.title=online?`${onlineUsers} active PlantMaster user${onlineUsers===1?'':'s'} in this plant`:'Changes will queue until connection returns';x.style.color=online?'#32d39a':'#fbbf24'}
-const operations=createOperations({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''})});procurement=createProcurement({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),audit:operations.audit,enhanceVoice:operations.enhanceVoice});csvImport=createCsvImport({sb,$,esc,toast,state:()=>({org,plant,userId,role})});window.PMCsv=csvImport;
+const operations=createOperations({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''})});procurement=createProcurement({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),audit:operations.audit,enhanceVoice:operations.enhanceVoice});csvImport=createCsvImport({sb,$,esc,toast,state:()=>({org,plant,userId,role}),audit:(...a)=>operations.audit(...a)});window.PMCsv=csvImport;
 const scanner=createScanner({sb,$,esc,toast,FILE_BUCKET,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),enhanceVoice:operations.enhanceVoice,audit:operations.audit});
 const conditionMonitor=createConditionMonitor({sb,$,esc,toast,FILE_BUCKET,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),enhanceVoice:operations.enhanceVoice,audit:operations.audit});
 const unifiedSolver=createUnifiedSolver({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),audit:operations.audit});
@@ -383,7 +383,7 @@ window.exportReport=type=>{if(!reportRows.length)return toast('Generate the repo
 const addPhase2Click=$('#add').onclick;$('#add').onclick=()=>{if(view==='support')return phase3Form('support_threads',[['subject','Subject'],['priority','Priority']]);if(view==='solver')return phase3Form('problem_cases',[['title','Problem title'],['symptoms','Symptoms'],['alarm_code','Alarm code']]);if(view==='manuals')return createManualInput();return ['assets','work','files'].includes(view)?openRecordForm():view==='checklists'?phase2Form('checklist_templates',[['name','Checklist name'],['schedule','Schedule'],['shift_name','Shift'],['instructions','Instructions']]):view==='maintenance'?phase2Form('maintenance_plans',[['title','Title'],['frequency','Frequency'],['priority','Priority'],['next_due','Due date','date'],['description','Description']]):view==='inventory'?inventoryChoice():null};
 function phase3Form(table,fields){$('#modalTitle').textContent='Add '+view;$('#fields').innerHTML=fields.map(f=>field(f[0],f[1],'',f[2]||'text')).join('');formHandler=async values=>{const r={...values,id:crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,created_by:userId,updated_at:new Date().toISOString()};if(table==='support_threads')r.status='open';if(table==='problem_cases'){r.status='open';r.mode='offline'}const q=await sb.from(table).insert(r);if(q.error)throw q.error;toast('Saved');loadPhase3View()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','')}
 function createManualInput(){const i=document.createElement('input');i.type='file';i.accept='.pdf,.doc,.docx,image/*';i.onchange=()=>uploadManual(i.files[0]);i.click()}
-async function uploadManual(file){if(!file)return;const reserve=await sb.rpc('reserve_storage_upload',{p_organization_id:org.id,p_bytes:file.size,p_file_name:file.name,p_mime_type:file.type||'application/octet-stream'});if(reserve.error)return toast(reserve.error.message);const reservationId=reserve.data,id=crypto.randomUUID(),path=`${org.id}/${plant.id}/manuals/${id}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(path,file);if(u.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(u.error.message)}const r=await sb.from('manuals').insert({id,organization_id:org.id,plant_id:plant.id,title:file.name,storage_path:path,mime_type:file.type,size_bytes:file.size,uploaded_by:userId});if(r.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(r.error.message)}const meta=await sb.from('file_metadata').insert({organization_id:org.id,plant_id:plant.id,bucket:FILE_BUCKET,object_path:path,file_name:file.name,mime_type:file.type,size_bytes:file.size,category:'manual',uploaded_by:userId}).select('id').single();if(meta.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(meta.error.message)}await sb.rpc('finalize_storage_upload',{p_reservation_id:reservationId,p_object_path:path,p_file_metadata_id:meta.data.id});loadPhase3View();if(file.type==='application/pdf'&&file.size<=20*1024*1024){toast('Manual saved — starting AI indexing automatically…');indexManual(id)}else toast(file.type==='application/pdf'?'Manual uploaded (over 20 MB — split it into parts, then use Index for AI)':'Manual uploaded')}
+async function uploadManual(file){if(!file)return;const reserve=await sb.rpc('reserve_storage_upload',{p_organization_id:org.id,p_bytes:file.size,p_file_name:file.name,p_mime_type:file.type||'application/octet-stream'});if(reserve.error)return toast(reserve.error.message);const reservationId=reserve.data,id=crypto.randomUUID(),path=`${org.id}/${plant.id}/manuals/${id}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(path,file);if(u.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(u.error.message)}const r=await sb.from('manuals').insert({id,organization_id:org.id,plant_id:plant.id,title:file.name,storage_path:path,mime_type:file.type,size_bytes:file.size,uploaded_by:userId});if(r.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(r.error.message)}await operations.audit('manual_uploaded','manual',id,{title:file.name});const meta=await sb.from('file_metadata').insert({organization_id:org.id,plant_id:plant.id,bucket:FILE_BUCKET,object_path:path,file_name:file.name,mime_type:file.type,size_bytes:file.size,category:'manual',uploaded_by:userId}).select('id').single();if(meta.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(meta.error.message)}await sb.rpc('finalize_storage_upload',{p_reservation_id:reservationId,p_object_path:path,p_file_metadata_id:meta.data.id});loadPhase3View();if(file.type==='application/pdf'&&file.size<=20*1024*1024){toast('Manual saved — starting AI indexing automatically…');indexManual(id)}else toast(file.type==='application/pdf'?'Manual uploaded (over 20 MB — split it into parts, then use Index for AI)':'Manual uploaded')}
 
 
 
@@ -570,33 +570,6 @@ window.manageSafety = id => {
   const m=$('#modal'); m.style.removeProperty('display'); m.showModal ? m.showModal() : m.setAttribute('open','');
 };
 
-window.applyLoto = async (woId, assetId) => {
-  if(!assetId || assetId==='null') return toast('This Work Order has no specific asset assigned.');
-  const r = await sb.from('loto_procedures').insert({plant_id: plant.id, asset_id: assetId, work_order_id: woId, applied_by: userId});
-  if(r.error) return toast(r.error.message);
-  toast('LOTO Applied'); loadView(); closeCustomModal();
-};
-window.removeLoto = async (lotoId) => {
-  const r = await sb.from('loto_procedures').update({removed_at: new Date().toISOString(), removed_by: userId}).eq('id', lotoId);
-  if(r.error) return toast(r.error.message);
-  toast('LOTO Removed'); loadView(); closeCustomModal();
-};
-window.requestPermit = async (woId) => {
-  const pType = $('#newPermitType').value;
-  const r = await sb.from('permits').insert({plant_id: plant.id, work_order_id: woId, permit_type: pType, requested_by: userId});
-  if(r.error) return toast(r.error.message);
-  toast('Permit Requested'); loadView(); closeCustomModal();
-};
-window.approvePermit = async (permitId) => {
-  const r = await sb.from('permits').update({status: 'approved', approved_by: userId, approved_at: new Date().toISOString()}).eq('id', permitId);
-  if(r.error) return toast(r.error.message);
-  toast('Permit Approved'); loadView(); closeCustomModal();
-};
-window.closePermit = async (permitId) => {
-  const r = await sb.from('permits').update({status: 'closed'}).eq('id', permitId);
-  if(r.error) return toast(r.error.message);
-  toast('Permit Closed'); loadView(); closeCustomModal();
-};
 
 
 window.closeCustomModal = () => {
@@ -646,27 +619,32 @@ window.manageSafety = id => {
 window.applyLoto = async (woId, assetId) => {
   if(!assetId || assetId==='null') return toast('This Work Order has no specific asset assigned.');
   const r = await sb.from('loto_procedures').insert({plant_id: plant.id, asset_id: assetId, work_order_id: woId, applied_by: userId});
+  if(!r.error) await operations.audit('loto_applied','loto_procedure',woId,{asset_id:assetId,work_order_id:woId});
   if(r.error) return toast(r.error.message);
   toast('LOTO Applied'); loadView(); closeCustomModal();
 };
 window.removeLoto = async (lotoId) => {
   const r = await sb.from('loto_procedures').update({removed_at: new Date().toISOString(), removed_by: userId}).eq('id', lotoId);
+  if(!r.error) await operations.audit('loto_removed','loto_procedure',lotoId,{});
   if(r.error) return toast(r.error.message);
   toast('LOTO Removed'); loadView(); closeCustomModal();
 };
 window.requestPermit = async (woId) => {
   const pType = $('#newPermitType').value;
   const r = await sb.from('permits').insert({plant_id: plant.id, work_order_id: woId, permit_type: pType, requested_by: userId});
+  if(!r.error) await operations.audit('permit_requested','permit',woId,{permit_type:pType,work_order_id:woId});
   if(r.error) return toast(r.error.message);
   toast('Permit Requested'); loadView(); closeCustomModal();
 };
 window.approvePermit = async (permitId) => {
   const r = await sb.from('permits').update({status: 'approved', approved_by: userId, approved_at: new Date().toISOString()}).eq('id', permitId);
+  if(!r.error) await operations.audit('permit_approved','permit',permitId,{});
   if(r.error) return toast(r.error.message);
   toast('Permit Approved'); loadView(); closeCustomModal();
 };
 window.closePermit = async (permitId) => {
   const r = await sb.from('permits').update({status: 'closed'}).eq('id', permitId);
+  if(!r.error) await operations.audit('permit_closed','permit',permitId,{});
   if(r.error) return toast(r.error.message);
   toast('Permit Closed'); loadView(); closeCustomModal();
 };

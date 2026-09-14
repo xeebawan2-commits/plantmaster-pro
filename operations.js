@@ -239,6 +239,7 @@ export function createOperations(ctx){
   window.PMOps.updateRequest = async (id, status) => {
     const q = await sb.from('material_requests').update({status, managed_by: S().userId, updated_at: now()}).eq('id', id);
     if(q.error) return toast(q.error.message);
+    await audit('material_request_'+status,'material_request',id,{status});
     toast('Request updated to ' + status);
     window.PMOps.loadMaterialRequests();
   };
@@ -252,10 +253,12 @@ export function createOperations(ctx){
     }
     let q = await sb.from('material_requests').update({status: 'received', managed_by: S().userId, updated_at: now()}).eq('id', reqId);
     if(q.error) return toast(q.error.message);
+    await audit('material_request_received','material_request',reqId,{});
     
     const {data: spare} = await sb.from('spares').select('stock').eq('id', spareId).maybeSingle();
     if(spare) {
       await sb.from('spares').update({stock: Number(spare.stock||0) + Number(qty), updated_at: now()}).eq('id', spareId);
+      await audit('stock_changed','spare',spareId,{change:Number(qty),from:Number(spare.stock||0),to:Number(spare.stock||0)+Number(qty),reason:'material request received'});
     }
     toast('Part received! Stock automatically updated.');
     window.PMOps.loadMaterialRequests();

@@ -146,6 +146,7 @@ export function createCsvImport(ctx){
       if(q.error)throw new Error(`Row ${i+1}+: ${q.error.message}`);
       done+=batch.length;
     }
+    try{ await (ctx.audit||(async()=>{}))('bulk_import','import',s.table,{table:s.table,rows:done}); }catch(_){}
     return done;
   }
 
