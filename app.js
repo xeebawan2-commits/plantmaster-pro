@@ -396,12 +396,14 @@ async function uploadManual(file){if(!file)return;const reserve=await sb.rpc('re
 
 
 
-/* Strips the paid branding out of a settings row when the
-   company's package does not include it. Keeps the free
-   fields (plant name, address, contact, footer) intact, so a
-   downgraded company loses the logo and colours but not its
-   own details. */
+/* Branding a company has ALREADY SAVED is left alone — taking
+   away a logo they are using would be punishing them for a
+   change on our side. The gate only stops them setting NEW
+   branding. If you ever need to strip branding on downgrade,
+   set STRIP_BRANDING_ON_DOWNGRADE to true. */
+const STRIP_BRANDING_ON_DOWNGRADE=false;
 async function brandingAllowed(x={}){
+  if(!STRIP_BRANDING_ON_DOWNGRADE)return x;
   if(await canUseBranding())return x;
   const{app_name,primary_color,secondary_color,theme,pattern,logo_path,...rest}=x;
   return rest;
@@ -454,7 +456,11 @@ async function saveCompanyProfile(e){
   const brandOK=await canUseBranding();
   let logo_path;const file=brandOK?$('#setLogo').files[0]:null;if(file){if(file.size>5*1024*1024)throw Error('Logo must be smaller than 5 MB');logo_path=`${org.id}/branding/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(logo_path,file);if(u.error)throw u.error}
   const payload={organization_id:org.id,app_name:$('#setApp').value.trim(),plant_display_name:$('#setPlant').value.trim(),primary_color:$('#setPrimary').value,secondary_color:$('#setSecondary').value,theme:$('#setTheme').value,pattern:$('#setPattern').value,address:$('#setAddress').value.trim(),contact:$('#setContact').value.trim(),email:$('#setEmail').value.trim(),report_time:$('#setReportTime').value||'11:00',footer_text:$('#setFooter').value.trim(),updated_at:new Date().toISOString()};if(logo_path)payload.logo_path=logo_path;if(!brandOK){delete payload.app_name;delete payload.primary_color;delete payload.secondary_color;delete payload.theme;delete payload.pattern;delete payload.logo_path}
-  const r=await sb.from('organization_settings').upsert(payload);if(r.error)throw r.error;await applyBranding(brandOK?payload:{...payload,app_name:undefined});await operations.audit('company_profile_updated','organization',org.id,{theme:payload.theme,pattern:payload.pattern,branding:brandOK});toast('Company profile saved and applied');await renderCompanyProfile()}catch(error){toast(error.message)}finally{button.disabled=false;button.textContent='Save & Apply Profile'}}
+  const r=await sb.from('organization_settings').upsert(payload);if(r.error)throw r.error;
+  /* Re-read the saved row so branding the customer already owns
+     (logo, colours) is re-applied, not wiped by a partial payload. */
+  const after=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();
+  await applyBranding(after.data||payload);await operations.audit('company_profile_updated','organization',org.id,{theme:payload.theme,pattern:payload.pattern,branding:brandOK});toast('Company profile saved and applied');await renderCompanyProfile()}catch(error){toast(error.message)}finally{button.disabled=false;button.textContent='Save & Apply Profile'}}
 
 /* Phase 4 */
 async function loadPhase4View(){
