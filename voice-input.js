@@ -26,14 +26,14 @@ if (Rec && isSecureContext) {
   // ---------- self-injected UI (uses the app's theme variables) ----------
   const style = document.createElement('style');
   style.textContent = `
-  #pmVoiceFab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;width:58px;height:58px;border-radius:50%;
+  #pmVoiceFab{position:fixed;right:16px;bottom:calc(108px + env(safe-area-inset-bottom));z-index:50;width:58px;height:58px;border-radius:50%;
     border:none;cursor:pointer;background:var(--brand,#0b9dd4);color:#fff;font-size:24px;line-height:1;
     box-shadow:0 6px 18px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;touch-action:manipulation}
   #pmVoiceFab .pm-voice-badge{position:absolute;top:-4px;left:-2px;background:#fff;color:#0b2440;font-size:9px;font-weight:800;
     padding:2px 5px;border-radius:8px;letter-spacing:.3px}
   #pmVoiceFab.listening{background:#e5484d;animation:pmVoicePulse 1.1s ease-in-out infinite}
   @keyframes pmVoicePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-  #pmVoiceBubble{position:fixed;right:16px;bottom:calc(152px + env(safe-area-inset-bottom));z-index:60;max-width:min(320px,80vw);
+  #pmVoiceBubble{position:fixed;right:16px;bottom:calc(176px + env(safe-area-inset-bottom));z-index:50;max-width:min(320px,80vw);
     background:rgba(10,25,45,.96);color:#eaf3ff;border:1px solid rgba(120,180,255,.35);border-radius:14px;padding:10px 12px;
     font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5)}
   #pmVoiceBubble small{opacity:.75;display:block;margin-top:3px}`;
