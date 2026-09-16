@@ -407,3 +407,22 @@ input[data-pm-smart="1"]::-webkit-calendar-picker-indicator{
 body.pm-gate-open #pmVoiceFab,
 body.pm-gate-open .mobile-bottom,
 body:has(#pmDemoGate) #pmVoiceFab{display:none!important}
+
+/* ---- read-only demo ribbon (v4.47.4) ---- */
+#pmDemoBanner{
+  position:fixed;left:0;right:0;bottom:0;
+  z-index:71;
+  display:none;
+  padding:7px 14px calc(7px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(90deg,#0e7490,#0891b2);
+  color:#ecfeff;
+  font-size:12.5px;font-weight:600;letter-spacing:.2px;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,.18);
+  pointer-events:none;
+}
+body.pm-demo-readonly #pmDemoBanner{display:block}
+/* lift the nav bar so the ribbon does not cover it */
+body.pm-demo-readonly .mobile-bottom{bottom:30px}
+body.pm-demo-readonly #pmVoiceFab{bottom:138px}
+body.pm-gate-open #pmDemoBanner{display:none}
