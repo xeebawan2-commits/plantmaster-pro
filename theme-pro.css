@@ -354,3 +354,56 @@ input[data-pm-smart="1"]::-webkit-calendar-picker-indicator{
   background:linear-gradient(92deg,#ffffff 20%, var(--pro-accent) 90%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
+
+
+/* ==========================================================
+   DEMO ACCOUNT GATE — shown when ?demo=1 is opened while a
+   different account is already signed in on this browser
+   ========================================================== */
+#pmDemoGate{
+  position:fixed;inset:0;z-index:200;
+  display:grid;place-items:center;padding:20px;
+  background:radial-gradient(circle at 50% 0,#12315e,#050a12 60%);
+}
+#pmDemoGate .pm-gate-card{
+  width:100%;max-width:440px;
+  background:linear-gradient(150deg,var(--pro-surface),var(--pro-surface-2));
+  border:1px solid rgba(34,211,238,.4);border-radius:18px;
+  padding:26px 24px;
+  box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 0 5px rgba(14,165,233,.06);
+}
+#pmDemoGate h2{
+  margin:0 0 12px;font-size:21px;line-height:1.25;
+  color:var(--pro-text);background:none;-webkit-text-fill-color:currentColor;
+}
+#pmDemoGate p{
+  margin:0 0 13px;font-size:14px;line-height:1.6;color:var(--pro-muted);
+}
+#pmDemoGate p b{color:var(--pro-text)}
+#pmDemoGate .pm-gate-who{
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:14px;color:var(--pro-accent);
+  background:rgba(34,211,238,.08);
+  border:1px solid rgba(34,211,238,.28);
+  border-radius:10px;padding:11px 13px;margin:0 0 15px;
+  word-break:break-all;
+}
+#pmDemoGate .pm-gate-btns{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+#pmDemoGate button{
+  width:100%;min-height:48px;border-radius:12px;
+  font-size:14.5px;font-weight:750;cursor:pointer;
+  transition:.16s;padding:12px 16px;
+}
+#pmDemoGate .pm-gate-go{
+  background:var(--pro-grad);border:none;color:var(--pro-ink);font-weight:800;
+}
+#pmDemoGate .pm-gate-go:disabled{opacity:.6;cursor:default}
+#pmDemoGate .pm-gate-stay{
+  background:transparent;border:1px solid var(--pro-line-2);color:var(--pro-muted);
+}
+#pmDemoGate .pm-gate-stay:hover{color:var(--pro-text);border-color:var(--pro-accent)}
+
+/* the floating mic must never sit over the gate */
+body.pm-gate-open #pmVoiceFab,
+body.pm-gate-open .mobile-bottom,
+body:has(#pmDemoGate) #pmVoiceFab{display:none!important}

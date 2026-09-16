@@ -2,7 +2,7 @@
  * = v4.12.0 + notificationclick routes through ?pmroute= (app is single-page;
  *   direct paths like /notifications 404 on GitHub Pages).
  */
-const C='plantmaster-pro-v4.47.2';
+const C='plantmaster-pro-v4.47.3';
 const F=['./','./index.html','./styles.css?v=4.47.0','./ui-v4.5.css?v=4.11.1','./scanner-v4.8.css?v=4.11.1','./condition-v4.9.css?v=4.11.1','./solver-v4.11.css?v=4.11.1','./theme-pro.css?v=4.32.0?vv=2.1.0','./app.js?v=4.47.0','./scanner.js?v=4.11.1','./condition.js?v=4.11.1','./solver.js?v=4.11.1','./config.js?v=4.3.1','./offline.js?v=4.11.1','./operations.js?v=4.33.1','./procurement.js?v=1.1.0','./csv-import.js?v=1.0.2','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(f=>c.add(f).catch(()=>null)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));

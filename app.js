@@ -24,7 +24,40 @@ function dispatchAdd(){
   if(view==='inventory')return inventoryChoice();
 }
 
-async function init(){setSync();const{data}=await sb.auth.getSession();session=data.session;$('#boot').hidden=true;if(!session)return showAuth();await loadWorkspace()}
+const PM_DEMO_EMAIL='demo@hsbfix.org';
+function pmWantsDemo(){try{const q=new URLSearchParams(location.search);return q.get('demo')==='1'||q.has('demo')&&q.get('demo')!=='0'}catch(_){return false}}
+function pmStripDemoParam(){try{const u=new URL(location.href);u.searchParams.delete('demo');history.replaceState({},'',u.pathname+u.search+u.hash)}catch(_){}}
+function pmShowDemoSwitch(currentEmail){
+  $('#boot').hidden=true;$('#auth').hidden=true;$('#app').hidden=true;
+  document.body.classList.add('pm-auth','pm-gate-open');
+  let g=document.getElementById('pmDemoGate');
+  if(!g){g=document.createElement('section');g.id='pmDemoGate';document.body.appendChild(g)}
+  g.innerHTML='<div class="pm-gate-card">'+
+    '<h2>Already signed in</h2>'+
+    '<p>This link opens the <b>read-only demo workspace</b>, but this browser is signed in as:</p>'+
+    '<div class="pm-gate-who">'+esc(currentEmail||'another account')+'</div>'+
+    '<p>Opening the demo will sign this account out of this browser. Your data is not affected and you can sign back in at any time.</p>'+
+    '<div class="pm-gate-btns">'+
+      '<button class="pm-gate-go" id="pmGateGo">Sign out and open the demo</button>'+
+      '<button class="pm-gate-stay" id="pmGateStay">Stay in my account</button>'+
+    '</div></div>';
+  document.getElementById('pmGateGo').onclick=async()=>{
+    const b=document.getElementById('pmGateGo');b.disabled=true;b.textContent='Signing out…';
+    try{sessionStorage.removeItem('pmView')}catch(_){}
+    await sb.auth.signOut();
+    g.remove();document.body.classList.remove('pm-gate-open');
+    showAuth();
+    const em=$('#email');if(em){em.value=PM_DEMO_EMAIL;em.dispatchEvent(new Event('input',{bubbles:true}))}
+    const am=$('#authMsg');if(am)am.textContent='Signed out. Enter the demo password shown on the website to continue.';
+    const pw=$('#password');if(pw)pw.focus();
+  };
+  document.getElementById('pmGateStay').onclick=async()=>{
+    pmStripDemoParam();g.remove();
+    document.body.classList.remove('pm-auth','pm-gate-open');
+    if(session){await loadWorkspace()}else{showAuth()}
+  };
+}
+async function init(){setSync();const{data}=await sb.auth.getSession();session=data.session;$('#boot').hidden=true;if(pmWantsDemo()){const em=session?.user?.email||'';if(session&&em.toLowerCase()!==PM_DEMO_EMAIL){return pmShowDemoSwitch(em)}pmStripDemoParam();if(!session){showAuth();const f=$('#email');if(f)f.value=PM_DEMO_EMAIL;const am=$('#authMsg');if(am)am.textContent='Demo workspace — enter the password shown on the website.';return}}if(!session)return showAuth();await loadWorkspace()}
 function showAuth(){$('#auth').hidden=false;$('#app').hidden=true;const r=$('#resetPw');if(r)r.hidden=true;const o=$('#onboard');if(o)o.hidden=true;document.body.classList.add('pm-auth')}
 function authCredentials(){const email=$('#email').value.trim(),password=$('#password').value;if(!email){$('#authMsg').textContent='Enter your work email first.';$('#email').focus();return null}if(!/^\S+@\S+\.\S+$/.test(email)){ $('#authMsg').textContent='Enter a valid email address.';return null}if(password.length<8){$('#authMsg').textContent='Password must contain at least 8 characters.';$('#password').focus();return null}return{email,password}}
 $('#authForm').onsubmit=async e=>{e.preventDefault();const credentials=authCredentials();if(!credentials)return;$('#authMsg').textContent='Signing in…';const{error}=await sb.auth.signInWithPassword(credentials);$('#authMsg').textContent=error?.message||''};
