@@ -15,8 +15,8 @@
   --pro-line-2:#3d3d3d;
   --pro-text:#f3f4f6;
   --pro-muted:#9ca3af;
-  --pro-accent:#22d3ee;
-  --pro-accent-2:#0ea5e9;
+  --pro-accent:#3b82f6;
+  --pro-accent-2:#2563eb;
   --pro-radius:14px;
   --pro-shadow:0 10px 30px rgba(0,0,0,.35);
 }
@@ -93,7 +93,7 @@ h2{letter-spacing:-.01em;font-weight:750}
   border-radius:12px;min-height:48px;font-size:15px;letter-spacing:.01em;
 }
 #auth .panel button:first-of-type,#onboard .panel button:first-of-type{
-  background:linear-gradient(92deg, var(--brand-primary,#0ea5e9), var(--pro-accent));
+  background:linear-gradient(92deg, var(--brand-primary,#2563eb), var(--pro-accent));
   border:none;color:#04121e;
   box-shadow:0 8px 24px rgba(14,165,233,.35);
 }
@@ -136,8 +136,8 @@ aside button{
 }
 aside button:hover{background:var(--pro-surface-2);color:var(--pro-text)}
 #drawer [data-view].active{
-  background:linear-gradient(90deg, color-mix(in srgb, var(--brand-primary,#0ea5e9) 22%, transparent), transparent 90%);
-  border-left:3px solid var(--brand-primary,#0ea5e9);
+  background:linear-gradient(90deg, color-mix(in srgb, var(--brand-primary,#2563eb) 22%, transparent), transparent 90%);
+  border-left:3px solid var(--brand-primary,#2563eb);
   border-radius:0 11px 11px 0;
   color:var(--pro-text);font-weight:700;
 }
@@ -160,7 +160,7 @@ main{padding:18px}
   border-radius:var(--pro-radius);
   box-shadow:var(--pro-shadow);
 }
-.card:hover{border-color:color-mix(in srgb, var(--brand-primary,#0ea5e9) 55%, var(--pro-line));transform:translateY(-1px)}
+.card:hover{border-color:color-mix(in srgb, var(--brand-primary,#2563eb) 55%, var(--pro-line));transform:translateY(-1px)}
 .kpi{
   background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
   border:1px solid var(--pro-line-2);
@@ -414,7 +414,7 @@ body:has(#pmDemoGate) #pmVoiceFab{display:none!important}
   z-index:71;
   display:none;
   padding:7px 14px calc(7px + env(safe-area-inset-bottom,0px));
-  background:linear-gradient(90deg,#0e7490,#0891b2);
+  background:linear-gradient(90deg,#1e40af,#2563eb);
   color:#ecfeff;
   font-size:12.5px;font-weight:600;letter-spacing:.2px;
   text-align:center;
