@@ -32,7 +32,7 @@ body{
 }
 h1{font-size:1.55rem;letter-spacing:-.02em;font-weight:800}
 h2{letter-spacing:-.01em;font-weight:750}
-::selection{background:rgba(34,211,238,.28)}
+::selection{background:rgba(59,130,246,.28)}
 *::-webkit-scrollbar{width:10px;height:10px}
 *::-webkit-scrollbar-thumb{background:var(--pro-line-2);border-radius:99px;border:2px solid var(--pro-bg)}
 *::-webkit-scrollbar-track{background:transparent}
@@ -46,12 +46,12 @@ h2{letter-spacing:-.01em;font-weight:750}
 #auth,#onboard{
   background:
     radial-gradient(760px 460px at 50% -12%, rgba(14,165,233,.22), transparent 62%),
-    radial-gradient(560px 380px at 92% 108%, rgba(34,211,238,.10), transparent 60%),
+    radial-gradient(560px 380px at 92% 108%, rgba(59,130,246,.10), transparent 60%),
     var(--pro-bg);
 }
 #auth .panel,#onboard .panel{
   background:linear-gradient(165deg, rgba(18,34,56,.92), rgba(8,17,30,.96));
-  border:1px solid rgba(34,211,238,.28);
+  border:1px solid rgba(59,130,246,.28);
   border-radius:22px;
   padding:34px 30px 28px;
   box-shadow:0 30px 80px rgba(2,8,20,.7), 0 0 0 6px rgba(14,165,233,.05);
@@ -69,9 +69,9 @@ h2{letter-spacing:-.01em;font-weight:750}
   display:block;
   width:64px;height:64px;margin:0 auto 14px;
   border-radius:16px;
-  background:#0d1117 no-repeat center/64px 64px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d1117'/%3E%3Ctext x='32' y='41' font-family='system-ui,-apple-system,Segoe UI,Roboto,sans-serif' font-size='23' font-weight='800' text-anchor='middle' fill='%23ffffff'%3EHS%3Ctspan fill='%2322d3ee'%3EB%3C/tspan%3E%3C/text%3E%3C/svg%3E");
-  box-shadow:0 8px 24px rgba(2,8,20,.6), 0 0 0 1px rgba(34,211,238,.25);
+  background:transparent no-repeat center/64px 64px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 124'%3E%3Crect width='120' height='124' rx='26' fill='%230d1117'/%3E%3Cpolygon points='60 9 106 35 106 89 60 115 14 89 14 35' fill='%2316326e' stroke='%233b82f6' stroke-width='3'/%3E%3Cpath d='M30 85 L30 58 L48 46 L48 58 L66 46 L66 58 L84 46 L84 85 Z' fill='%23334155'/%3E%3Crect x='74' y='32' width='6' height='18' fill='%23475569'/%3E%3Cpath d='M40 82 L72 50 C76 46 82 46 86 50 C90 54 90 60 86 64 L54 96 C50 100 44 100 40 96 Z' fill='%23e08706'/%3E%3Ccircle cx='80' cy='56' r='4' fill='%230f172a'/%3E%3Ccircle cx='30' cy='35' r='4' fill='%2310b981'/%3E%3C/svg%3E");
+  box-shadow:0 8px 24px rgba(2,8,20,.6);
 }
 #auth .panel p,.auth-help{color:var(--pro-muted);font-size:12.5px}
 #auth .panel input,#onboard .panel input{
@@ -86,7 +86,7 @@ h2{letter-spacing:-.01em;font-weight:750}
 }
 #auth .panel input:focus,#onboard .panel input:focus{
   border-color:var(--pro-accent);
-  box-shadow:0 0 0 3px rgba(34,211,238,.15);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
   outline:none;
 }
 #auth .panel button,#onboard .panel button{
@@ -169,7 +169,7 @@ main{padding:18px}
 }
 .kpi::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(120px 60px at 85% 0, rgba(34,211,238,.12), transparent 70%);
+  background:radial-gradient(120px 60px at 85% 0, rgba(59,130,246,.12), transparent 70%);
 }
 .kpi strong{font-size:30px;font-weight:800;letter-spacing:-.02em}
 .dashboard-link{font-weight:700}
@@ -208,7 +208,7 @@ button.secondary,button.danger{border-radius:11px}
 table{min-width:640px}
 th{background:var(--pro-surface-2);color:var(--pro-muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
 tr:nth-child(even) td{background:rgba(16,33,58,.25)}
-tr:hover td{background:rgba(34,211,238,.05)}
+tr:hover td{background:rgba(59,130,246,.05)}
 td{border-bottom:1px solid var(--pro-line)}
 
 /* ---------- chips & states ---------- */
@@ -220,7 +220,7 @@ td{border-bottom:1px solid var(--pro-line)}
   background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
   border:1px solid var(--pro-accent);
   border-radius:12px;
-  box-shadow:0 14px 40px rgba(0,0,0,.5), 0 0 0 4px rgba(34,211,238,.08);
+  box-shadow:0 14px 40px rgba(0,0,0,.5), 0 0 0 4px rgba(59,130,246,.08);
   font-weight:600;
   max-width:min(360px,80vw);
 }
@@ -243,7 +243,7 @@ td{border-bottom:1px solid var(--pro-line)}
   display:flex;align-items:center;gap:12px;
   max-width:min(400px,calc(100vw - 32px));
   background:linear-gradient(150deg, var(--pro-surface), var(--pro-surface-2));
-  border:1px solid rgba(34,211,238,.4);
+  border:1px solid rgba(59,130,246,.4);
   border-radius:16px;padding:14px 16px;
   box-shadow:0 20px 60px rgba(0,0,0,.55), 0 0 0 5px rgba(14,165,233,.06);
   animation:pmup .3s ease;
@@ -303,8 +303,8 @@ body[data-pattern] {
 .audit-row .ar-main b{font-size:13px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .audit-row .ar-main small{color:var(--pro-muted,#8ba3c0);font-size:11.5px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.audit-row .ar-type{flex:0 0 auto;align-self:center;background:rgba(34,211,197,.12);
-  color:var(--pro-accent,#22d3c5);font-size:9.5px;font-weight:750;letter-spacing:.5px;
+.audit-row .ar-type{flex:0 0 auto;align-self:center;background:rgba(59,130,246,.12);
+  color:var(--pro-accent,#3b82f6);font-size:9.5px;font-weight:750;letter-spacing:.5px;
   text-transform:uppercase;padding:4px 8px;border-radius:20px;white-space:nowrap}
 @media(max-width:560px){
   .audit-row{flex-wrap:wrap;gap:8px}
@@ -316,7 +316,7 @@ body[data-pattern] {
    arrow, so it reads as a plain text box and nobody realises there is a list.
    The chevron below restores the affordance. */
 input[data-pm-smart="1"]{
-  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2322d3c5' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%233b82f6' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;
   background-position:right 12px center;
   padding-right:34px !important;
@@ -368,7 +368,7 @@ input[data-pm-smart="1"]::-webkit-calendar-picker-indicator{
 #pmDemoGate .pm-gate-card{
   width:100%;max-width:440px;
   background:linear-gradient(150deg,var(--pro-surface),var(--pro-surface-2));
-  border:1px solid rgba(34,211,238,.4);border-radius:18px;
+  border:1px solid rgba(59,130,246,.4);border-radius:18px;
   padding:26px 24px;
   box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 0 5px rgba(14,165,233,.06);
 }
@@ -383,8 +383,8 @@ input[data-pm-smart="1"]::-webkit-calendar-picker-indicator{
 #pmDemoGate .pm-gate-who{
   font-family:ui-monospace,Menlo,Consolas,monospace;
   font-size:14px;color:var(--pro-accent);
-  background:rgba(34,211,238,.08);
-  border:1px solid rgba(34,211,238,.28);
+  background:rgba(59,130,246,.08);
+  border:1px solid rgba(59,130,246,.28);
   border-radius:10px;padding:11px 13px;margin:0 0 15px;
   word-break:break-all;
 }
