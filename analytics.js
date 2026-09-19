@@ -106,7 +106,7 @@ export function createAnalytics({ sb, $, esc, state, toast }) {
           labels: ['Running', 'Shutdown'],
           datasets: [{
             data: [running, shutdown],
-            backgroundColor: ['#0ea5e9', '#ef4444'],
+            backgroundColor: ['#2563eb', '#ef4444'],
             borderWidth: 0
           }]
         },
