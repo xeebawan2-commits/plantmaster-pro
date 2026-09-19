@@ -1,0 +1,6 @@
+const DB='plantmaster-v4-offline',STORE='queue';
+function open(){return new Promise((ok,no)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'queueId'});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+export async function enqueue(operation){const db=await open();return new Promise((ok,no)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put({queueId:crypto.randomUUID(),createdAt:Date.now(),...operation});tx.oncomplete=ok;tx.onerror=()=>no(tx.error)})}
+export async function allQueued(){const db=await open();return new Promise((ok,no)=>{const r=db.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+export async function removeQueued(id){const db=await open();return new Promise((ok,no)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=ok;tx.onerror=()=>no(tx.error)})}
+export async function flushQueue(client){if(!navigator.onLine)return 0;let done=0;for(const q of await allQueued()){try{const table=client.from(q.table);const r=q.action==='delete'?await table.delete().eq('id',q.record.id):await table.upsert(q.record);if(r.error)throw r.error;await removeQueued(q.queueId);done++}catch{break}}return done}

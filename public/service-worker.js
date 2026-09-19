@@ -1,0 +1,42 @@
+/* PlantMaster Pro — service worker v4.22.0
+ * = v4.12.0 + notificationclick routes through ?pmroute= (app is single-page;
+ *   direct paths like /notifications 404 on GitHub Pages).
+ */
+const C='plantmaster-pro-v4.48.1';
+const F=['./','./index.html','./styles.css?v=4.48.1','./ui-v4.5.css?v=4.8.0','./scanner-v4.8.css?v=4.10.1','./condition-v4.9.css?v=4.11.1','./solver-v4.11.css?v=4.11.1','./theme-pro.css?v=4.48.1','./app.js?v=4.48.1','./scanner.js?v=4.11.1','./condition.js?v=4.11.1','./solver.js?v=4.11.1','./config.js?v=4.3.1','./offline.js?v=4.11.1','./operations.js?v=4.33.1','./procurement.js?v=1.1.0','./csv-import.js?v=1.0.2','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/maskable-512.png'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(f=>c.add(f).catch(()=>null)))).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).hostname.endsWith('.supabase.co'))return;
+/* Never serve app.js from cache: a stale copy silently undoes every
+   update, which is how a password-reset fix got stranded once. */
+if(/\/(app\.js|styles\.css)$/.test(new URL(e.request.url).pathname))return e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request)));
+if(e.request.mode==='navigate')return e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match('./index.html')));e.respondWith(caches.match(e.request).then(x=>x||fetch(e.request).then(r=>{if(r.ok)caches.open(C).then(c=>c.put(e.request,r.clone()));return r})))});
+/* ---------- Web Push ---------- */
+self.addEventListener('push',e=>{
+  let d={};
+  try{d=e.data?e.data.json():{}}catch(_){d={body:e.data&&e.data.text()}}
+  const title=d.title||'PlantMaster Pro';
+  const body=d.body||'';
+  const opts={
+    body,
+    icon:'icons/icon-192.png',
+    badge:'icons/maskable-512.png',
+    tag:d.tag||'pmpro-default',
+    renotify:!!d.body,
+    requireInteraction:d.severity==='high'||d.tag==='alarm',
+    data:{route:d.route||'/notifications',org_id:d.org_id||''}
+  };
+  e.waitUntil(self.registration.showNotification(title,opts));
+});
+self.addEventListener('notificationclick',e=>{
+  e.notification.close();
+  const route=((e.notification.data&&e.notification.data.route)||'').replace(/^\//,'');
+  const q=route?('pmroute='+encodeURIComponent(route)):'';
+  const url=(q?self.location.origin+'/?'+q:self.location.origin+'/');
+  e.waitUntil(
+    self.clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+      for(const c of list){try{c.navigate(url);c.focus();return}catch(_){}}
+      return self.clients.openWindow(url);
+    })
+  );
+});
