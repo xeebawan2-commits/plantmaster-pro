@@ -1,5 +1,9 @@
 {
-  "dependencies": {
-    "jsdom": "^29.1.1"
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.13.0"
   }
 }
