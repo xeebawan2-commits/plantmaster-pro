@@ -10,7 +10,7 @@
     "build:site": "node scripts/build.mjs --site",
     "build:admin": "node scripts/build.mjs --admin",
     "dev": "node scripts/build.mjs --all && node scripts/serve.mjs",
-    "verify": "npm run verify:db && npm run verify:fn && npm run verify:push && npm run verify:pwa && npm run verify:links",
+    "verify": "npm run verify:db && npm run verify:repairs && npm run verify:fn && npm run verify:push && npm run verify:pwa && npm run verify:links",
     "verify:db": "node tools/db-verify/verify.mjs",
     "verify:fn": "node scripts/verify-functions.mjs",
     "verify:push": "node tools/fn-check/webpush.test.mjs",
@@ -21,7 +21,8 @@
     "deploy": "npm run build:app && wrangler pages deploy public --project-name=plantmaster-pro",
     "deploy:site": "npm run build:site && wrangler pages deploy dist/site --project-name=plantmaster-site",
     "deploy:admin": "npm run build:admin && wrangler pages deploy dist/admin --project-name=plantmaster-admin",
-    "deploy:all": "npm run deploy && npm run deploy:site && npm run deploy:admin"
+    "deploy:all": "npm run deploy && npm run deploy:site && npm run deploy:admin",
+    "verify:repairs": "node tools/db-verify/repair-test.mjs && node tools/db-verify/repair2-test.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
