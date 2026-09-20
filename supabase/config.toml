@@ -1,0 +1,111 @@
+# PlantMaster Pro — Supabase project configuration
+#
+# `project_id` is the local dev stack's container prefix, not the hosted
+# project ref. Link the hosted project with:
+#     supabase link --project-ref <your-project-ref>
+project_id = "plantmaster-pro"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+# A runaway `select *` on a large tenant should not be able to pull the whole
+# table into a phone on a 3G link.
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = true
+default_pool_size = 20
+max_client_conn = 100
+
+[auth]
+enabled = true
+site_url = "https://app.hsbfix.org"
+# Every origin that may complete an OAuth or magic-link redirect.
+additional_redirect_urls = [
+  "https://app.hsbfix.org",
+  "https://admin.hsbfix.org",
+  "https://hsbfix.org",
+  "http://localhost:8080",
+  "http://localhost:8082",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+double_confirm_changes = true
+secure_password_change = true
+max_frequency = "60s"
+
+[auth.sessions]
+# A shared plant tablet must not stay signed in forever.
+timebox = "720h"
+inactivity_timeout = "336h"
+
+[storage]
+enabled = true
+# Manuals are the largest upload; ingest-manual refuses anything over 40 MB.
+file_size_limit = "50MiB"
+
+[storage.buckets.plant-files]
+public = false
+file_size_limit = "50MiB"
+allowed_mime_types = [
+  "application/pdf",
+  "image/png", "image/jpeg", "image/webp", "image/heic",
+  "audio/webm", "audio/mp4", "audio/mpeg", "audio/wav", "audio/ogg",
+  "text/csv",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]
+
+# ===========================================================================
+# Edge functions
+#
+# verify_jwt = true  → Supabase rejects the request before our code runs
+#                      unless a valid user JWT is present.
+# verify_jwt = false → the endpoint authenticates itself (shared token), so
+#                      the platform gate must be off or the scheduler cannot
+#                      reach it. Both such functions compare their token in
+#                      constant time and are unreachable without it.
+# ===========================================================================
+
+[functions.smart-responder]
+verify_jwt = true
+
+[functions.condition-analyzer]
+verify_jwt = true
+
+[functions.vision-scanner]
+verify_jwt = true
+
+[functions.ingest-manual]
+verify_jwt = true
+
+[functions.delete-manual]
+verify_jwt = true
+
+[functions.voice-translate]
+verify_jwt = true
+
+# Called by the GitHub Actions poller with X-Internal-Token; the /subscribe,
+# /unsubscribe and /test routes still require a user JWT in our own code.
+[functions.web-push]
+verify_jwt = false
+
+# Called once a day by the scheduler with DAILY_REPORTS_TOKEN.
+[functions.daily-reports]
+verify_jwt = false
+
+[analytics]
+enabled = false

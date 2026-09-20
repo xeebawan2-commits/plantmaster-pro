@@ -1,0 +1,72 @@
+plugins {
+    id 'com.android.application'
+}
+
+// ---------------------------------------------------------------------------
+// Signing. Never commit a keystore or its passwords. Create
+// android/keystore.properties locally (git-ignored) with:
+//   storeFile=/absolute/path/plantmaster-release.jks
+//   storePassword=...
+//   keyAlias=plantmaster
+//   keyPassword=...
+// ---------------------------------------------------------------------------
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasKeystore = keystorePropertiesFile.exists()
+if (hasKeystore) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace 'org.hsbfix.plantmaster'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "org.hsbfix.plantmaster"
+        minSdk 24            // Android 7.0 — TWA needs a Chrome that supports it
+        targetSdk 35         // Play requires targetSdk 35 for new submissions
+        versionCode 1
+        versionName "4.49.0"
+        resValue "string", "app_name", "PlantMaster Pro"
+    }
+
+    signingConfigs {
+        if (hasKeystore) {
+            release {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasKeystore) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    bundle {
+        language { enableSplit = false }   // keep Urdu strings in the base module
+    }
+}
+
+dependencies {
+    // Trusted Web Activity support library.
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

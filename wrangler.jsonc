@@ -1,8 +1,0 @@
-{
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "plantmaster-pro",
-  "compatibility_date": "2026-09-18",
-  "assets": {
-    "directory": "./public"
-  }
-}

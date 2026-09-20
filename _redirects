@@ -1,0 +1,3 @@
+# Single-page app: every unknown path renders the shell.
+# 200 (rewrite) not 301, so deep links keep their URL.
+/*    /index.html   200

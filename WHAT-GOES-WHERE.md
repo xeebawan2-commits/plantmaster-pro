@@ -1,0 +1,232 @@
+# What goes where — your direct answers
+
+> # ⛔ STOP — read `STOP-READ-FIRST.md` before running any deploy command
+>
+> Your live database has **87 tables and 14 edge functions**, not the 55 and 8
+> these migrations assume. `npm run db:push` would create **5 duplicate
+> tables** and rewrite permissions on 32 tables it does not know about.
+> `npm run functions:deploy` would overwrite **7 working functions**.
+>
+> **`npm run deploy` (the app) is safe and carries all the real fixes.**
+> Everything else is on hold until the migrations are adapted.
+
+> ## ⚠️ Read this before you run `npm run deploy:site`
+>
+> You already have a **separate repository** — `xeebawan2-commits/hsbfix-org` —
+> serving `hsbfix.org` through the Cloudflare project `plantmaster-site`. It
+> contains pages this package does **not** have:
+>
+> `demo.html` · `guide.html` · `pricing.html` · `resources.html` ·
+> `og-image.jpg` · `img/` · `docs/PlantMaster-Pro-Overview…`
+>
+> **`npm run deploy:site` would replace that site and those pages would go
+> offline.** My `site/` folder has only 6 pages
+> (`index`, `signup`, `privacy`, `terms`, `delete-account`, `site.css`).
+>
+> **So: skip `deploy:site` for now.** Deploy the app and admin, which are
+> safe, and decide about the marketing site separately — see
+> *"Your existing marketing site"* near the end of this document.
+>
+> The app and admin have no such conflict.
+
+You asked two things:
+
+1. Do I need a **new** account / repository / database?
+2. What do I upload, and where?
+
+---
+
+## Answer 1: No new accounts. Keep everything you already have.
+
+| Thing | New or existing? | Why |
+|---|---|---|
+| Supabase project | **Existing** — `dpmmenwziplixrgylapy` | The migrations are written to *merge into* your live database, not replace it. Your real data stays. |
+| GitHub repository | **Existing** | The work is already pushed to the branch `arena/01a0be08-plantmaster-pro`. |
+| Cloudflare account | **Existing** | You only add two new Pages projects alongside your current one. |
+| Domain `hsbfix.org` | **Existing** | Only DNS records change. |
+| Google Play account | **New, if you don't have one** | One-time US$25. This is the only thing that may be new. |
+
+**Your customers' data is not touched.** No table is dropped, no row is
+deleted. The migrations only add what's missing and fix what's wrong.
+
+---
+
+## Answer 2: You don't "upload files" anywhere. Three commands do it.
+
+This is the key thing to understand. **There is no manual file upload.** You
+don't drag files into Supabase or Cloudflare. Everything is published by
+running a command from this folder.
+
+```bash
+npm run db:push            # sends the database changes to Supabase
+npm run functions:deploy   # sends the 8 server functions to Supabase
+npm run deploy:all         # sends the 3 websites to Cloudflare
+```
+
+That's it. Below is exactly what each one sends.
+
+---
+
+### Where each folder ends up
+
+| Folder in this package | Goes to | Sent by | You upload manually? |
+|---|---|---|---|
+| root (`index.html`, `app.js`, CSS…) | Cloudflare → `app.hsbfix.org` | `npm run deploy` | No |
+| `site/` | Cloudflare → `hsbfix.org` | `npm run deploy:site` | No |
+| `admin/` | Cloudflare → `admin.hsbfix.org` | `npm run deploy:admin` | No |
+| `supabase/migrations/` | Supabase database | `npm run db:push` | No |
+| `supabase/functions/` | Supabase edge functions | `npm run functions:deploy` | No |
+| `android/` | Google Play Console | `./gradlew bundleRelease`, then upload **one** `.aab` file | **Yes — one file** |
+| `play-assets/`, `screenshots/` | Google Play listing | — | **Yes — the images** |
+| `docs/`, `README.md`, `START-HERE.md` | Nowhere. For you to read. | — | No |
+| `scripts/`, `tools/` | Nowhere. They run on your machine. | — | No |
+
+**The only genuine manual uploads in the whole project are to Google Play:**
+one `.aab` file, plus the store images. Everything else is a command.
+
+---
+
+### Three separate Cloudflare Pages projects
+
+Your app is currently one site. It becomes three, because you now have three
+addresses. In Cloudflare these are three Pages projects:
+
+| Pages project | Serves | Created by |
+|---|---|---|
+| `plantmaster-pro` | `app.hsbfix.org` | `npm run deploy` |
+| `plantmaster-site` | `hsbfix.org` | `npm run deploy:site` |
+| `plantmaster-admin` | `admin.hsbfix.org` | `npm run deploy:admin` |
+
+The first time you run each command, Wrangler asks whether to create the
+project — say yes. After that the same command just updates it.
+
+> If your existing Pages project has a different name, either rename it in the
+> Cloudflare dashboard to `plantmaster-pro`, or edit the `--project-name=`
+> value in `package.json` to match what you already have. Otherwise you'll end
+> up with a second, empty project.
+
+---
+
+### What is NOT in this package, and why
+
+| Not included | Reason |
+|---|---|
+| `node_modules/` | 40 MB of downloaded libraries. `npm install` recreates it. |
+| `public/`, `dist/` | Generated by `npm run build`. Editing them is pointless — they're overwritten. |
+| `.git/` history | **Deliberately excluded.** The leaked token lives in that history. |
+| Your keystore, `.env` | You create these; they must never be shared. |
+
+**Never edit `public/` or `dist/`.** They look like your website but they're
+throwaway copies. Edit the root files and `site/` and `admin/` instead.
+
+---
+
+## The order that matters
+
+Do these in sequence. Each one depends on the last.
+
+```
+1. Rotate the leaked token          (Task 1 in START-HERE.md)
+        ↓
+2. npm install                       once, in this folder
+        ↓
+3. Back up your Supabase database    dashboard → Database → Backups
+        ↓
+4. npm run db:push                   database
+        ↓
+5. npm run functions:deploy          server functions
+        ↓
+6. supabase secrets set ...          the API keys
+        ↓
+7. npm run verify                    must say ALL CHECKS PASSED
+        ↓
+8. npm run deploy:all                the three websites
+        ↓
+9. DNS in Cloudflare                 point the three addresses
+        ↓
+10. Android + Play Store             (Tasks 4–5 in START-HERE.md)
+```
+
+Full detail for every step is in **`START-HERE.md`**.
+
+---
+
+## Your existing marketing site — and the repository-name question
+
+### Do you need to rename the repository?
+
+**No.** Repository names and Cloudflare project names are independent, and
+nothing in this package reads the repository name. Leave both repos as they
+are.
+
+What *did* need fixing was the **Cloudflare project name** in the deploy
+command. Your app lives in the project `plantmaster-pro`, but my script was
+targeting `plantmaster-app` — which would have created a fourth, empty project
+instead of updating yours. **That is now corrected** in `package.json`:
+
+| Cloudflare project you have | Command that updates it |
+|---|---|
+| `plantmaster-pro` → app.hsbfix.org | `npm run deploy` |
+| `plantmaster-site` → hsbfix.org | `npm run deploy:site` ⚠️ see below |
+| `plantmaster-admin` → admin.hsbfix.org | `npm run deploy:admin` |
+
+### The two-repository situation
+
+You currently have two GitHub repositories feeding Cloudflare:
+
+| Repository | Feeds | Deploy style |
+|---|---|---|
+| `plantmaster-pro` (this one) | app + admin | Command (`npm run deploy`) |
+| `hsbfix-org` | hsbfix.org | Connected to Cloudflare — auto-builds on push |
+
+That split is fine and you can leave it exactly as it is.
+
+### So what do I do about the marketing site?
+
+Three options. **Option A is the safe default.**
+
+**Option A — Leave it alone (recommended for now).**
+Keep editing `hsbfix.org` in the `hsbfix-org` repo as you do today. Never run
+`npm run deploy:site`. You lose nothing: your current site is richer than mine.
+Just make sure two pages exist there, because Google Play requires them:
+- `privacy.html` ✅ you have it
+- a **delete-account** page ❌ you do *not* have one — copy
+  `site/delete-account.html` from this package into `hsbfix-org`
+
+**Option B — Take just the missing pieces.**
+Copy `site/delete-account.html` (and anything else you like the look of) into
+`hsbfix-org`, and keep everything else as-is.
+
+**Option C — Switch fully to this package's site.**
+Only if you prefer my version. First copy your `demo.html`, `guide.html`,
+`pricing.html`, `resources.html`, `og-image.jpg`, `img/` and `docs/` into this
+package's `site/` folder, run `npm run verify:links` to confirm nothing breaks,
+*then* run `npm run deploy:site`. Skipping that copy step takes those pages
+offline.
+
+> Whichever you choose, the **delete-account page must be publicly reachable**
+> before Google Play will approve the app. It is the one hard requirement.
+
+---
+
+## If you'd rather not use the command line
+
+Everything above can also be done through web dashboards, but it is slower and
+more error-prone:
+
+- **Database:** open `supabase/migrations/0001_foundation.sql` in a text
+  editor, paste into Supabase → SQL Editor → Run. Repeat for `0002` through
+  `0009` **in numerical order**. Do not skip or reorder.
+- **Functions:** Supabase dashboard → Edge Functions → create each of the 8 by
+  name, paste in the matching `index.ts`. Note the `_shared/` folder is
+  imported by all of them and must exist too.
+- **Websites:** Cloudflare Pages → Create project → Upload assets. But you must
+  first run `npm run build` locally to generate `public/` and `dist/`, because
+  those are what get uploaded, not the source folders.
+
+The three commands are genuinely easier. But the manual route works if you
+prefer it.
+
+---
+
+HSB Fix Services · Karachi, Pakistan · support@hsbfix.org

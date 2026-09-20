@@ -12,11 +12,34 @@ const VAPID_PUBLIC_KEY='BH9ogu3zE6LfOW6yp4oQs372lm61ySttCWXO4hYe6Rn5LGrwKL2jrZf1
 const FN_URL=SUPABASE_URL+'/functions/v1/web-push';
 let dismissedThisSession=false; // 'Later' only hides the banner for this page session
 
+/* Was called by init() but never defined — the ReferenceError aborted push
+   setup entirely, so no device ever subscribed. Persisted across reloads so
+   "Later" is respected for a week rather than nagging on every launch. */
+const DISMISS_KEY='pmPushDismissedUntil';
+function alreadyDismissed(){
+  if(dismissedThisSession)return true;
+  try{
+    const until=Number(localStorage.getItem(DISMISS_KEY)||0);
+    return Number.isFinite(until)&&Date.now()<until;
+  }catch(_){return false}
+}
+function rememberDismissal(days=7){
+  dismissedThisSession=true;
+  try{localStorage.setItem(DISMISS_KEY,String(Date.now()+days*864e5))}catch(_){}
+}
+
 const b64ToUint8array=b64=>{const pad='='.repeat((4-b64.length%4)%4);const raw=atob((b64+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))};
+/* supabase-js v2 stores the session as {access_token,...} at the top level;
+   v1 nested it under currentSession. `sessionId` was never a token at all, so
+   the old fallback could hand the server a meaningless string. */
 const readToken=()=>{
   for(const k of Object.keys(localStorage)){
-    if(!/sb-.*-auth-token$/.test(k))continue;
-    try{const j=JSON.parse(localStorage.getItem(k));const t=j?.currentSession?.access_token||j?.sessionId;if(t)return t}catch(_){}
+    if(!/^sb-.*-auth-token$/.test(k))continue;
+    try{
+      const j=JSON.parse(localStorage.getItem(k));
+      const t=j?.access_token||j?.currentSession?.access_token;
+      if(typeof t==='string'&&t.split('.').length===3)return t;
+    }catch(_){}
   }
   return null;
 };
@@ -30,7 +53,7 @@ function showBanner(onEnable,onDismiss){
   const yes=document.createElement('button');yes.className='pb-yes';yes.textContent='Enable';
   const no=document.createElement('button');no.className='pb-no';no.textContent='Later';
   yes.onclick=()=>{el.remove();onEnable()};
-  no.onclick=()=>{dismissedThisSession=true;el.remove();onDismiss()};
+  no.onclick=()=>{rememberDismissal();el.remove();onDismiss()};
   el.append(yes,no);
   document.body.appendChild(el);
 }
@@ -55,7 +78,12 @@ function init(){
   if(document.getElementById('pushBanner'))return;
   if(alreadyDismissed())return;
 
+  /* Bounded retry: the old version polled every 3–5 s forever on the sign-in
+     screen, keeping the phone awake and the radio busy. */
+  let attempts=0;
+  const MAX_ATTEMPTS=40; // ~3 minutes, then give up until the next page load
   const tryStart=async()=>{
+    if(++attempts>MAX_ATTEMPTS)return;
     const token=readToken();
     if(!token)return setTimeout(tryStart,5000); // wait until the user signs in
     const reg=await navigator.serviceWorker.getRegistration();
