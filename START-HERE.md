@@ -85,9 +85,10 @@ duplicate tables alongside your real ones.
    |---|---|---|
    | 1 | `R1-fix-organization-creation.sql` | signup — creating a company works again |
    | 2 | `R2-control-center.sql` | the Control Center's dead buttons |
-   | 3 | `R3-verify.sql` | read-only; confirms 1 and 2 worked |
+   | 3 | `R4-company-features.sql` | per-company module control in the Control Center |
+   | 4 | `R3-verify.sql` | read-only; confirms the others worked |
 
-   R3 prints 16 rows, each with a *result* and a *want* column. They should
+   R3 prints 19 rows, each with a *result* and a *want* column. They should
    match. If row 13 (*companies with NO subscription*) is not `0`, the bottom
    of R3 has a commented-out block that repairs those companies — read the
    list it prints first.

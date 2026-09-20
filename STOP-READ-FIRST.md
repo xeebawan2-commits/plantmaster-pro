@@ -52,17 +52,21 @@ node tools/db-verify/repair-test.mjs
 
 ## What you need to run, in order
 
-Three files in `supabase/repairs/`. Open each in the Supabase **SQL Editor**,
+Four files in `supabase/repairs/`. Open each in the Supabase **SQL Editor**,
 set the row-limit dropdown beside Run to **No limit**, and run it.
 
 | Order | File | What it does |
 |---|---|---|
 | 1 | `R1-fix-organization-creation.sql` | Inserts the subscription **before** the plant. Signup works again. |
 | 2 | `R2-control-center.sql` | Adds `owner_invitations` + `signup_requests` and the six missing control RPCs. Your Control Center buttons start working. |
-| 3 | `R3-verify.sql` | Read-only. 16 checks; every row tells you what it should say. |
+| 3 | `R4-company-features.sql` | Lets you give one company a module the others do not get, from the Control Center. |
+| 4 | `R3-verify.sql` | Read-only. 19 checks; every row tells you what it should say. |
 
 All three are idempotent — safe to run twice. They only **add**; nothing is
 dropped or renamed.
+
+R4 is optional but you asked to control everything from admin: without it the
+per-company module editor can only take features away, never add them.
 
 **R1 alone restores open signup. R2 then closes it**, so a workspace can only
 be created by someone you invited from the Control Center. Run R1 first even

@@ -118,9 +118,28 @@ select * from (
          (select count(*)::text from public.plants p
            where not exists (select 1 from public.organizations o where o.id=p.organization_id)), '0'
 
+  -- ---------------- R4: per-company feature control ----------------
+  union all
+  select 16, 'table company_feature_grants (R4)',
+         case when to_regclass('public.company_feature_grants') is not null then 'yes' else 'NO' end, 'yes'
+  union all
+  select 17, 'organization_effective_features() (R4)',
+         case when exists (select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+                            where n.nspname='public' and p.proname='organization_effective_features')
+              then 'yes' else 'NO' end, 'yes'
+  union all
+  select 18, 'feature-name limit removed from blocks (R4)',
+         case when exists (select 1 from pg_constraint con
+                             join pg_class c on c.oid=con.conrelid
+                             join pg_namespace n on n.oid=c.relnamespace
+                            where n.nspname='public' and c.relname='company_feature_blocks'
+                              and con.contype='c'
+                              and pg_get_constraintdef(con.oid) ilike '%feature%')
+              then 'STILL THERE' else 'removed' end, 'removed'
+
   -- ---------------- you can still get in ----------------
   union all
-  select 16, 'platform admins configured',
+  select 19, 'platform admins configured',
          (select count(*)::text from public.platform_admins where active), '1 or more'
 
 ) t order by ord;
