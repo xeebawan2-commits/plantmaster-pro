@@ -42,10 +42,23 @@ const onDisk = existsSync(fnDir)
   ? readdirSync(fnDir).filter((d) => !d.startsWith('_') && statSync(join(fnDir, d)).isDirectory())
   : [];
 
+// Functions that run on the live Supabase project but whose source is not in
+// this repo. They are deployed and working; we simply never had the code.
+// Confirmed live in the Supabase dashboard and in the owner's master package
+// (04-EDGE-FUNCTIONS/INVENTORY.txt). Recover with:
+//   npx supabase functions download <name>
+// Listing them here keeps `verify` honest: the call sites are real, so they
+// must not be reported as broken, but they are still flagged as unvendored.
+const LIVE_NOT_VENDORED = new Set(['create-owner', 'platform-admin-api']);
+
 console.log(`${DIM}── edge functions ──${RESET}`);
 for (const name of [...invoked].sort()) {
   const entry = join(fnDir, name, 'index.ts');
   if (existsSync(entry)) console.log(`  ${GREEN}✓${RESET} ${name}`);
+  else if (LIVE_NOT_VENDORED.has(name)) {
+    console.log(`  ${YELLOW}!${RESET} ${name} — live on Supabase, source not in this repo`);
+    warnings.push(`unvendored function: ${name} (npx supabase functions download ${name})`);
+  }
   else { console.log(`  ${RED}✗${RESET} ${name} — invoked by the app but missing`); problems.push(`missing function: ${name}`); }
 }
 for (const name of onDisk) {

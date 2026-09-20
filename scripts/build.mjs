@@ -114,10 +114,14 @@ function buildStatic(name) {
     if (fs.existsSync(src)) { fs.copyFileSync(src, path.join(to, f)); n++; }
   }
 
-  // The admin console imports /config.js for the Supabase URL + anon key.
+  // The admin console imports ./config.js. It needs CUSTOMER_APP_URL and
+  // WHATSAPP_NUMBER, which the app's root config.js does not export, so the
+  // console ships its own. Only fall back to the root one if it is absent.
   if (name === 'admin') {
-    fs.copyFileSync(path.join(repo, 'config.js'), path.join(to, 'config.js'));
-    n++;
+    if (!fs.existsSync(path.join(from, 'config.js'))) {
+      fs.copyFileSync(path.join(repo, 'config.js'), path.join(to, 'config.js'));
+      n++;
+    }
     fs.writeFileSync(path.join(to, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
     fs.writeFileSync(path.join(to, '_headers'), [
       '/*',
