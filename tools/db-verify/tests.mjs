@@ -628,6 +628,135 @@ export async function runTests(db) {
     if (theirs.rows[0].n !== 0) throw new Error('profile leaked across tenants');
   });
 
+  // ---- 0009: edge function support ----------------------------------------
+  await check('manual indexing columns exist and accept the function payload', async () => {
+    const m = (await db.query(
+      `insert into public.manuals(organization_id,plant_id,title,storage_path,status)
+       values ($1,$2,'Pump manual','${''}x/y.pdf','stored') returning id`,
+      [ids.orgA, ids.plantA])).rows[0].id;
+    await db.query(
+      `update public.manuals
+          set status='indexed', chunk_count=412, page_count=87,
+              indexed_at=now(), index_error=null
+        where id=$1`, [m]);
+    const r = (await db.query(
+      `select status, chunk_count, indexed_at from public.manuals where id=$1`, [m])).rows[0];
+    if (r.status !== 'indexed' || r.chunk_count !== 412 || !r.indexed_at) {
+      throw new Error('indexing progress not stored');
+    }
+    // The status vocabulary must be enforced, not merely documented.
+    let rejected = false;
+    try { await db.query(`update public.manuals set status='bogus' where id=$1`, [m]); }
+    catch { rejected = true; }
+    if (!rejected) throw new Error('manuals.status accepted an unknown value');
+    await db.query(`delete from public.manuals where id=$1`, [m]);
+  });
+
+  await check('document_chunks stores the heading written by ingest-manual', async () => {
+    const m = (await db.query(
+      `insert into public.manuals(organization_id,plant_id,title,status)
+       values ($1,$2,'Gearbox manual','indexed') returning id`,
+      [ids.orgA, ids.plantA])).rows[0].id;
+    await db.query(
+      `insert into public.document_chunks
+         (organization_id,manual_id,chunk_index,page_number,heading,content)
+       values ($1,$2,0,51,'4.2 Bearing replacement','Torque the cap bolts to 210 Nm.')`,
+      [ids.orgA, m]);
+    const r = (await db.query(
+      `select heading, page_number from public.document_chunks where manual_id=$1`, [m])).rows[0];
+    if (r.heading !== '4.2 Bearing replacement' || r.page_number !== 51) {
+      throw new Error('chunk heading/page not stored');
+    }
+    // smart-responder's retrieval predicate must stay tenant-scoped.
+    const leak = await asUser(ids.ownerB,
+      `select count(*)::int n from public.document_chunks where manual_id=$1`, [m]);
+    if (leak.rows[0].n !== 0) throw new Error('another tenant read our manual chunks');
+    await db.query(`delete from public.manuals where id=$1`, [m]);
+  });
+
+  await check('daily_report_runs cannot send the same company twice in a day', async () => {
+    await db.query(
+      `insert into public.daily_report_runs(organization_id,report_date,recipients)
+       values ($1, current_date, 2)`, [ids.orgA]);
+    let blocked = false;
+    try {
+      await db.query(
+        `insert into public.daily_report_runs(organization_id,report_date,recipients)
+         values ($1, current_date, 2)`, [ids.orgA]);
+    } catch { blocked = true; }
+    if (!blocked) throw new Error('a company could be emailed twice on the same day');
+    // A different day, and a different company, must both still be allowed.
+    await db.query(
+      `insert into public.daily_report_runs(organization_id,report_date,recipients)
+       values ($1, current_date - 1, 2)`, [ids.orgA]);
+    await db.query(
+      `insert into public.daily_report_runs(organization_id,report_date,recipients)
+       values ($1, current_date, 1)`, [ids.orgB]);
+  });
+
+  await check('daily report history is readable by managers, not technicians', async () => {
+    const mgr = await asUser(ids.mgrA,
+      `select count(*)::int n from public.daily_report_runs where organization_id=$1`, [ids.orgA]);
+    if (mgr.rows[0].n === 0) throw new Error('manager cannot see their own send history');
+    const tech = await asUser(ids.techA,
+      `select count(*)::int n from public.daily_report_runs where organization_id=$1`, [ids.orgA]);
+    if (tech.rows[0].n !== 0) throw new Error('technician saw the billing-adjacent send history');
+    const other = await asUser(ids.ownerB,
+      `select count(*)::int n from public.daily_report_runs where organization_id=$1`, [ids.orgA]);
+    if (other.rows[0].n !== 0) throw new Error('another tenant read our send history');
+  });
+
+  await denied('clients cannot write daily_report_runs', async () => {
+    await asUser(ids.ownerA,
+      `insert into public.daily_report_runs(organization_id,report_date) values ($1, current_date + 5)`,
+      [ids.orgA]);
+  });
+
+  await check('bump_push_failures parks an endpoint after repeated failures', async () => {
+    const sub = (await db.query(
+      `insert into public.push_subscriptions(user_id,organization_id,endpoint,p256dh,auth)
+       values ($1,$2,'https://fcm.example/ep1','p','a') returning id`,
+      [ids.techA, ids.orgA])).rows[0].id;
+
+    for (let i = 0; i < 9; i++) await db.query(`select public.bump_push_failures($1)`, [[sub]]);
+    let r = (await db.query(
+      `select failure_count, active from public.push_subscriptions where id=$1`, [sub])).rows[0];
+    if (r.failure_count !== 9 || r.active !== true) {
+      throw new Error(`parked too early: ${r.failure_count}/${r.active}`);
+    }
+    await db.query(`select public.bump_push_failures($1)`, [[sub]]);
+    r = (await db.query(
+      `select failure_count, active from public.push_subscriptions where id=$1`, [sub])).rows[0];
+    if (r.failure_count !== 10 || r.active !== false) {
+      throw new Error('endpoint was not parked at the threshold');
+    }
+    await db.query(`delete from public.push_subscriptions where id=$1`, [sub]);
+  });
+
+  await denied('clients cannot call bump_push_failures', async () => {
+    await asUser(ids.techA, `select public.bump_push_failures($1)`, [[ids.techA]]);
+  });
+
+  await denied('clients cannot forge AI usage rows', async () => {
+    await asUser(ids.ownerA,
+      `insert into public.ai_usage_events(organization_id,user_id,function_name)
+       values ($1,$2,'smart-responder')`, [ids.orgA, ids.ownerA]);
+  });
+
+  await check('AI quota counting sees only this tenant this month', async () => {
+    await db.query(
+      `insert into public.ai_usage_events(organization_id,user_id,function_name,created_at)
+       values ($1,$2,'smart-responder', now()),
+              ($1,$2,'smart-responder', now() - interval '40 days'),
+              ($3,$4,'smart-responder', now())`,
+      [ids.orgA, ids.ownerA, ids.orgB, ids.ownerB]);
+    const n = (await db.query(
+      `select count(*)::int n from public.ai_usage_events
+        where organization_id=$1 and created_at >= date_trunc('month', now())`,
+      [ids.orgA])).rows[0].n;
+    if (n !== 1) throw new Error(`quota window counted ${n}, expected 1 (last month/other tenant leaked)`);
+  });
+
   console.log(`\n${DIM}── ${pass} passed, ${fail} failed ──${RESET}`);
   if (fail) console.log(`${RED}failing: ${failures.join(', ')}${RESET}`);
   return fail;

@@ -10,16 +10,22 @@
     "build:site": "node scripts/build.mjs --site",
     "build:admin": "node scripts/build.mjs --admin",
     "dev": "node scripts/build.mjs --all && node scripts/serve.mjs",
-    "verify": "npm run verify:db && npm run verify:pwa && npm run verify:links",
+    "verify": "npm run verify:db && npm run verify:fn && npm run verify:push && npm run verify:pwa && npm run verify:links",
     "verify:db": "node tools/db-verify/verify.mjs",
+    "verify:fn": "node scripts/verify-functions.mjs",
+    "verify:push": "node tools/fn-check/webpush.test.mjs",
     "verify:pwa": "node scripts/build.mjs --app && node scripts/verify-pwa.mjs",
     "verify:links": "node scripts/verify-links.mjs",
+    "db:push": "supabase db push",
+    "functions:deploy": "supabase functions deploy smart-responder condition-analyzer vision-scanner ingest-manual delete-manual voice-translate web-push daily-reports",
     "deploy": "npm run build:app && wrangler pages deploy public --project-name=plantmaster-app",
     "deploy:site": "npm run build:site && wrangler pages deploy dist/site --project-name=plantmaster-site",
-    "deploy:admin": "npm run build:admin && wrangler pages deploy dist/admin --project-name=plantmaster-admin"
+    "deploy:admin": "npm run build:admin && wrangler pages deploy dist/admin --project-name=plantmaster-admin",
+    "deploy:all": "npm run deploy && npm run deploy:site && npm run deploy:admin"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "typescript": "^5.9.3",
     "wrangler": "^4.13.0"
   }
 }

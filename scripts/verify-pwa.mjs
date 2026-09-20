@@ -35,6 +35,30 @@ for(const i of mf.icons){
     :no(`${i.src} declares ${i.sizes} but is ${w}x${h}`);
 }
 
+/* Screenshots drive the richer install prompt on Android and are reused for
+   the Play listing, so a declared-but-missing file is a blocking error. */
+console.log('\nScreenshots');
+if(!Array.isArray(mf.screenshots)||!mf.screenshots.length)
+  wr('no screenshots — Android shows the minimal install prompt');
+else{
+  const forms=new Set();
+  for(const s of mf.screenshots){
+    const p=path.join(OUT,s.src.replace(/^\//,''));
+    if(!fs.existsSync(p)){no(`screenshot file missing: ${s.src}`);continue}
+    const b=fs.readFileSync(p);
+    const isPng=b.slice(0,8).equals(Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]));
+    if(!isPng){no(`${s.src} is not a valid PNG`);continue}
+    const w=b.readUInt32BE(16),h=b.readUInt32BE(20);
+    if(s.sizes&&`${w}x${h}`!==s.sizes){no(`${s.src} declares ${s.sizes} but is ${w}x${h}`);continue}
+    if(s.form_factor)forms.add(s.form_factor);
+    /* Play rejects anything under 320px on its shortest side. */
+    Math.min(w,h)>=320?ok(`${s.src} ${w}x${h} (${s.form_factor||'any'})`)
+      :no(`${s.src} is ${w}x${h} — Play requires at least 320px on the short side`);
+  }
+  forms.has('wide')?ok('wide form factor covered'):wr('no wide screenshot — desktop install prompt stays minimal');
+  forms.has('narrow')?ok('narrow form factor covered'):wr('no narrow screenshot — phone install prompt stays minimal');
+}
+
 console.log('\nService worker & offline');
 const sw=path.join(OUT,'service-worker.js');
 fs.existsSync(sw)?ok('service-worker.js shipped'):no('no service worker — not installable');
