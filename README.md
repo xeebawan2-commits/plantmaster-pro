@@ -106,9 +106,9 @@ supply chain and no CDN fetch at cold start.
 
 1. **Rotate `PUSH_INTERNAL_TOKEN`.** It was committed in plain text and is
    still in git history at `6c367eb`.
-2. **Supply the Play App Signing SHA-256** for
-   `.well-known/assetlinks.json` and `android/…/strings.xml` — available only
-   after the first upload to the Play Console.
+2. **Supply the Play App Signing SHA-256** in `.well-known/assetlinks.json`
+   (and its mirror in `site/`) — available only after the first upload to the
+   Play Console.
 3. **Seed `platform_admins`** before using the admin console.
 4. **Generate the release keystore** (needs a JDK; see `docs/PLAY_STORE.md`).
 

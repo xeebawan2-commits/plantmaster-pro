@@ -197,15 +197,19 @@ all written out for you in **`docs/PLAY_STORE.md`** — copy and paste from ther
    *Test and release → Setup → App signing* and copy the
    **SHA-256 certificate fingerprint**.
 
-   Paste that fingerprint into **two** files, replacing the placeholder text
-   `REPLACE_WITH_PLAY_APP_SIGNING_SHA256_FINGERPRINT`:
+   Paste that fingerprint into these **two files**, replacing the placeholder
+   text `REPLACE_WITH_PLAY_APP_SIGNING_SHA256_FINGERPRINT`:
 
-   - `.well-known/assetlinks.json`
-   - `android/app/src/main/res/values/strings.xml`
+   - `.well-known/assetlinks.json`  ← the one that matters
+   - `site/.well-known/assetlinks.json`  ← keep the copy in sync
 
-   Then republish the web app:
+   > You do **not** touch `strings.xml`. It is already correct. It carries the
+   > app's side of the handshake, which only names the website; the
+   > fingerprint only ever goes in `assetlinks.json`.
+
+   Then republish:
    ```bash
-   npm run deploy
+   npm run deploy && npm run deploy:site
    ```
 
    > **Why this matters:** without it the app still works, but it shows a

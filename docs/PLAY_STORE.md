@@ -16,15 +16,18 @@ app as normal and the store listing points at the same code.
 
 ## The one thing that will bite you
 
-A TWA only hides the URL bar when **two** files agree:
+A TWA only hides the URL bar when both sides of a handshake agree:
 
-1. `app/src/main/res/values/strings.xml` → `asset_statements`
-2. `https://app.hsbfix.org/.well-known/assetlinks.json`
+1. **App → web.** `app/src/main/res/values/strings.xml` → `asset_statements`
+   names the site (`https://app.hsbfix.org`). This is already correct; you do
+   not edit it.
+2. **Web → app.** `https://app.hsbfix.org/.well-known/assetlinks.json` names
+   the package **and the SHA-256 fingerprint** of the certificate that
+   actually signs the installed app.
 
-Both must contain the SHA-256 of the certificate that **actually signs the
-installed app**. If you use Play App Signing — and you should — that is
-Google's certificate, not your upload key. The file in this repo currently
-holds the placeholder:
+Only file 2 needs the fingerprint. If you use Play App Signing — and you
+should — that is Google's certificate, **not** your upload key. The file in
+this repo currently holds the placeholder:
 
 ```
 REPLACE_WITH_PLAY_APP_SIGNING_SHA256_FINGERPRINT
@@ -35,10 +38,11 @@ Get the real value **after** the first upload:
 > Play Console → your app → **Test and release → Setup → App signing** →
 > *App signing key certificate* → copy the SHA-256 fingerprint.
 
-Then replace the placeholder in **both** files, redeploy the web app, and
-verify:
+Replace the placeholder in `.well-known/assetlinks.json` (and the mirrored
+copy in `site/.well-known/assetlinks.json`), redeploy, then verify:
 
 ```bash
+npm run deploy && npm run deploy:site
 curl -s https://app.hsbfix.org/.well-known/assetlinks.json | jq .
 npm run verify:pwa      # the advisory disappears once it is a real fingerprint
 ```
@@ -229,7 +233,7 @@ promotion of external payment as a violation. The pricing lives on
 - [ ] `npm run verify` green
 - [ ] Web app deployed; `app.hsbfix.org` loads and installs
 - [ ] `assetlinks.json` holds the **Play App Signing** SHA-256 (not the upload key)
-- [ ] `strings.xml` `asset_statements` holds the same fingerprint
+- [ ] `site/.well-known/assetlinks.json` mirrors the same fingerprint
 - [ ] `versionCode` bumped
 - [ ] `./gradlew bundleRelease` succeeds
 - [ ] Uploaded to **internal testing** first
