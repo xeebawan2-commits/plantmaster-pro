@@ -1,1 +1,76 @@
-{"id":"./index.html","name":"PlantMaster Pro Multi-User","short_name":"PlantMaster","start_url":"./index.html","scope":"./","display":"standalone","background_color":"#050a12","theme_color":"#07101c","icons":[{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png"},{"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
+{
+  "id": "/",
+  "name": "PlantMaster Pro — Plant Maintenance",
+  "short_name": "PlantMaster",
+  "description": "Multi-plant maintenance management: work orders, QR asset scanning, sound and vibration condition monitoring, AI troubleshooting grounded in your own equipment manuals, with Urdu and English voice input.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#050a12",
+  "theme_color": "#07101c",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "business", "utilities"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Plant dashboard with live work order and asset status"
+    },
+    {
+      "src": "/screenshots/dashboard-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Plant dashboard on a phone"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Work Orders",
+      "short_name": "Work",
+      "description": "Open assigned corrective work",
+      "url": "/?pmroute=work",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Scan QR",
+      "short_name": "Scan",
+      "description": "Scan an asset or spare QR code",
+      "url": "/?pmroute=qr",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Alerts",
+      "short_name": "Alerts",
+      "description": "Plant alarms and notifications",
+      "url": "/?pmroute=notifications",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

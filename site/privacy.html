@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07101c">
+<title>Privacy Policy — PlantMaster Pro</title>
+<meta name="description" content="How PlantMaster Pro collects, uses and protects your data.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<header class="nav"><div class="wrap nav-inner">
+<a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="34" height="34"><span>PlantMaster <b>Pro</b></span></a>
+<nav><a href="/#features">Features</a><a href="/#pricing">Pricing</a><a class="btn small" href="https://app.hsbfix.org">Open app</a></nav>
+</div></header>
+<main class="wrap page">
+<h1>Privacy Policy</h1>
+<p><strong>Last updated:</strong> 20 September 2026</p>
+<p>This policy explains what PlantMaster Pro collects, why, and what control you have. It also covers the disclosures Google Play requires.</p>
+
+<h2>1. What we collect</h2>
+<ul>
+<li><strong>Account data</strong> — name, work email, phone, designation, employee ID, shift and role within your company workspace.</li>
+<li><strong>Operational data you enter</strong> — assets, work orders, checklists, attendance, spares, purchase orders, daily logs and similar maintenance records.</li>
+<li><strong>Files you upload</strong> — equipment manuals, drawings, photos, scanned documents and audio recordings you make for condition monitoring.</li>
+<li><strong>Technical data</strong> — device type, browser/app version and error diagnostics, used to keep the app working.</li>
+<li><strong>Audit records</strong> — who changed which record and when. This is a core feature and cannot be switched off within a workspace.</li>
+</ul>
+
+<h2>2. What we do not collect</h2>
+<p>We do not collect precise location. We do not use advertising identifiers, run third-party ad networks, or sell or rent your data to anyone.</p>
+
+<h2>3. Camera, microphone and notifications</h2>
+<ul>
+<li><strong>Camera</strong> — used only when you scan a QR code or photograph a document or fault. Images go to your workspace storage; the camera is never used in the background.</li>
+<li><strong>Microphone</strong> — used only when you record machine sound for condition monitoring, or use voice input to dictate a field. Recording is explicit and visible.</li>
+<li><strong>Notifications</strong> — used to deliver work-order assignments and plant alarms. You can decline or revoke this at any time in your device settings.</li>
+</ul>
+
+<h2>4. How your data is protected</h2>
+<p>Data is stored with Supabase (PostgreSQL) and transmitted over TLS. Every table is protected by row-level security so a workspace can only ever read its own rows; this is enforced by the database itself, not only by the app. Files are stored in a private bucket and served through short-lived signed links. Access inside your company is controlled by the role your owner assigns you.</p>
+
+<h2>5. AI processing</h2>
+<p>When you use AI troubleshooting or condition analysis, the relevant question and context — which may include extracts from manuals you uploaded and the plant history of the machine concerned — are sent to Google's Gemini API to generate a response. This is processing on our behalf for your request. Your data is not used to train third-party models. If you prefer not to use AI features, simply do not use them; the rest of the app works without them.</p>
+
+<h2>6. Who else processes data</h2>
+<ul>
+<li><strong>Supabase</strong> — database, authentication and file storage.</li>
+<li><strong>Cloudflare</strong> — hosting and content delivery for the web app.</li>
+<li><strong>Google (Gemini API)</strong> — AI responses, only when you use an AI feature.</li>
+<li><strong>Resend</strong> — delivery of the optional daily email report.</li>
+</ul>
+
+<h2>7. Retention</h2>
+<p>Operational records are retained for as long as your workspace is active, and by default for the periods set in your workspace retention policy (operational records 3 years, audit records 7 years, AI prompts 1 year). Deleted records go to a recovery bin for a grace period (30 days by default) before permanent deletion.</p>
+
+<h2>8. Your rights</h2>
+<p>You may request access to, correction of, or deletion of your personal data. Workspace owners can export company data at any time from the app. To delete your account see <a href="/delete-account.html" style="color:#7aa2f7">Delete my account</a>. Contact <a href="mailto:privacy@hsbfix.org" style="color:#7aa2f7">privacy@hsbfix.org</a> for any privacy request.</p>
+
+<h2>9. Children</h2>
+<p>The Service is for workplace use and is not directed at anyone under 18.</p>
+
+<h2>10. Changes</h2>
+<p>We will notify you in the app of material changes to this policy.</p>
+
+<h2>11. Contact</h2>
+<p>HSB Fix Services · <a href="mailto:privacy@hsbfix.org" style="color:#7aa2f7">privacy@hsbfix.org</a> · Karachi, Sindh, Pakistan</p>
+</main>
+<footer class="footer"><div class="wrap foot-base" style="border:0;margin:0;padding-top:0;text-align:center">
+© <span id="yr">2026</span> HSB Fix Services ·
+<a href="/terms.html" style="color:inherit">Terms</a> ·
+<a href="/privacy.html" style="color:inherit">Privacy</a> ·
+<a href="/delete-account.html" style="color:inherit">Delete account</a>
+</div></footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear()</script>
+</body></html>

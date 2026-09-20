@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PlantMaster Pro</string>
+    <string name="launch_url">https://app.hsbfix.org/</string>
+
+    <!--
+      Digital Asset Links statement. The host must serve a matching
+      /.well-known/assetlinks.json listing this package and the SHA-256
+      fingerprint of the key Play signs the app with.
+    -->
+    <string name="asset_statements" translatable="false">
+        [{
+          \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+          \"target\": {
+            \"namespace\": \"web\",
+            \"site\": \"https://app.hsbfix.org\"
+          }
+        }]
+    </string>
+</resources>

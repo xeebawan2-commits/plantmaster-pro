@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07101c">
+<meta name="robots" content="noindex,nofollow">
+<title>PlantMaster Control Center</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<!-- ── sign in ─────────────────────────────────────────────────────────── -->
+<section id="auth" class="gate">
+  <form id="authForm" class="gate-card">
+    <div class="gate-brand">
+      <img src="/icons/icon-192.png" alt="" width="42" height="42">
+      <div><b>PlantMaster</b><small>Control Center</small></div>
+    </div>
+    <p class="gate-note">Restricted to PlantMaster platform staff.</p>
+    <label class="field"><span>Email</span>
+      <input id="email" type="email" required autocomplete="email" placeholder="you@hsbfix.org"></label>
+    <label class="field"><span>Password</span>
+      <input id="password" type="password" required minlength="8" autocomplete="current-password"></label>
+    <button class="btn" type="submit">Sign in</button>
+    <div id="authMsg" class="msg"></div>
+  </form>
+</section>
+
+<!-- ── denied ──────────────────────────────────────────────────────────── -->
+<section id="denied" class="gate" hidden>
+  <div class="gate-card">
+    <h2>Not a platform administrator</h2>
+    <p class="gate-note">This account is signed in but is not on the platform staff list, so the control center is unavailable.</p>
+    <p class="gate-note">If you are a customer, use <a href="https://app.hsbfix.org">app.hsbfix.org</a> instead.</p>
+    <button class="btn ghost" id="denyOut">Sign out</button>
+  </div>
+</section>
+
+<!-- ── console ─────────────────────────────────────────────────────────── -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-brand">
+      <img src="/icons/icon-192.png" alt="" width="28" height="28">
+      <b>Control Center</b>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-view="tenants">Companies</button>
+      <button class="tab" data-view="complaints">Complaints</button>
+      <button class="tab" data-view="incidents">Incidents</button>
+      <button class="tab" data-view="plans">Plans</button>
+    </nav>
+    <div class="top-right">
+      <span id="who" class="who"></span>
+      <button id="signOut" class="btn ghost tiny">Sign out</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="loading"><span class="spin"></span> Loading…</div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+<script type="module" src="/admin.js"></script>
+</body>
+</html>

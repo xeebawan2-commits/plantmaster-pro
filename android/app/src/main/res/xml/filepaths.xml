@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Lets the web app share downloaded reports and signed-URL files. -->
+    <cache-path name="shared" path="twa_shared/" />
+    <files-path name="downloads" path="downloads/" />
+</paths>

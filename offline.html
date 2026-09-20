@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101c">
+<title>Offline — PlantMaster Pro</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh; display: grid; place-items: center;
+    padding: 24px; background: #050a12; color: #e6eefc;
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .card {
+    max-width: 440px; width: 100%; text-align: center;
+    background: #0b1626; border: 1px solid #1e3a5f;
+    border-radius: 18px; padding: 34px 26px;
+  }
+  .icon { font-size: 46px; line-height: 1; margin-bottom: 14px; }
+  h1 { font-size: 21px; margin: 0 0 10px; }
+  p { color: #93a9c4; margin: 0 0 10px; font-size: 14.5px; }
+  ul { text-align: left; color: #93a9c4; font-size: 14px; margin: 14px 0 20px; padding-left: 20px; }
+  li { margin: 6px 0; }
+  button {
+    width: 100%; padding: 13px 18px; font-size: 15px; font-weight: 600;
+    color: #fff; background: #2563eb; border: 0; border-radius: 11px; cursor: pointer;
+  }
+  button:active { background: #1d4ed8; }
+  small { display: block; margin-top: 16px; color: #64798f; font-size: 12.5px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" aria-hidden="true">📴</div>
+    <h1>You are offline</h1>
+    <p>PlantMaster Pro could not reach the network.</p>
+    <ul>
+      <li>Work you already saved is safe on this device.</li>
+      <li>New records you create offline are queued and sync automatically when the connection returns.</li>
+      <li>Keep the app installed so it opens instantly next time.</li>
+    </ul>
+    <button onclick="location.replace('/')">Try again</button>
+    <small>PlantMaster Pro · a product of HSB Fix Services</small>
+  </div>
+  <script>
+    addEventListener('online', () => location.replace('/'));
+    setInterval(() => { if (navigator.onLine) location.replace('/'); }, 5000);
+  </script>
+</body>
+</html>

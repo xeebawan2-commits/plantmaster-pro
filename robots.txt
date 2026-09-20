@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /$
+Allow: /index.html
+Allow: /manifest.webmanifest
+Allow: /icons/
+Disallow: /?pmroute=
+Disallow: /?invite=
+
+Sitemap: https://hsbfix.org/sitemap.xml

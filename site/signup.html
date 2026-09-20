@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07101c">
+<title>Request access — PlantMaster Pro</title>
+<meta name="description" content="Request a PlantMaster Pro workspace for your plant. We set up your company, import your asset list and train your team.">
+<link rel="canonical" href="https://hsbfix.org/signup.html">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="/"><img src="/icons/icon-192.png" alt="" width="34" height="34"><span>PlantMaster <b>Pro</b></span></a>
+    <nav><a href="/#features">Features</a><a href="/#pricing">Pricing</a><a class="btn small" href="https://app.hsbfix.org">Open app</a></nav>
+  </div>
+</header>
+
+<main class="wrap page">
+  <h1>Request access</h1>
+  <p>Accounts are created by HSB Fix Services so every workspace is set up correctly — your plants, your roster and your asset list. Tell us about your operation and we will get back to you within one working day.</p>
+
+  <div class="note">
+    Already have an account? <a href="https://app.hsbfix.org" style="color:#7aa2f7">Sign in to the app</a>.
+    Want to look around first? <a href="https://app.hsbfix.org/?demo=1" style="color:#7aa2f7">Open the read-only demo</a>.
+  </div>
+
+  <form class="form" id="signupForm"
+        action="https://formsubmit.co/support@hsbfix.org" method="POST">
+    <!-- Progressive enhancement: posts to email if JS is unavailable. -->
+    <input type="hidden" name="_subject" value="PlantMaster Pro — access request">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+    <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+    <label class="field">
+      <span>Company name *</span>
+      <input name="company" required autocomplete="organization" placeholder="e.g. Alpha Cement (Pvt) Ltd">
+    </label>
+
+    <label class="field">
+      <span>Your full name *</span>
+      <input name="name" required autocomplete="name" placeholder="e.g. Hassan Bin Saeed">
+    </label>
+
+    <label class="field">
+      <span>Work email *</span>
+      <input name="email" type="email" required autocomplete="email" placeholder="you@company.com">
+    </label>
+
+    <label class="field">
+      <span>WhatsApp / phone *</span>
+      <input name="phone" type="tel" required autocomplete="tel" placeholder="+92 3xx xxxxxxx">
+    </label>
+
+    <label class="field">
+      <span>Your role</span>
+      <select name="role">
+        <option>Maintenance Manager</option>
+        <option>Plant Manager</option>
+        <option>Maintenance Engineer</option>
+        <option>Production Engineer</option>
+        <option>Owner / Director</option>
+        <option>IT</option>
+        <option>Other</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Industry</span>
+      <select name="industry">
+        <option>Cement</option><option>Steel / Re-rolling</option><option>Textile</option>
+        <option>Sugar</option><option>Food &amp; Beverage</option><option>Chemicals</option>
+        <option>Power generation</option><option>Paper</option><option>Other</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>Approximate number of maintenance staff</span>
+      <select name="team_size">
+        <option>1–10</option><option>11–25</option><option>26–60</option>
+        <option>61–150</option><option>More than 150</option>
+      </select>
+    </label>
+
+    <label class="field">
+      <span>What do you want to fix first?</span>
+      <textarea name="message" placeholder="e.g. We track breakdowns on paper and lose history when staff leave. We have about 400 machines across two plants."></textarea>
+    </label>
+
+    <label class="field" style="display:flex;gap:10px;align-items:flex-start">
+      <input type="checkbox" name="consent" required style="width:auto;margin-top:4px">
+      <span style="margin:0">I agree to the <a href="/terms.html" style="color:#7aa2f7">Terms of Service</a> and <a href="/privacy.html" style="color:#7aa2f7">Privacy Policy</a>. *</span>
+    </label>
+
+    <button class="btn" type="submit">Send request</button>
+    <p class="micro" style="margin-top:14px;text-align:center">
+      Prefer to talk? <a href="https://wa.me/923162364074" style="color:#7aa2f7">Message us on WhatsApp</a>
+    </p>
+  </form>
+</main>
+
+<footer class="footer">
+  <div class="wrap foot-base" style="border:0;margin:0;padding-top:0;text-align:center">
+    © <span id="yr">2026</span> HSB Fix Services ·
+    <a href="/terms.html" style="color:inherit">Terms</a> ·
+    <a href="/privacy.html" style="color:inherit">Privacy</a>
+  </div>
+</footer>
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+// Friendly inline confirmation instead of bouncing to a third-party page.
+const f=document.getElementById('signupForm');
+f.addEventListener('submit',async e=>{
+  if(!f.reportValidity())return;
+  e.preventDefault();
+  const btn=f.querySelector('button');btn.disabled=true;btn.textContent='Sending…';
+  try{
+    await fetch(f.action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}});
+    f.innerHTML='<h2 style="margin-top:0">Request received ✓</h2>'+
+      '<p>Thank you. We will contact you within one working day to set up your workspace.</p>'+
+      '<p><a class="btn ghost" href="/">Back to home</a></p>';
+  }catch(_){
+    btn.disabled=false;btn.textContent='Send request';
+    alert('Could not send just now. Please WhatsApp us on +92 316 2364074.');
+  }
+});
+</script>
+</body>
+</html>
