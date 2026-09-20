@@ -1,0 +1,116 @@
+name: Build Android app bundle
+
+# Builds the Play Store .aab in the cloud, because you are working from a
+# phone and cannot run Android Studio or Gradle locally.
+#
+# HOW TO USE IT
+#   1. Create the signing key ONCE (see docs/PHONE-ONLY-GUIDE.md section 5).
+#   2. Add these four repository secrets:
+#        ANDROID_KEYSTORE_BASE64   the .jks file, base64 encoded
+#        ANDROID_KEYSTORE_PASSWORD
+#        ANDROID_KEY_ALIAS
+#        ANDROID_KEY_PASSWORD
+#   3. GitHub -> Actions -> "Build Android app bundle" -> Run workflow.
+#   4. When it finishes, download the "plantmaster-aab" artifact and upload
+#      that .aab to the Play Console.
+#
+# If the secrets are absent the job still runs and produces an UNSIGNED
+# bundle, which is useful for checking the project compiles but cannot be
+# uploaded to Play.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'versionName, e.g. 4.49.0'
+        required: false
+        default: ''
+      version_code:
+        description: 'versionCode, a whole number that must increase every upload'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Add the Gradle wrapper
+        # The wrapper JAR is deliberately not committed. Generate it here.
+        working-directory: android
+        run: |
+          if [ ! -f gradlew ]; then
+            gradle wrapper --gradle-version 8.7 --distribution-type bin
+          fi
+          chmod +x gradlew
+          ./gradlew --version
+
+      - name: Apply version overrides
+        if: inputs.version_name != '' || inputs.version_code != ''
+        working-directory: android
+        run: |
+          if [ -n "${{ inputs.version_name }}" ]; then
+            sed -i "s/versionName \".*\"/versionName \"${{ inputs.version_name }}\"/" app/build.gradle
+          fi
+          if [ -n "${{ inputs.version_code }}" ]; then
+            sed -i "s/versionCode .*/versionCode ${{ inputs.version_code }}/" app/build.gradle
+          fi
+          grep -E "versionCode|versionName" app/build.gradle
+
+      - name: Restore the signing key
+        id: signing
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KS" ]; then
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret. Building an UNSIGNED bundle, which Play will reject."
+            exit 0
+          fi
+          echo "$KS" | base64 -d > "$RUNNER_TEMP/release.jks"
+          ls -l "$RUNNER_TEMP/release.jks"
+          cat > android/keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/release.jks
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build the bundle
+        working-directory: android
+        run: ./gradlew bundleRelease --no-daemon --stacktrace
+
+      - name: Report the signing fingerprint
+        if: steps.signing.outputs.signed == 'true'
+        run: |
+          echo "## Upload-key fingerprint" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          keytool -list -v \
+            -keystore "$RUNNER_TEMP/release.jks" \
+            -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            -alias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            | grep -A1 "SHA256:" | head -4 >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "NOTE: assetlinks.json needs the **Play App Signing** fingerprint" >> "$GITHUB_STEP_SUMMARY"
+          echo "from Play Console -> Test and release -> Setup -> App signing," >> "$GITHUB_STEP_SUMMARY"
+          echo "which is usually DIFFERENT from the upload key above." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: plantmaster-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+          retention-days: 30
