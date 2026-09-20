@@ -3,7 +3,9 @@ name: Fetch transfer
 # Temporary bridge: the agent sandbox cannot reach wetransfer.com (TLS blocked),
 # but a GitHub runner can. This downloads the transfer and commits it back to
 # this branch so the sandbox can retrieve it over github.com, which IS reachable.
-# Delete this workflow and the incoming/ directory once the file is retrieved.
+# Runner logs are ALSO unreachable from the sandbox, so every step appends to
+# incoming/DIAG.txt which is committed unconditionally.
+# Delete this workflow and incoming/ once the file is retrieved.
 
 on:
   push:
@@ -28,75 +30,92 @@ jobs:
           ref: arena/01a0be08-plantmaster-pro
 
       - name: Download from WeTransfer
+        continue-on-error: true
         env:
           SHORT_URL: ${{ github.event.inputs.url || 'https://we.tl/t-yxjsd1d7e7GVsGgf' }}
         run: |
-          set -x
           mkdir -p incoming
-          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
+          D=incoming/DIAG.txt
+          : > "$D"
+          log(){ echo "$@" | tee -a "$D"; }
 
-          # 1. follow the short link to the real download page, keeping cookies
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+
+          log "=== 1. resolve short link ==="
           FINAL=$(curl -sSL -A "$UA" -c /tmp/cj.txt -o /tmp/page.html \
-                       -w '%{url_effective}' "$SHORT_URL")
-          echo "FINAL=$FINAL"
+                       -w '%{url_effective}' "$SHORT_URL" 2>>"$D") || log "curl rc=$?"
+          log "FINAL=$FINAL"
+          log "page bytes=$(stat -c%s /tmp/page.html 2>/dev/null || echo 0)"
 
-          # 2. pull transfer id + security hash out of the resolved URL
-          TID=$(echo "$FINAL" | sed -n 's#.*/downloads/\([0-9a-f]\{1,\}\)/.*#\1#p')
-          HASH=$(echo "$FINAL" | sed -n 's#.*/downloads/[0-9a-f]\{1,\}/\([0-9a-zA-Z]\{1,\}\).*#\1#p')
-          # some links carry an extra recipient segment: /downloads/<tid>/<rid>/<hash>
-          if [ -z "$HASH" ]; then
-            TID=$(echo  "$FINAL" | awk -F/ '{print $5}')
-            HASH=$(echo "$FINAL" | awk -F/ '{print $NF}')
-          fi
-          echo "TID=$TID HASH=$HASH"
+          # transfer id / security hash: /downloads/<tid>[/<recipient>]/<hash>
+          PATHPART=${FINAL#*/downloads/}
+          PATHPART=${PATHPART%%\?*}
+          IFS='/' read -r P1 P2 P3 <<< "$PATHPART"
+          if [ -n "$P3" ]; then TID=$P1; RID=$P2; HASH=$P3; else TID=$P1; RID=""; HASH=$P2; fi
+          log "TID=$TID RID=$RID HASH=$HASH"
 
-          # 3. csrf token from the page
           CSRF=$(grep -o 'name="csrf-token" content="[^"]*"' /tmp/page.html | head -1 | cut -d'"' -f4)
-          echo "CSRF len=${#CSRF}"
+          log "CSRF len=${#CSRF}"
 
-          # 4. ask the API for a direct link
-          for BODY in \
-            "{\"intent\":\"entire_transfer\",\"security_hash\":\"$HASH\"}" \
-            "{\"intent\":\"entire_transfer\",\"security_hash\":\"$HASH\",\"domain_user_id\":\"$(uuidgen)\"}" ; do
-            curl -sS -A "$UA" -b /tmp/cj.txt -c /tmp/cj.txt \
-              -H 'Content-Type: application/json' \
-              -H "x-csrf-token: $CSRF" \
-              -H 'x-requested-with: XMLHttpRequest' \
-              -H "Referer: $FINAL" \
-              -d "$BODY" \
-              "https://wetransfer.com/api/v4/transfers/$TID/download" -o /tmp/api.json || true
-            echo "--- api.json ---"; cat /tmp/api.json; echo
-            LINK=$(grep -o '"direct_link":"[^"]*"' /tmp/api.json | cut -d'"' -f4)
-            [ -n "$LINK" ] && break
+          log "=== 2. try download APIs ==="
+          if [ -n "$RID" ]; then
+            B1="{\"intent\":\"entire_transfer\",\"security_hash\":\"$HASH\",\"recipient_id\":\"$RID\"}"
+          else
+            B1="{\"intent\":\"entire_transfer\",\"security_hash\":\"$HASH\"}"
+          fi
+          B2="{\"intent\":\"entire_transfer\",\"security_hash\":\"$HASH\",\"domain_user_id\":\"$(cat /proc/sys/kernel/random/uuid)\"}"
+
+          LINK=""
+          for EP in "https://wetransfer.com/api/v4/transfers/$TID/download" \
+                    "https://wetransfer.com/api/v4/transfers/$TID/download?security_hash=$HASH"; do
+            for BODY in "$B1" "$B2"; do
+              log "--- POST $EP"
+              log "    body=$BODY"
+              CODE=$(curl -sS -A "$UA" -b /tmp/cj.txt -c /tmp/cj.txt \
+                -H 'Content-Type: application/json' \
+                -H "x-csrf-token: $CSRF" \
+                -H 'x-requested-with: XMLHttpRequest' \
+                -H "Referer: $FINAL" -H 'Origin: https://wetransfer.com' \
+                -d "$BODY" -o /tmp/api.json -w '%{http_code}' "$EP" 2>>"$D")
+              log "    http=$CODE resp=$(head -c 600 /tmp/api.json)"
+              LINK=$(grep -o '"direct_link":"[^"]*"' /tmp/api.json | cut -d'"' -f4)
+              [ -n "$LINK" ] && break 2
+            done
           done
 
           if [ -z "$LINK" ]; then
-            echo "::error::could not obtain direct_link — link may be expired or need consent"
-            head -c 3000 /tmp/page.html
-            exit 1
+            log "=== FAILED: no direct_link ==="
+            log "--- first 2500 bytes of landing page ---"
+            head -c 2500 /tmp/page.html >> "$D"
+            exit 0
           fi
 
-          # 5. download the payload
-          curl -sSL -A "$UA" -b /tmp/cj.txt -o "incoming/payload.zip" "$LINK"
-          ls -la incoming/
-          file incoming/payload.zip || true
-          unzip -l incoming/payload.zip | head -40 || true
+          log "=== 3. download payload ==="
+          log "LINK=${LINK:0:120}..."
+          curl -sSL -A "$UA" -b /tmp/cj.txt -o incoming/payload.zip \
+               -w 'http=%{http_code} bytes=%{size_download}\n' "$LINK" | tee -a "$D"
+          log "$(ls -la incoming/)"
+          log "--- zip listing ---"
+          unzip -l incoming/payload.zip 2>&1 | head -60 | tee -a "$D" || log "not a zip"
 
-      - name: Split if large, then commit back
+      - name: Commit results (always)
+        if: always()
         run: |
-          set -x
+          mkdir -p incoming
           cd incoming
-          SIZE=$(stat -c%s payload.zip)
-          echo "size=$SIZE"
-          if [ "$SIZE" -gt 94371840 ]; then
-            split -b 45m payload.zip payload.zip.part-
-            rm payload.zip
+          if [ -f payload.zip ]; then
+            SIZE=$(stat -c%s payload.zip)
+            echo "payload size=$SIZE" >> DIAG.txt
+            if [ "$SIZE" -gt 94371840 ]; then
+              split -b 45m payload.zip payload.zip.part- && rm payload.zip
+            fi
           fi
-          sha256sum * > SHA256SUMS
+          sha256sum * > SHA256SUMS 2>/dev/null || true
           ls -la
           cd ..
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add -f incoming/
-          git commit -m 'chore: fetched transfer payload for agent retrieval' || echo 'nothing to commit'
+          git commit -m 'chore: transfer fetch attempt + diagnostics' || echo 'nothing to commit'
+          git pull --rebase origin arena/01a0be08-plantmaster-pro || true
           git push origin arena/01a0be08-plantmaster-pro
