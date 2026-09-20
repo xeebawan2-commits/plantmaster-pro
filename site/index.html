@@ -2,197 +2,621 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07101c">
-<title>PlantMaster Pro — Plant Maintenance Management | HSB Fix Services</title>
-<meta name="description" content="PlantMaster Pro is multi-plant maintenance management software: work orders, QR asset scanning, preventive maintenance, spares and procurement, sound and vibration condition monitoring, and AI troubleshooting grounded in your own equipment manuals.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HSB Fix Services — PlantMaster Pro | AI Maintenance Software for Plants</title>
+<meta name="description" content="PlantMaster Pro by HSB Fix Services. AI troubleshooting on your own equipment manuals, condition monitoring, work orders, spares and procurement — on every technician's phone.">
+<!-- social preview: what WhatsApp, LinkedIn, Facebook and X show -->
 <link rel="canonical" href="https://hsbfix.org/">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="HSB Fix Services">
+<meta property="og:locale" content="en_PK">
 <meta property="og:url" content="https://hsbfix.org/">
-<meta property="og:title" content="PlantMaster Pro — Plant Maintenance Management">
-<meta property="og:description" content="Work orders, QR asset scanning, condition monitoring and AI troubleshooting grounded in your own manuals. Built for process plants.">
-<meta property="og:image" content="https://hsbfix.org/icons/icon-512.png">
+<meta property="og:title" content="The maintenance app that reads your manuals and answers back.">
+<meta property="og:description" content="PlantMaster Pro by HSB Fix Services. AI troubleshooting from your own equipment manuals, condition monitoring from a phone, work orders, spares and procurement.">
+<meta property="og:image" content="https://hsbfix.org/img/og-image.jpg">
+<meta property="og:image:secure_url" content="https://hsbfix.org/img/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PlantMaster Pro — AI maintenance software for plants">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/site.css">
+<meta name="twitter:title" content="The maintenance app that reads your manuals and answers back.">
+<meta name="twitter:description" content="PlantMaster Pro by HSB Fix Services. AI troubleshooting from your own equipment manuals, condition monitoring from a phone, work orders, spares and procurement.">
+<meta name="twitter:image" content="https://hsbfix.org/img/og-image.jpg">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<!-- /social preview -->
+<link rel="stylesheet" href="styles.css">
+
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "PlantMaster Pro",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Android, iOS, Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PKR",
-              "description": "30-day free trial" },
-  "publisher": { "@type": "Organization", "name": "HSB Fix Services",
-                 "url": "https://hsbfix.org" }
+ "@context": "https://schema.org",
+ "@type": "SoftwareApplication",
+ "name": "PlantMaster Pro",
+ "applicationCategory": "BusinessApplication",
+ "applicationSubCategory": "CMMS — Computerized Maintenance Management System",
+ "operatingSystem": "Web, Android, iOS",
+ "description": "AI maintenance management for industrial plants. Troubleshooting answers cited from your own equipment manuals, condition monitoring from a phone, work orders, preventive maintenance, spares and procurement.",
+ "url": "https://hsbfix.org",
+ "image": "https://hsbfix.org/og-image.jpg",
+ "inLanguage": [
+  "en",
+  "ur"
+ ],
+ "featureList": [
+  "AI Problem Solver with manual citations",
+  "Acoustic condition monitoring from a phone",
+  "Urdu and English voice input",
+  "Work orders",
+  "Preventive maintenance",
+  "Asset register with QR scanning",
+  "Spares and tools",
+  "Purchase orders",
+  "Checklists",
+  "Roster and attendance",
+  "Audit trail",
+  "Reports and analytics",
+  "Daily management email",
+  "REST API"
+ ],
+ "offers": [
+  {
+   "@type": "Offer",
+   "name": "Basic",
+   "price": "7500",
+   "priceCurrency": "PKR",
+   "priceSpecification": {
+    "@type": "UnitPriceSpecification",
+    "price": "7500",
+    "priceCurrency": "PKR",
+    "unitText": "MONTH"
+   }
+  },
+  {
+   "@type": "Offer",
+   "name": "Essential",
+   "price": "12000",
+   "priceCurrency": "PKR",
+   "priceSpecification": {
+    "@type": "UnitPriceSpecification",
+    "price": "12000",
+    "priceCurrency": "PKR",
+    "unitText": "MONTH"
+   }
+  },
+  {
+   "@type": "Offer",
+   "name": "Professional",
+   "price": "24000",
+   "priceCurrency": "PKR",
+   "priceSpecification": {
+    "@type": "UnitPriceSpecification",
+    "price": "24000",
+    "priceCurrency": "PKR",
+    "unitText": "MONTH"
+   }
+  },
+  {
+   "@type": "Offer",
+   "name": "Enterprise",
+   "price": "40000",
+   "priceCurrency": "PKR",
+   "priceSpecification": {
+    "@type": "UnitPriceSpecification",
+    "price": "40000",
+    "priceCurrency": "PKR",
+    "unitText": "MONTH"
+   }
+  }
+ ],
+ "provider": {
+  "@type": "Organization",
+  "name": "HSB Fix Services",
+  "url": "https://hsbfix.org",
+  "logo": "https://hsbfix.org/img/apple-touch-icon.png",
+  "areaServed": "PK",
+  "contactPoint": {
+   "@type": "ContactPoint",
+   "contactType": "sales",
+   "telephone": "+92-316-2364074",
+   "availableLanguage": [
+    "English",
+    "Urdu"
+   ]
+  }
+ }
 }
 </script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
 
-<header class="nav">
-  <div class="wrap nav-inner">
-    <a class="brand" href="/">
-      <img src="/icons/icon-192.png" alt="" width="34" height="34">
-      <span>PlantMaster <b>Pro</b></span>
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">HS<span>B</span></span>
+      <span class="logo-txt">HSB Fix Services<small>PlantMaster Pro</small></span>
     </a>
-    <nav>
+    <nav class="nav-links">
+      <a href="#ai">AI</a>
       <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="/signup.html">Request access</a>
-      <a class="btn small" href="https://app.hsbfix.org">Open app</a>
+      <a href="#modules">Modules</a>
+      <a href="guide.html">Guide</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="demo.html">Demo</a>
+      <a href="resources.html">Resources</a>
+      <a href="#faq">FAQ</a>
     </nav>
+    <div class="nav-cta">
+      <a href="https://app.hsbfix.org" class="btn btn-ghost">Sign in</a>
+      <a href="signup.html" class="btn btn-primary">Start free trial</a>
+    </div>
+    <button class="burger" aria-label="Menu" aria-expanded="false" onclick="var h=this.closest('header');var open=h.classList.toggle('nav-open');this.setAttribute('aria-expanded',open);this.textContent=open?'✕':'☰';">☰</button>
   </div>
 </header>
 
-<main id="main">
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="eyebrow">For cement, steel, textile and process plants</p>
-        <h1>Stop losing maintenance knowledge to paper and WhatsApp.</h1>
-        <p class="lede">
-          PlantMaster Pro runs your whole maintenance operation from one app —
-          work orders, QR-tagged assets, preventive schedules, spares and
-          purchase orders, plus sound and vibration monitoring and an AI
-          troubleshooter that answers from <em>your</em> equipment manuals.
-        </p>
-        <div class="cta">
-          <a class="btn" href="/signup.html">Request access</a>
-          <a class="btn ghost" href="https://app.hsbfix.org/?demo=1">Try the live demo</a>
-        </div>
-        <p class="micro">Works offline on the plant floor · Urdu &amp; English voice input · Installs as an app</p>
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="badge"><span class="dot"></span> AI-POWERED MAINTENANCE MANAGEMENT</span>
+      <h1>The maintenance app that <span class="hl">reads your manuals</span> and answers back.</h1>
+      <p class="lede">
+        PlantMaster Pro runs your work orders, PM schedules, spares and purchase orders —
+        then adds an AI that has read every equipment manual you own and can troubleshoot
+        a breakdown at 3am when your senior engineer is asleep.
+      </p>
+      <div class="hero-cta">
+        <a href="signup.html" class="btn btn-primary btn-lg">Start 7-day free trial</a>
+        <a href="demo.html" class="btn btn-dark btn-lg">See the live demo</a>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="phone">
-          <div class="phone-screen">
-            <div class="ps-row"><span class="dot green"></span> Kiln ID Fan — running</div>
-            <div class="ps-row"><span class="dot amber"></span> WO-1042 Bearing noise</div>
-            <div class="ps-row"><span class="dot red"></span> Checklist alarm ×2</div>
-            <div class="ps-bar"><i style="width:72%"></i></div>
-            <div class="ps-meta">Preventive plan · 72% complete</div>
+      <div class="hero-trust">
+        <span>✓ No credit card</span>
+        <span>✓ Runs on <b>any</b> phone</span>
+        <span>✓ Works on the plant floor</span>
+        <span>✓ Set up in an afternoon</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="shot"><img src="img/hero-plant.jpg" alt="Maintenance engineer using PlantMaster Pro on the plant floor"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<div class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat"><b class="tea">AI</b><span>Trained on your manuals</span></div>
+      <div class="stat"><b>19</b><span>Modules included</span></div>
+      <div class="stat"><b>24/7</b><span>Condition monitoring</span></div>
+      <div class="stat"><b>0</b><span>Software to install</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ AI SECTION ============ -->
+<section id="ai">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">What makes it different</span>
+      <h2>Record the work. Then get help fixing it.</h2>
+      <p>PlantMaster Pro keeps your maintenance records in order, and puts your own equipment manuals in the hands of whoever is standing at the machine.</p>
+    </div>
+
+    <!-- AI manual -->
+    <div class="frow">
+      <div class="ftext">
+        <span class="ftag">AI Problem Solver</span>
+        <h3>Upload your manuals once. Ask questions forever.</h3>
+        <p>
+          Drop in the PDF manuals for your compressors, chillers, moulding machines —
+          whatever you run. The AI indexes every page. After that, any technician can
+          describe a fault in plain language and get an answer taken from
+          <b>your own documentation</b>, not a generic internet guess.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Answers cite the <b>exact manual and page</b> they came from</span></li>
+          <li><span class="tick">✓</span><span>Ask in English or Urdu — speak it if typing is slow</span></li>
+          <li><span class="tick">✓</span><span>Captures your senior engineer's knowledge before he retires</span></li>
+          <li><span class="tick">✓</span><span>Works at 3am on a night shift with nobody to call</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ai-demo">
+          <div class="ai-q">Compressor tripping on high discharge temperature after 20 minutes. Oil level is normal. What should I check?</div>
+          <div class="ai-a">
+            Check the aftercooler and oil cooler for fouling first — high discharge
+            temperature with normal oil level usually points to restricted heat exchange
+            rather than lubrication. Verify cooling water flow is at least 45 L/min and
+            confirm the thermostatic valve is opening. If both are correct, inspect the
+            minimum pressure valve for sticking.
+            <span class="src">Source: Atlas Copco GA-75 Service Manual, section 4.3 — Fault Finding</span>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="strip">
-    <div class="wrap strip-grid">
-      <div><b>Offline-first</b><span>Queues work and syncs when signal returns</span></div>
-      <div><b>QR asset tags</b><span>Scan to open history, manuals and spares</span></div>
-      <div><b>Audit trail</b><span>Every change recorded, who and when</span></div>
-      <div><b>Multi-plant</b><span>One company, many sites, one roster</span></div>
+    <!-- Condition monitoring -->
+    <div class="frow flip">
+      <div class="ftext">
+        <span class="ftag">Condition Monitoring</span>
+        <h3>Hear when a machine stops sounding normal</h3>
+        <p>
+          Hold a phone to a running machine and record 30 seconds. PlantMaster analyses
+          the sound, compares it against that machine's healthy baseline, and flags it
+          when the pattern shifts — an early warning that something is changing.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Records machine sound with the phone you already carry</span></li>
+          <li><span class="tick">✓</span><span>Baseline recorded once, every check compared against it</span></li>
+          <li><span class="tick">✓</span><span>Alarms raised automatically when the signature drifts</span></li>
+          <li><span class="tick">✓</span><span>Turn an unplanned stoppage into a planned Sunday job</span></li>
+        </ul>
+      </div>
+      <div class="fimg"><img src="img/feature-condition.jpg" alt="Recording machine sound on an industrial motor"></div>
     </div>
-  </section>
 
-  <section id="features" class="wrap section">
-    <h2>Everything a maintenance department actually needs</h2>
-    <div class="cards">
-      <article class="card">
-        <h3>🧰 Work orders</h3>
-        <p>Raise, assign, and close corrective work with downtime, labour and cost captured. Permits to work and lock-out/tag-out are enforced by the system, not by memory.</p>
-      </article>
-      <article class="card">
-        <h3>🏭 Asset register</h3>
-        <p>Every machine with its code, rating, manuals and full repair history. Print a QR sticker and any technician can pull it up in two seconds.</p>
-      </article>
-      <article class="card">
-        <h3>✅ Checklists &amp; rounds</h3>
-        <p>Shift rounds with limits on every reading. An out-of-range value raises an alarm to supervisors immediately.</p>
-      </article>
-      <article class="card">
-        <h3>🛠 Preventive maintenance</h3>
-        <p>Weekly, monthly and running-hour based plans that generate work automatically and track what was really done.</p>
-      </article>
-      <article class="card">
-        <h3>📦 Spares &amp; procurement</h3>
-        <p>Stock with minimum levels, tool custody, material requests, purchase orders and goods receipt — stock updates itself as goods arrive.</p>
-      </article>
-      <article class="card">
-        <h3>🎧 Condition monitoring</h3>
-        <p>Record machine sound and vibration with the phone you already carry. Compare against a healthy baseline and get an early warning before failure.</p>
-      </article>
-      <article class="card">
-        <h3>🤖 AI troubleshooting</h3>
-        <p>Ask in plain language or Urdu voice. Answers are grounded in your uploaded manuals and your plant's own solved cases — with safety steps first.</p>
-      </article>
-      <article class="card">
-        <h3>📊 Reports &amp; audit</h3>
-        <p>Daily email summaries, MTTR and downtime analytics, and an immutable audit trail you can export to CSV, Excel, Word or PDF.</p>
-      </article>
+    <!-- Daily email -->
+    <div class="frow">
+      <div class="ftext">
+        <span class="ftag">Daily Management Email</span>
+        <h3>The morning report, in your inbox at 7am</h3>
+        <p>
+          Management should not have to open an app to know how the plant is running.
+          Every morning PlantMaster emails a plain summary of what happened yesterday
+          and what needs attention today.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Jobs completed, jobs still open, total downtime</span></li>
+          <li><span class="tick">✓</span><span>PM tasks falling due this week</span></li>
+          <li><span class="tick">✓</span><span>Spares below minimum and POs awaiting approval</span></li>
+          <li><span class="tick">✓</span><span>Sent to as many addresses as you like — owner, GM, accounts</span></li>
+        </ul>
+      </div>
+      <div>
+        <div class="mail">
+          <div class="mail-head">
+            <b>PlantMaster Daily Report — Molding Plant</b>
+            <span>to: management · today 07:00</span>
+          </div>
+          <div class="mail-body">
+            <div class="mail-row"><span>Jobs completed yesterday</span><b class="good">7</b></div>
+            <div class="mail-row"><span>Jobs still open</span><b>2</b></div>
+            <div class="mail-row"><span>Total downtime</span><b>1 h 15 m</b></div>
+            <div class="mail-row"><span>PM due this week</span><b class="warn">4 tasks</b></div>
+            <div class="mail-row"><span>Spares below minimum</span><b class="warn">3 items</b></div>
+            <div class="mail-row"><span>POs awaiting approval</span><b class="warn">Rs 236,000</b></div>
+            <div class="mail-row"><span>Condition alarms</span><b class="good">None</b></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <section id="pricing" class="wrap section">
-    <h2>Simple pricing</h2>
-    <p class="section-sub">Start with a 30-day trial. No card required. Prices in PKR per month.</p>
-    <div class="pricing" id="pricing-grid">
-      <article class="plan">
-        <h3>Trial</h3><div class="price">Free<span>/30 days</span></div>
-        <ul><li>5 users</li><li>1 plant</li><li>100 assets</li><li>1 GB storage</li><li>AI troubleshooting</li></ul>
-        <a class="btn ghost" href="/signup.html">Start trial</a>
-      </article>
-      <article class="plan">
-        <h3>Starter</h3><div class="price">15,000<span>/month</span></div>
-        <ul><li>15 users</li><li>1 plant</li><li>500 assets</li><li>5 GB storage</li><li>Procurement module</li></ul>
-        <a class="btn ghost" href="/signup.html">Choose Starter</a>
-      </article>
-      <article class="plan featured">
-        <div class="tag">Most popular</div>
-        <h3>Professional</h3><div class="price">45,000<span>/month</span></div>
-        <ul><li>60 users</li><li>3 plants</li><li>3,000 assets</li><li>25 GB storage</li><li>Company branding</li></ul>
-        <a class="btn" href="/signup.html">Choose Professional</a>
-      </article>
-      <article class="plan">
-        <h3>Enterprise</h3><div class="price">120,000<span>/month</span></div>
-        <ul><li>Unlimited users</li><li>Unlimited plants</li><li>200 GB storage</li><li>API access</li><li>Priority support</li></ul>
-        <a class="btn ghost" href="/signup.html">Talk to us</a>
-      </article>
+    <!-- Voice -->
+    <div class="frow flip">
+      <div class="ftext">
+        <span class="ftag">Voice Input</span>
+        <h3>Your fitter speaks. The system writes the report.</h3>
+        <p>
+          The biggest reason maintenance records stay empty is that nobody wants to type
+          on a phone with oily hands. So don't. Press the microphone, describe the job in
+          Urdu or English, and PlantMaster writes it up as a proper technical record.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Speak Urdu — it is transcribed and translated to technical English</span></li>
+          <li><span class="tick">✓</span><span>Works for work orders, findings, root cause and handovers</span></li>
+          <li><span class="tick">✓</span><span>Staff who avoid writing will actually use the system</span></li>
+          <li><span class="tick">✓</span><span>Records get filled in properly instead of left blank</span></li>
+        </ul>
+      </div>
+      <div class="fimg"><img src="img/feature-ai.jpg" alt="Equipment manuals indexed by AI"></div>
     </div>
-  </section>
 
-  <section class="wrap section cta-band">
-    <h2>Ready to see it on your plant?</h2>
-    <p>We set up your company workspace, import your asset list, and train your team.</p>
-    <div class="cta">
-      <a class="btn" href="/signup.html">Request access</a>
-      <a class="btn ghost" href="https://wa.me/923162364074">WhatsApp us</a>
+    <!-- ===== REAL SIDE-BY-SIDE PROOF ===== -->
+    <div class="sec-head" style="margin-top:86px">
+      <span class="eyebrow">Real output &middot; not a mock-up</span>
+      <h2>The same question, asked in two accounts</h2>
+      <p>One account had no equipment manuals loaded. The other had the plant's own compressor documentation indexed. Below is what each one actually returned.</p>
     </div>
-  </section>
-</main>
 
-<footer class="footer">
-  <div class="wrap foot-grid">
-    <div>
-      <b>PlantMaster Pro</b>
-      <p>A product of HSB Fix Services.<br>Industrial maintenance software built in Pakistan.</p>
+    <div class="proof-strip">
+      <b>Question typed by the technician:</b> &ldquo;Compressor isn't providing the 8 bar pressure even the capacity of compressors is 10&nbsp;bar&rdquo;
     </div>
-    <div>
-      <b>Product</b>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="https://app.hsbfix.org">Open the app</a>
-      <a href="https://app.hsbfix.org/?demo=1">Live demo</a>
+
+    <div class="proof">
+
+      <div class="pcol">
+        <div class="phead plain">
+          <h3>Account with no manuals loaded</h3>
+          <span>General engineering knowledge only</span>
+        </div>
+        <div class="pmeta">
+          <span class="pill">Confidence 0.85</span>
+          <span class="pill zero">0 plant sources</span>
+        </div>
+        <div class="pbody">
+          <div class="plabel">Diagnostic answer</div>
+          <div class="pquote">
+            &ldquo;&hellip;typically indicates a leak, mechanical wear, or control system limitation. Check for air leaks in the discharge piping, valves and fittings. Inspect the air intake filter for clogs. Verify the pressure switch or transducer calibration. Check for worn piston rings or leaking valves <mark>(reciprocating)</mark> or air-end wear <mark>(rotary screw)</mark>.&rdquo;
+          </div>
+          <div class="plabel">Likely causes</div>
+          <ul class="plist">
+            <li>Air leaks in the discharge line or downstream system</li>
+            <li>Clogged air intake filter</li>
+            <li>Faulty pressure switch or transducer calibration</li>
+            <li>Worn piston rings or leaking valves (reciprocating)</li>
+            <li>Clogged oil separator or minimum pressure valve (rotary screw)</li>
+            <li>Slipping drive belts</li>
+          </ul>
+        </div>
+        <div class="psrc">
+          <b>Sources</b>
+          PlantMaster General Compressor Maintenance Guidelines &middot; Standard Industrial Pneumatic Troubleshooting Protocol
+        </div>
+      </div>
+
+      <div class="pcol win">
+        <div class="phead win">
+          <h3>Account with its own manuals loaded</h3>
+          <span>Grounded in the plant's own documentation</span>
+        </div>
+        <div class="pmeta">
+          <span class="pill good">Confidence 0.90</span>
+          <span class="pill good">8 plant sources</span>
+        </div>
+        <div class="pbody">
+          <div class="plabel">Diagnostic answer</div>
+          <div class="pquote">
+            &ldquo;&hellip;is likely due to incorrect controller setpoints, a significant downstream air leak, or a restricted intake filter. <b>First, verify the &lsquo;Unloading Pressure&rsquo; parameter in the controller menu <mark>(MAM 6080)</mark> to ensure it is not set to 8&nbsp;bar.</b> Second, inspect the system for air leaks and check the intake air filter for blockages.&rdquo;
+          </div>
+          <div class="plabel">Safe checks, in order</div>
+          <ul class="plist">
+            <li>Verify <b>&lsquo;Unloading Pressure&rsquo;</b> parameter in the <b>MAM 6080</b> controller menu</li>
+            <li>Perform a leak test on the downstream air distribution system</li>
+            <li>Inspect and clean/replace the air intake filter</li>
+            <li>Check pressure transducer readings against a calibrated gauge</li>
+            <li>Inspect the unloading valve for proper seating</li>
+          </ul>
+        </div>
+        <div class="psrc">
+          <b>Sources</b>
+          Jaguar 55KW instruction manual, <span class="pg">pages 28&ndash;31</span> &middot; Oil-free compressor 75&nbsp;K OF part manual &middot; Maintenance Schedule &mdash; GA compressors and FX Dryer
+        </div>
+      </div>
+
     </div>
-    <div>
-      <b>Company</b>
-      <a href="/signup.html">Request access</a>
-      <a href="https://wa.me/923162364074">WhatsApp</a>
-      <a href="mailto:support@hsbfix.org">support@hsbfix.org</a>
+
+    <div class="verdict">
+      Both answers are competent. Only one of them tells the technician <b>which menu to open on the controller in front of him</b> &mdash; and shows the page it came from, so he can check it himself.
+      The generic answer sends him hunting through five possibilities; the grounded one starts with a setting that is often the whole problem, and no parts are replaced unnecessarily.
     </div>
-    <div>
-      <b>Legal</b>
-      <a href="/terms.html">Terms of Service</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/delete-account.html">Delete my account</a>
+
+  </div>
+</section>
+
+<!-- ============ CORE FEATURES ============ -->
+<section id="features" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The foundation</span>
+      <h2>All the everyday work, done properly</h2>
+      <p>The AI is the reason people stay. This is the reason they start.</p>
+    </div>
+
+    <div class="frow">
+      <div class="ftext">
+        <span class="ftag">Work orders &amp; QR scanning</span>
+        <h3>Point the camera at the machine. Everything opens.</h3>
+        <p>
+          Stick a QR label on each asset. A technician scans it and gets that machine's
+          full history, open jobs, manuals and spare parts while standing in front of it.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Priority, downtime, labour time and cost on every job</span></li>
+          <li><span class="tick">✓</span><span>Root cause and corrective action captured while fresh</span></li>
+          <li><span class="tick">✓</span><span>Photos straight from the phone camera</span></li>
+          <li><span class="tick">✓</span><span>Meter readings logged on the spot, PM triggered automatically</span></li>
+        </ul>
+      </div>
+      <div class="fimg"><img src="img/feature-scan.jpg" alt="Scanning an asset QR code"></div>
+    </div>
+
+    <div class="frow flip">
+      <div class="ftext">
+        <span class="ftag">Spares &amp; procurement</span>
+        <h3>From "we need this" to goods received, with approvals</h3>
+        <p>
+          A technician requests a part. The manager converts requests into a purchase
+          order, the owner approves it, and stock increases automatically when it arrives.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Stock levels, minimum alerts and bin locations</span></li>
+          <li><span class="tick">✓</span><span>Material requests convert to a PO in one tap</span></li>
+          <li><span class="tick">✓</span><span>Supplier records, GST handled, printable PO with signatures</span></li>
+          <li><span class="tick">✓</span><span>Goods receipt updates stock — no double counting</span></li>
+        </ul>
+      </div>
+      <div class="fimg"><img src="img/feature-team.jpg" alt="Maintenance team reviewing work"></div>
+    </div>
+
+    <div class="frow">
+      <div class="ftext">
+        <span class="ftag">Reporting &amp; analytics</span>
+        <h3>Know which machine is costing you money</h3>
+        <p>
+          Downtime by asset, mean time to repair, cost per machine, job completion rates.
+          The numbers you need when deciding whether to repair or replace.
+        </p>
+        <ul class="flist">
+          <li><span class="tick">✓</span><span>Downtime and MTTR trends per asset</span></li>
+          <li><span class="tick">✓</span><span>Maintenance cost and spare consumption by machine</span></li>
+          <li><span class="tick">✓</span><span>Technician workload and completion rates</span></li>
+          <li><span class="tick">✓</span><span>Export anything to Excel whenever you want</span></li>
+        </ul>
+      </div>
+      <div class="fimg"><img src="img/feature-email.jpg" alt="Plant manager reviewing maintenance reports"></div>
     </div>
   </div>
-  <div class="wrap foot-base">© <span id="yr">2026</span> HSB Fix Services. All rights reserved.</div>
+</section>
+
+<!-- ============ MODULES ============ -->
+<section id="modules">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Everything included</span>
+      <h2>Nineteen modules. One subscription.</h2>
+      <p>No paid add-ons and no locked "enterprise" features you actually need on day one.</p>
+    </div>
+    <div class="mods">
+      <div class="mod"><div class="ic">🧠</div><h3>AI Problem Solver</h3><p>Troubleshooting answers taken from your own uploaded equipment manuals, with sources cited.</p></div>
+      <div class="mod"><div class="ic">∿</div><h3>Condition Monitoring</h3><p>Record machine sound, compare it against a healthy baseline, and get flagged when it changes.</p></div>
+      <div class="mod"><div class="ic">📧</div><h3>Daily Email Report</h3><p>Morning summary to management — jobs, downtime, PM due, low stock, pending approvals.</p></div>
+      <div class="mod"><div class="ic">🗣</div><h3>Voice Input</h3><p>Speak in Urdu or English. Transcribed and written up as a proper technical record.</p></div>
+      <div class="mod"><div class="ic">🧰</div><h3>Work Orders</h3><p>Corrective jobs with priority, downtime, labour, root cause, photos and sign-off.</p></div>
+      <div class="mod"><div class="ic">🛠</div><h3>Preventive Maintenance</h3><p>Weekly, monthly, yearly and meter-based plans that raise jobs automatically.</p></div>
+      <div class="mod"><div class="ic">🏭</div><h3>Asset Register</h3><p>Every machine with code, location, running state, meter readings and full history.</p></div>
+      <div class="mod"><div class="ic">📷</div><h3>QR Scanning</h3><p>Label each asset, scan to open its record instantly. No typing codes.</p></div>
+      <div class="mod"><div class="ic">📦</div><h3>Spares &amp; Tools</h3><p>Stock, minimum alerts, bin locations, issue and receive, tool custody and calibration.</p></div>
+      <div class="mod"><div class="ic">🧾</div><h3>Purchase Orders</h3><p>Requests, approvals, suppliers, tax, printable POs and goods receipt.</p></div>
+      <div class="mod"><div class="ic">✅</div><h3>Checklists</h3><p>Build inspection templates once, run them on the floor, keep the completed record.</p></div>
+      <div class="mod"><div class="ic">👷</div><h3>Roster &amp; Attendance</h3><p>Shift assignments, handovers, daily logs and attendance in one place.</p></div>
+      <div class="mod"><div class="ic">📋</div><h3>Audit Trail</h3><p>Every change logged with the person, action and time. Download as CSV, Excel, Word or PDF.</p></div>
+      <div class="mod"><div class="ic">📊</div><h3>Reports &amp; Analytics</h3><p>Reports across every operational area, exportable in four formats for management and auditors.</p></div>
+      <div class="mod"><div class="ic">📚</div><h3>Manuals &amp; Drawings</h3><p>Central library of equipment documentation, indexed and searchable by the AI.</p></div>
+      <div class="mod"><div class="ic">💬</div><h3>Support Desk</h3><p>Raise an issue from the floor, track it to closure, keep the full conversation on record.</p></div>
+      <div class="mod"><div class="ic">🗂️</div><h3>Files &amp; Photos</h3><p>Attach evidence to any record — nameplate photos, damage pictures, test certificates.</p></div>
+      <div class="mod"><div class="ic">♻️</div><h3>Recovery Bin</h3><p>Nothing is truly deleted. Restore a removed record, or erase it permanently on purpose.</p></div>
+      <div class="mod"><div class="ic">👥</div><h3>Team &amp; Permissions</h3><p>Invite your team, set owner, manager and supervisor roles, control who approves what.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Questions</span>
+      <h2>What plant managers ask us</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>How does the AI actually know about our machines?</summary>
+        <p>You upload the PDF manuals for your equipment. The system reads and indexes every page. When a technician asks a question, the answer is built from those documents and tells you which manual and section it came from. It is not guessing from the internet — it is quoting your own paperwork.</p>
+      </details>
+      <details>
+        <summary>Do my technicians need to be good with computers?</summary>
+        <p>No. If they can use WhatsApp they can use PlantMaster. Large buttons, few screens, and voice input for anyone who does not want to type. Most teams are working confidently after a twenty-minute walkthrough.</p>
+      </details>
+      <details>
+        <summary>Do we need to buy computers, tablets or sensors?</summary>
+        <p>No. It runs in the browser on any Android phone your staff already carry. Condition monitoring records machine sound through the phone's microphone and compares it against a baseline you set — it is an early-warning aid, not a replacement for calibrated vibration analysis.</p>
+      </details>
+      <details>
+        <summary>What happens when the internet or power goes?</summary>
+        <p>If the connection drops briefly while you are saving a record, the entry is held on the phone and sent automatically once the signal returns, so the work is not lost. A working internet connection is needed for normal day-to-day use.</p>
+      </details>
+      <details>
+        <summary>How long does setup take?</summary>
+        <p>An afternoon for most plants. We create your company, add your plants and import your asset list and spares from Excel for you at no charge.</p>
+      </details>
+      <details>
+        <summary>Is our data safe, and who can see it?</summary>
+        <p>Your data is isolated from every other company at the database level, not just hidden in the interface. Inside your company, access is controlled by role — owner, manager, supervisor, technician. You can export everything at any time.</p>
+      </details>
+      <details>
+        <summary>Can it connect to our accounts or ERP software?</summary>
+        <p>Yes. PlantMaster has a REST API so your accounts system can read assets, work orders, spares, suppliers and purchase orders automatically. Your IT person or software vendor gets an API key and documentation.</p>
+      </details>
+      <details>
+        <summary>What if we want to stop?</summary>
+        <p>Cancel whenever you like. No lock-in contract, no cancellation fee. Export your complete data to Excel first — it is yours and we will help you get it out.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>See it running on your own machines</h2>
+    <p>Start a 7-day free trial, or send a WhatsApp message and we will walk you through it on a call. No sales pressure, no credit card.</p>
+    <div class="cta-btns">
+      <a href="signup.html" class="btn btn-primary btn-lg">Start free trial</a>
+      <a href="https://wa.me/923162364074" class="btn btn-wa btn-lg">Ask a question</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-mark">HS<span>B</span></span>
+          <span class="logo-txt">HSB Fix Services<small>PlantMaster Pro</small></span>
+        </a>
+        <p>AI-powered maintenance management software for industrial plants.</p>
+        <a href="https://wa.me/923162364074" class="btn btn-wa">WhatsApp us</a>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#ai">AI Problem Solver</a>
+        <a href="#features">Features</a>
+        <a href="#modules">All modules</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="demo.html">Live demo</a>
+        <a href="resources.html">Videos &amp; documents</a>
+        <a href="guide.html">User Guide</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#faq">FAQ</a>
+        <a href="signup.html">Start free trial</a>
+        <a href="https://wa.me/923162364074">Contact</a>
+        <a href="https://app.hsbfix.org">Sign in</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="delete-account.html">Delete your account</a>
+      </div>
+      <div class="foot-col">
+        <h4>Contact</h4>
+        <a href="https://wa.me/923162364074">+92 316 236 4074</a>
+        <a href="mailto:support@hsbfix.org">support@hsbfix.org</a>
+        <a href="mailto:hsbfix.pk@gmail.com">hsbfix.pk@gmail.com</a>
+        <a href="https://app.hsbfix.org">app.hsbfix.org</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 HSB Fix Services. All rights reserved.</span>
+      <span>PlantMaster Pro</span>
+    </div>
+  </div>
 </footer>
-<script>document.getElementById('yr').textContent=new Date().getFullYear()</script>
+
+<script>
+/* nav: close the mobile menu on outside tap, Escape, or link choice */
+(function(){
+  var h=document.querySelector('header');
+  if(!h)return;
+  var b=h.querySelector('.burger');
+  if(!b)return;
+  function close(){
+    if(!h.classList.contains('nav-open'))return;
+    h.classList.remove('nav-open');
+    b.setAttribute('aria-expanded','false');
+    b.textContent='\u2630';
+  }
+  document.addEventListener('pointerdown',function(e){
+    if(!h.classList.contains('nav-open'))return;
+    if(h.contains(e.target))return;   /* taps inside the header keep it open */
+    close();
+  },true);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape')close(); });
+  h.querySelectorAll('nav a').forEach(function(a){ a.addEventListener('click',close); });
+})();
+</script>
 </body>
 </html>

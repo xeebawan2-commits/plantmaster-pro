@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>User Guide — HSB Fix Services | PlantMaster Pro</title>
+<meta name="description" content="Complete user guide for PlantMaster Pro. Every module explained: assets, work orders, maintenance, spares, purchase orders, QR scanning, condition monitoring and the AI problem solver.">
+<!-- social preview: what WhatsApp, LinkedIn, Facebook and X show -->
+<link rel="canonical" href="https://hsbfix.org/guide.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HSB Fix Services">
+<meta property="og:locale" content="en_PK">
+<meta property="og:url" content="https://hsbfix.org/guide.html">
+<meta property="og:title" content="How PlantMaster Pro works — a plain guide">
+<meta property="og:description" content="What the system does, module by module: work orders, PM schedules, the AI problem solver, condition monitoring, spares and purchase orders.">
+<meta property="og:image" content="https://hsbfix.org/img/og-image.jpg">
+<meta property="og:image:secure_url" content="https://hsbfix.org/img/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PlantMaster Pro — AI maintenance software for plants">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How PlantMaster Pro works — a plain guide">
+<meta name="twitter:description" content="What the system does, module by module: work orders, PM schedules, the AI problem solver, condition monitoring, spares and purchase orders.">
+<meta name="twitter:image" content="https://hsbfix.org/img/og-image.jpg">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="/img/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<!-- /social preview -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">HS<span>B</span></span>
+      <span class="logo-txt">HSB Fix Services<small>PlantMaster Pro</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#ai">AI</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#modules">Modules</a>
+      <a href="guide.html">Guide</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="demo.html">Demo</a>
+      <a href="resources.html">Resources</a>
+      <a href="index.html#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="https://app.hsbfix.org" class="btn btn-ghost">Sign in</a>
+      <a href="signup.html" class="btn btn-primary">Start free trial</a>
+    </div>
+    <button class="burger" aria-label="Menu" aria-expanded="false" onclick="var h=this.closest('header');var open=h.classList.toggle('nav-open');this.setAttribute('aria-expanded',open);this.textContent=open?'✕':'☰';">☰</button>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">User Guide</span>
+    <h1>How to use PlantMaster Pro</h1>
+    <p>Every section of the app, what it is for, and how your team uses it day to day.
+       Written for the people on the floor, not for software people.</p>
+  </div>
+</div>
+
+<section style="padding-top:34px">
+  <div class="wrap guide">
+
+    <!-- CONTENTS -->
+    <nav class="g-toc">
+      <b>On this page</b>
+      <div class="g-toc-grid">
+        <a href="#start">Getting started</a>
+        <a href="#layout">Finding your way around</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#assets">Assets</a>
+        <a href="#work">Work Orders</a>
+        <a href="#maintenance">Preventive Maintenance</a>
+        <a href="#checklists">Checklists</a>
+        <a href="#inventory">Spares &amp; Tools</a>
+        <a href="#procurement">Purchase Orders</a>
+        <a href="#suppliers">Suppliers</a>
+        <a href="#people">Roster &amp; Attendance</a>
+        <a href="#scanner">QR Scanner</a>
+        <a href="#condition">Condition Monitoring</a>
+        <a href="#solver">AI Problem Solver</a>
+        <a href="#manuals">Manuals &amp; Drawings</a>
+        <a href="#analytics">Analytics &amp; Reports</a>
+        <a href="#email">Daily Email Report</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#audit">Audit Trail</a>
+        <a href="#recovery">Recovery Bin</a>
+        <a href="#files">Files</a>
+        <a href="#invites">Team &amp; Invitations</a>
+        <a href="#support">Support</a>
+        <a href="#settings">Settings &amp; Profile</a>
+        <a href="#firstweek">Your first week</a>
+      </div>
+    </nav>
+
+    <!-- GETTING STARTED -->
+    <h2 id="start">Getting started</h2>
+    <p>
+      PlantMaster Pro runs in a web browser. There is nothing to install and no app store
+      download. Open <a href="https://app.hsbfix.org">app.hsbfix.org</a> on a phone,
+      tablet or computer and sign in.
+    </p>
+    <div class="g-tip">
+      <b>Add it to the home screen.</b> On Android Chrome, tap the three dots and choose
+      <i>Add to Home screen</i>. It then opens like a normal app, full screen, with its own
+      icon. Most plants do this on every technician's phone on day one.
+    </div>
+    <p>
+      The first person to sign up becomes the <b>owner</b>. The owner sets up the plant and
+      invites everyone else. You need a working internet connection; if the signal drops
+      for a moment while you are saving, the entry is held on the phone and sent when the
+      connection returns.
+    </p>
+
+    <!-- LAYOUT -->
+    <h2 id="layout">Finding your way around</h2>
+    <p>There are three ways to move around the app, and they all reach the same places.</p>
+    <ul class="g-list">
+      <li><b>The menu (☰)</b> — top left. Opens the full list of modules.</li>
+      <li><b>The dashboard tiles</b> — the home screen has a tile for every main module. Most people work from here.</li>
+      <li><b>The bottom bar</b> — on a phone: Home, Plan, Complaints, Support and More.</li>
+    </ul>
+    <p>
+      At the top you will always see your company, your plant and your role, plus an
+      <b>Online</b> indicator. Every screen has a <b>search box</b> that searches only the
+      module you are currently in, and an <b>＋ Add</b> button to create a new record.
+    </p>
+    <div class="g-note">
+      <b>Every dropdown can also be typed into.</b> If the list does not contain what you
+      need — a designation, a category, a unit — just type it. You are never stuck waiting
+      for someone to add an option for you.
+    </div>
+
+    <!-- DASHBOARD -->
+    <h2 id="dashboard">Dashboard</h2>
+    <p class="g-who"><b>Who uses it:</b> everyone, every shift.</p>
+    <p>
+      The home screen. It shows unread alerts at the top, then six quick tiles —
+      Analytics, Scanner, Daily Logs, Condition Monitoring, Problem Solver and Reports —
+      followed by cards for Assets, Work Orders, Checklists, Maintenance, Spares &amp;
+      Tools, Purchase Orders and Suppliers.
+    </p>
+    <p><b>How to use it:</b> start here at the beginning of a shift. Check the alert count, deal with anything urgent, then go to your module.</p>
+
+    <!-- ASSETS -->
+    <h2 id="assets">Assets</h2>
+    <p class="g-who"><b>Who uses it:</b> maintenance engineer, supervisor.</p>
+    <p>
+      The register of every machine in the plant — the foundation of everything else. Work
+      orders, maintenance plans, spare parts and manuals all attach to an asset, so it is
+      worth setting up properly.
+    </p>
+    <p><b>To add a machine:</b> Assets → <b>＋ Add</b> → fill in name, code, location, make, model and serial number → Save.</p>
+    <ul class="g-list">
+      <li>Give every machine a <b>short code</b> you would actually say out loud, like <span class="g-code">INJ-04</span> or <span class="g-code">COMP-01</span>.</li>
+      <li>Set the <b>status</b> — running, stopped, under maintenance — so the dashboard reflects reality.</li>
+      <li>Print a <b>QR code</b> for each asset and stick it on the machine. That single step is what makes the phone useful on the floor.</li>
+      <li>Attach photographs of the nameplate. It saves an argument later when ordering a part.</li>
+    </ul>
+    <div class="g-tip">
+      <b>Start with your 20 most critical machines</b>, not all 300. A register that is half
+      finished and accurate beats a complete one nobody trusts.
+    </div>
+
+    <!-- WORK ORDERS -->
+    <h2 id="work">Work Orders</h2>
+    <p class="g-who"><b>Who uses it:</b> supervisor raises, technician completes, manager reviews.</p>
+    <p>
+      A work order is one job on one machine. Something broke, something needs adjusting,
+      something needs checking.
+    </p>
+    <p><b>To raise one:</b> Work Orders → <b>＋ Add</b> → choose the asset, describe the problem, set priority, assign a person → Save.</p>
+    <p><b>The technician</b> opens it on their phone, does the job, records what was done and which spares were used, then marks it complete.</p>
+    <ul class="g-list">
+      <li>Write the problem as the operator described it, not as you assume it is.</li>
+      <li>Record spares used <i>at the time</i> — this is what keeps stock figures honest.</li>
+      <li>Attach a photo before and after when the job is significant.</li>
+    </ul>
+    <div class="g-note">
+      Every change is recorded in the <a href="#audit">Audit Trail</a> with the person and
+      the time. Not to police anyone — so that six months later you can answer "when was
+      this last touched, and by whom?"
+    </div>
+
+    <!-- MAINTENANCE -->
+    <h2 id="maintenance">Preventive Maintenance</h2>
+    <p class="g-who"><b>Who uses it:</b> maintenance planner or engineer.</p>
+    <p>
+      Scheduled work that repeats — weekly, monthly, quarterly, yearly. The app tells you
+      what is due instead of you remembering.
+    </p>
+    <p><b>To set one up:</b> Maintenance → <b>＋ Add</b> → pick the asset, describe the task, choose the frequency, set the next due date → Save.</p>
+    <ul class="g-list">
+      <li>Take the intervals from the manufacturer's manual where you have it.</li>
+      <li>Be realistic. A plan nobody can keep becomes a plan everybody ignores.</li>
+      <li>Completed plans build the machine's service history automatically.</li>
+    </ul>
+
+    <!-- CHECKLISTS -->
+    <h2 id="checklists">Checklists</h2>
+    <p class="g-who"><b>Who uses it:</b> operators and shift technicians.</p>
+    <p>
+      Repeatable inspection rounds. You build a <b>template</b> once — the list of points to
+      check — and staff complete a <b>run</b> against it each shift or each day.
+    </p>
+    <p><b>To use:</b> create the template with its check items, then staff open Checklists, pick it, and tick through on the phone. Each completed run is saved with the time and the person.</p>
+    <div class="g-tip">
+      Keep a shift round under fifteen items. Long checklists get ticked without looking,
+      which is worse than having none.
+    </div>
+
+    <!-- INVENTORY -->
+    <h2 id="inventory">Spares &amp; Tools</h2>
+    <p class="g-who"><b>Who uses it:</b> storekeeper, maintenance engineer.</p>
+    <p>Two separate registers in one module.</p>
+    <ul class="g-list">
+      <li><b>Spares</b> — parts you consume. Each has a current stock level and a minimum. When stock falls to or below the minimum, it is flagged as low.</li>
+      <li><b>Tools</b> — items you lend out and get back. Track who has custody and when calibration is due.</li>
+    </ul>
+    <p><b>To use:</b> add each spare with its minimum level. When a technician uses a part on a work order, the stock reduces. The low-stock flag is what triggers a purchase request.</p>
+    <div class="g-note">
+      <b>Set the minimum to the quantity you need on the shelf to survive the lead time.</b>
+      If a bearing takes three weeks to arrive and you use one a month, a minimum of one is
+      already too late.
+    </div>
+
+    <!-- PROCUREMENT -->
+    <h2 id="procurement">Purchase Orders</h2>
+    <p class="g-who"><b>Who uses it:</b> engineer requests, owner approves, storekeeper receives.</p>
+    <p>The full purchase cycle, built around Pakistani practice — PKR, NTN and STRN, 18% GST.</p>
+    <ol class="g-steps">
+      <li><b>Request</b> — someone raises a material request for what is needed.</li>
+      <li><b>Purchase order</b> — the request becomes a PO against a supplier. Numbers are generated automatically as <span class="g-code">PO-2026-0001</span>.</li>
+      <li><b>Approval</b> — <b>only the owner can approve.</b> This is deliberate and cannot be delegated in the app.</li>
+      <li><b>Receipt</b> — when goods arrive the storekeeper records what was actually received, and spare stock increases automatically.</li>
+    </ol>
+    <p>Totals, including GST, are calculated for you. Send the PO to a supplier over WhatsApp straight from the app.</p>
+
+    <!-- SUPPLIERS -->
+    <h2 id="suppliers">Suppliers</h2>
+    <p class="g-who"><b>Who uses it:</b> procurement, accounts.</p>
+    <p>
+      Your vendor list with the details Pakistani purchasing actually needs: <b>NTN</b> and
+      <b>STRN</b>, payment terms (default Net 30), currency (default PKR) and contact
+      numbers.
+    </p>
+    <p><b>To use:</b> add each supplier once, then select them when raising a PO. Keeping NTN and STRN here means every PO carries the correct tax details without retyping.</p>
+
+    <!-- PEOPLE -->
+    <h2 id="people">Roster &amp; Attendance</h2>
+    <p class="g-who"><b>Who uses it:</b> shift supervisor, HR.</p>
+    <p>Five sections in one module:</p>
+    <ul class="g-list">
+      <li><b>Members</b> — your people, their designations and skills.</li>
+      <li><b>Roster</b> — who is on which shift.</li>
+      <li><b>Attendance</b> — who actually turned up.</li>
+      <li><b>Daily Logs</b> — the shift log: what happened, what was noticed.</li>
+      <li><b>Handovers</b> — what the outgoing shift needs the incoming shift to know.</li>
+    </ul>
+    <div class="g-note">
+      <b>Handovers are the most undervalued screen in the app.</b> Most repeat failures in a
+      plant come from something the previous shift knew and did not pass on.
+    </div>
+
+    <!-- SCANNER -->
+    <h2 id="scanner">QR Scanner</h2>
+    <p class="g-who"><b>Who uses it:</b> anyone standing at a machine.</p>
+    <p>
+      Point the phone camera at the QR sticker on a machine and its record opens
+      immediately — history, open work, manuals, spares.
+    </p>
+    <p><b>To set up:</b> generate a QR code from each asset record, print it, laminate it, fix it to the machine where it stays clean and reachable.</p>
+    <div class="g-tip">
+      This is the feature that decides whether a CMMS gets used. Typing a machine code with
+      oily gloves does not happen. Scanning does.
+    </div>
+
+    <!-- CONDITION -->
+    <h2 id="condition">Condition Monitoring</h2>
+    <p class="g-who"><b>Who uses it:</b> maintenance engineer.</p>
+    <p>
+      Record about 30 seconds of a running machine's sound with the phone. The app compares
+      it against that machine's own healthy baseline and flags it when the pattern changes.
+    </p>
+    <ol class="g-steps">
+      <li>Record a <b>baseline</b> while the machine is running normally and you are confident it is healthy.</li>
+      <li>Record again at regular intervals — weekly works for most plants.</li>
+      <li>If the sound pattern shifts away from the baseline, you get an alarm.</li>
+    </ol>
+    <div class="g-warn">
+      <b>Be clear about what this is.</b> It is an early-warning aid that tells you to go and
+      look at something. It is <b>not</b> calibrated vibration analysis and not a certified
+      measuring instrument. Use it to prompt an inspection, never to certify that a machine
+      is safe to run.
+    </div>
+    <p><b>For a consistent reading:</b> same spot on the machine, same distance, same running condition every time. An inconsistent baseline is worse than no baseline.</p>
+
+    <!-- SOLVER -->
+    <h2 id="solver">AI Problem Solver</h2>
+    <p class="g-who"><b>Who uses it:</b> technicians and engineers, especially at night.</p>
+    <p>
+      Describe a fault in plain English or Urdu and get a structured troubleshooting path,
+      grounded in the equipment manuals you have uploaded.
+    </p>
+    <p><b>To use:</b> Problem Solver → describe the symptom → it asks clarifying questions → it suggests what to check, in order.</p>
+    <p><b>A good description</b>: "Injection moulding machine 4, hydraulic oil temperature reaching 65 degrees after two hours, was 45 last month, no change in cycle time." A weak one: "machine hot".</p>
+    <div class="g-warn">
+      <b>The AI gives suggestions, not instructions.</b> It can be wrong, and it can be
+      confidently wrong. A competent person must review every recommendation before work is
+      carried out. It never overrides your isolation procedures, permit-to-work system or
+      the manufacturer's instructions.
+    </div>
+    <div class="g-tip">
+      Its answers are only as good as the manuals you give it. A plant that uploads its
+      manuals gets specific answers with section references; a plant that uploads none gets
+      generic advice.
+    </div>
+
+    <!-- MANUALS -->
+    <h2 id="manuals">Manuals &amp; Drawings</h2>
+    <p class="g-who"><b>Who uses it:</b> everyone; set up by the engineer.</p>
+    <p>
+      Your equipment documentation in one place, readable on the floor instead of locked in
+      a cupboard in the office.
+    </p>
+    <p><b>To use:</b> upload the PDF and link it to its asset. The app indexes the contents so the Problem Solver can quote from it and so you can search inside it.</p>
+    <div class="g-note">
+      Upload the manuals for your ten most critical machines first. This is the single
+      highest-value setup task in the whole system, and the one most plants skip.
+    </div>
+
+    <!-- ANALYTICS -->
+    <h2 id="analytics">Analytics &amp; Reports</h2>
+    <p class="g-who"><b>Who uses it:</b> managers, and anyone facing an audit.</p>
+    <p><b>Analytics</b> shows trends — workload, failures, what is consuming your time and money.</p>
+    <p>
+      <b>Reports</b> generates a document from any of twelve areas: assets, work orders,
+      checklist runs, maintenance plans, spares, tools, support threads, manuals, problem
+      cases, attendance, daily logs and shift handovers.
+    </p>
+    <p><b>To use:</b> Reports → choose the module → set a date range → Generate. Preview it, then download as <b>CSV, Excel, Word or PDF</b>.</p>
+    <div class="g-tip">
+      For an ISO audit, export work orders and maintenance plans for the period as PDF. It
+      is the evidence auditors ask for, and it takes about a minute.
+    </div>
+
+    <!-- EMAIL -->
+    <h2 id="email">Daily Email Report</h2>
+    <p class="g-who"><b>Who uses it:</b> plant manager, general manager, owner.</p>
+    <p>
+      A summary of the day sent by email automatically — work raised and completed, alerts,
+      low stock, attendance.
+    </p>
+    <p><b>To use:</b> Daily Email → add the recipients. Management then sees what is happening without logging in or asking anyone.</p>
+
+    <!-- ALERTS -->
+    <h2 id="alerts">Alerts</h2>
+    <p class="g-who"><b>Who uses it:</b> everyone.</p>
+    <p>
+      Notifications for work assigned to you, approvals waiting, low stock, maintenance due
+      and condition alarms. The unread count sits on the dashboard.
+    </p>
+    <p>Enable phone notifications when the app asks, so an approval request does not sit unseen for a day.</p>
+
+    <!-- AUDIT -->
+    <h2 id="audit">Audit Trail</h2>
+    <p class="g-who"><b>Who uses it:</b> owner, manager, auditors.</p>
+    <p>
+      A record of every change made to plant work — who, what, when. Filter by date, by
+      action type, or search. Export in any of the four formats.
+    </p>
+    <div class="g-note">
+      <b>Scope is deliberate:</b> the audit trail records plant work. Platform and database
+      maintenance is not logged, because it is not your operation. Reading a record is not
+      logged either — only changes.
+    </div>
+
+    <!-- RECOVERY -->
+    <h2 id="recovery">Recovery Bin</h2>
+    <p class="g-who"><b>Who uses it:</b> owner, manager.</p>
+    <p>
+      Nothing is deleted immediately. Removed records go to the Recovery Bin and can be
+      restored. After the grace period — 30 days by default — they are permanently erased.
+    </p>
+    <p>If someone deletes something by mistake, look here first before worrying.</p>
+
+    <!-- FILES -->
+    <h2 id="files">Files</h2>
+    <p class="g-who"><b>Who uses it:</b> everyone.</p>
+    <p>
+      Photographs, test certificates, damage pictures and documents, attached to the records
+      they belong to. Use <b>＋ Upload</b> instead of ＋ Add in this module.
+    </p>
+    <p>A photo of a failed bearing attached to the work order is worth more than a paragraph describing it.</p>
+
+    <!-- INVITES -->
+    <h2 id="invites">Team &amp; Invitations</h2>
+    <p class="g-who"><b>Who uses it:</b> owner.</p>
+    <p>Invite your team by email and give each person a role:</p>
+    <ul class="g-list">
+      <li><b>Owner</b> — full control. <b>Only the owner approves purchase orders.</b></li>
+      <li><b>Manager</b> — runs the plant day to day.</li>
+      <li><b>Supervisor</b> — raises and completes work, limited administrative access.</li>
+    </ul>
+    <p>Company Profile is where your company name, logo and details live. The logo appears on your reports.</p>
+
+    <!-- SUPPORT -->
+    <h2 id="support">Support</h2>
+    <p class="g-who"><b>Who uses it:</b> anyone.</p>
+    <p>
+      Two different things, both on the bottom bar. <b>Support</b> is for asking us
+      questions. <b>Complaints</b> is for reporting a problem with the app itself. Both keep
+      the whole conversation on record.
+    </p>
+    <p>You can also message us on WhatsApp at <a href="https://wa.me/923162364074">+92 316 236 4074</a>.</p>
+
+    <!-- SETTINGS -->
+    <h2 id="settings">Settings &amp; Profile</h2>
+    <p class="g-who"><b>Who uses it:</b> owner for settings, everyone for their own profile.</p>
+    <p>
+      <b>Settings</b> holds theme, data retention periods and plant configuration.
+      <b>Profile</b> is your own details — name, contact, designation, skills, default shift.
+    </p>
+    <p><b>Plan</b> on the bottom bar shows your current subscription, user count and storage use.</p>
+
+    <!-- FIRST WEEK -->
+    <h2 id="firstweek">Your first week</h2>
+    <p>The order matters. This is what works, in the sequence that works.</p>
+    <ol class="g-steps g-week">
+      <li><b>Day 1 — Company and people.</b> Set up the company profile, invite your team, set roles.</li>
+      <li><b>Day 2 — Assets.</b> Add your 20 most critical machines with codes, locations and nameplate photos.</li>
+      <li><b>Day 3 — QR codes.</b> Print, laminate and fix a code to each of those machines. Get technicians scanning.</li>
+      <li><b>Day 4 — Manuals.</b> Upload documentation for the ten most critical machines. This is what makes the AI useful.</li>
+      <li><b>Day 5 — Spares.</b> Enter your fast-moving parts with honest minimum levels.</li>
+      <li><b>Day 6 — Live work.</b> Stop using the paper register. Every job goes in as a work order from now on.</li>
+      <li><b>Day 7 — Plans and reports.</b> Add your preventive maintenance schedules, switch on the daily email, generate one report.</li>
+    </ol>
+    <div class="g-tip">
+      <b>The hardest part is not the software.</b> It is the fortnight where people are asked
+      to change how they record work. Decide the paper register stops on a specific date and
+      hold that line. Plants that run both systems "for a while" end up with neither.
+    </div>
+
+    <div class="g-cta">
+      <h3>Want to see it on your own machines?</h3>
+      <p>We will walk you through the app using your plant as the example — no slides, no obligation.</p>
+      <div class="g-cta-btns">
+        <a href="https://wa.me/923162364074" class="btn btn-wa">Book a walkthrough</a>
+        <a href="signup.html" class="btn btn-primary">Start 7-day free trial</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" class="logo">
+          <span class="logo-mark">HS<span>B</span></span>
+          <span class="logo-txt">HSB Fix Services<small>PlantMaster Pro</small></span>
+        </a>
+        <p>AI-powered maintenance management software for industrial plants.</p>
+        <a href="https://wa.me/923162364074" class="btn btn-wa">WhatsApp us</a>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="index.html#ai">AI Problem Solver</a>
+        <a href="index.html#features">Features</a>
+        <a href="index.html#modules">All modules</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="demo.html">Live demo</a>
+        <a href="resources.html">Videos &amp; documents</a>
+        <a href="guide.html">User Guide</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="index.html#faq">FAQ</a>
+        <a href="signup.html">Start free trial</a>
+        <a href="https://wa.me/923162364074">Contact</a>
+        <a href="https://app.hsbfix.org">Sign in</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="delete-account.html">Delete your account</a>
+      </div>
+      <div class="foot-col">
+        <h4>Contact</h4>
+        <a href="https://wa.me/923162364074">+92 316 236 4074</a>
+        <a href="mailto:support@hsbfix.org">support@hsbfix.org</a>
+        <a href="mailto:hsbfix.pk@gmail.com">hsbfix.pk@gmail.com</a>
+        <a href="https://app.hsbfix.org">app.hsbfix.org</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 HSB Fix Services. All rights reserved.</span>
+      <span>PlantMaster Pro</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* nav: close the mobile menu on outside tap, Escape, or link choice */
+(function(){
+  var h=document.querySelector('header');
+  if(!h)return;
+  var b=h.querySelector('.burger');
+  if(!b)return;
+  function close(){
+    if(!h.classList.contains('nav-open'))return;
+    h.classList.remove('nav-open');
+    b.setAttribute('aria-expanded','false');
+    b.textContent='\u2630';
+  }
+  document.addEventListener('pointerdown',function(e){
+    if(!h.classList.contains('nav-open'))return;
+    if(h.contains(e.target))return;   /* taps inside the header keep it open */
+    close();
+  },true);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape')close(); });
+  h.querySelectorAll('nav a').forEach(function(a){ a.addEventListener('click',close); });
+})();
+</script>
+</body>
+</html>

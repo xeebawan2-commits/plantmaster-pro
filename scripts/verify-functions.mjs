@@ -49,7 +49,11 @@ const onDisk = existsSync(fnDir)
 //   npx supabase functions download <name>
 // Listing them here keeps `verify` honest: the call sites are real, so they
 // must not be reported as broken, but they are still flagged as unvendored.
-const LIVE_NOT_VENDORED = new Set(['create-owner', 'platform-admin-api']);
+const LIVE_NOT_VENDORED = new Set([
+  'create-owner',        // control centre: creates the owner login on approval
+  'platform-admin-api',  // control centre: privileged admin operations
+  'signup-notify',       // site/signup.html: emails the enquiry via Resend
+]);
 
 console.log(`${DIM}── edge functions ──${RESET}`);
 for (const name of [...invoked].sort()) {
