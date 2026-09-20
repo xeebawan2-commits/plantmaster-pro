@@ -1,203 +1,153 @@
-# ⛔ STOP — do not run `npm run db:push` or `npm run functions:deploy`
+# Read this first
 
-Your screenshots changed the picture. I built the migrations by reading your
-application's code, because the live database was unreachable from my
-environment. I said at the time that they were written to "merge safely."
+Last updated 20 September 2026, after your master package arrived.
 
-**Now that I can see the real database, that claim was wrong.** Running
-`db:push` today would damage your project. Here is exactly why, and what to do
-instead.
-
----
-
-## What I assumed vs. what is actually there
-
-| | I assumed | Reality (from your screenshots) |
-|---|---|---|
-| Tables | 55 | **87** |
-| Edge functions | 8 | **14** |
-| AI usage table | `ai_usage_events` | **`ai_usage`** — 25 rows of real data |
-| Complaints | `app_complaints` | **`platform_support_tickets`** |
-| Complaint messages | `app_complaint_messages` | **`platform_support_messages`** |
-| Feature flags | `organization_features` | **`organization_entitlements`** + `company_feature_grants` |
-| Report log | `daily_report_runs` | **`report_dispatches`** |
-| AI solver function | `smart-responder` | **`gemini-problem-solver`** |
-
-Your live database is **substantially larger and more developed** than what the
-application code revealed. It has whole subsystems I never saw: QA tooling
-(`qa_test_runs`, `qa_manual_checks`, `qa_test_results`), billing
-(`billing_events`, `organization_subscriptions`, `usage_counters`,
-`quota_overrides`), operations (`backup_jobs`, `restore_drills`,
-`health-monitor`), a public API (`api_keys`, `public-api`), signup flow
-(`signup_requests`, `signup-notify`, `create-owner`), and sensors
-(`sensor_devices`, `measurement_points`, `condition_alarms`).
+Everything below has been checked against the live schema snapshot in
+`reference/master-package/05-DATABASE/03-live-schema-snapshot/`
+(83 tables, 73 functions, 135 policies, captured 13 September 2026 from
+project `dpmmenwziplixrgylapy`).
 
 ---
 
-## What `db:push` would actually do
+## Why "create organization" fails
 
-**It would not overwrite your tables** — every statement is `if not exists`,
-so your 87 tables and their data survive. The damage is subtler and worse:
+Proven, not guessed. The live `create_organization()` runs four inserts:
 
-### 1. Five duplicate tables, splitting your data in two
-
-It would create `ai_usage_events` **alongside** your existing `ai_usage`.
-Same for complaints, entitlements and report logs. You would end up with two
-tables for the same job. New writes go to one, your 25 existing AI-usage rows
-and all your support tickets stay in the other. Reports silently disagree, and
-quota counting reads the empty one.
-
-### 2. It would re-grant permissions across every table
-
-`0008_grants_hardening.sql` runs `revoke all ... on all tables in schema public
-from anon`, then re-grants only what *my* 55-table model expects. Your other
-32 tables — billing, QA, API keys, sensors — are not in that model. Their
-carefully-set permissions get rewritten by a script that does not know they
-exist.
-
-### 3. It would collide with your existing policies
-
-Your screenshots show policies named `pm_block_viewer_insert`,
-`pm_block_viewer_update`, `pm_block_viewer_delete` applied to `public` — a
-naming scheme my `pm_standard_policies()` also uses. Overlapping policy names
-on the same tables is how you get a silent authorization change.
-
----
-
-## What `functions:deploy` would do
-
-It would **overwrite 7 of your 14 live functions** with my versions:
-
-`condition-analyzer` · `daily-reports` · `delete-manual` · `ingest-manual` ·
-`vision-scanner` · `voice-translate` · `web-push`
-
-Mine were written against my 55-table model. `delete-manual` writes to
-`file_metadata` and `audit_logs`; `ingest-manual` writes `chunk_count` and
-`heading` columns that **may not exist** in your live `manuals` /
-`document_chunks`. `daily-reports` reads `DAILY_REPORTS_TOKEN` and
-`REPORT_FROM`, and your screenshot shows **neither secret is set** — that
-function would fail on first run.
-
-It would also add `smart-responder` as a 15th function while your app keeps
-calling `gemini-problem-solver`.
-
----
-
-## What is safe right now
-
-| Action | Safe? | Why |
-|---|---|---|
-| `npm run deploy` (app) | ✅ **Yes** | Static files only. Does not touch the database. |
-| `npm run deploy:admin` | ⚠️ **Not yet** | The console calls RPCs named for tables you do not have. |
-| `npm run deploy:site` | ❌ **No** | Would delete your `demo`/`guide`/`pricing`/`resources` pages. |
-| `npm run db:push` | ❌ **No** | Creates 5 duplicate tables, rewrites grants on 32 unknown tables. |
-| `npm run functions:deploy` | ❌ **No** | Overwrites 7 working functions with schema-mismatched versions. |
-| The **app-layer fixes** | ✅ **Yes** | See below — these are the real, safe wins. |
-
----
-
-## What you should actually take
-
-The genuinely valuable work does **not** require the database at all. These
-are fixes to bugs in your live application, and they deploy with
-`npm run deploy`:
-
-1. **Push notifications never worked.** `push-client.js` called
-   `alreadyDismissed()`, a function that was never defined. The
-   ReferenceError aborted setup, so **no device ever subscribed**. It also
-   read `sessionId` as an auth token, which was never a token, and used the
-   supabase-js v1 session shape. All fixed.
-
-2. **The service worker precached URLs it could never match** (`?v=` query
-   strings), so the offline cache was largely dead, and there was no
-   navigation fallback. Rewritten with `ignoreSearch` matching, navigation
-   preload, a runtime cache cap and a real offline page.
-
-3. **A secret token was committed in plain text** to your public repo. Removed
-   from the code — **but still in your git history at `6c367eb`. Rotate it.**
-
-4. **`public/` was missing 7 files** that the app referenced, and duplicated
-   the source tree. Now generated by a build with content-hash cache busting.
-
-5. The PWA is now installable and Play-ready: real icon dimensions,
-   screenshots, manifest, asset links, security headers.
-
-That is a working push system, a working offline mode and a Play-ready app —
-none of which needs a single database change.
-
----
-
-## The three options for the database work
-
-### Option A — Take the app fixes only (recommended)
-
-```bash
-npm run deploy          # the PWA, with all the fixes above
+```
+organizations        ok
+organization_members ok
+plants               FAILS
+plant_members        never reached
 ```
 
-Leave the database and functions exactly as they are. You get every safe
-improvement today, with zero risk. The migrations stay in the repo as
-documentation of an intended design.
-
-### Option B — Adapt the migrations to your real schema
-
-I rename my tables to match yours (`ai_usage_events` → `ai_usage`,
-`app_complaints` → `platform_support_tickets`, and so on), drop the tables you
-already cover, and narrow `0008` so it only touches tables it owns.
-
-For this I need, from the SQL Editor:
+`plants` carries a trigger, `enforce_plant_plan_limit`, whose first act is
+to look up the company's subscription:
 
 ```sql
--- 1. exact columns of the tables I would touch
-select table_name, column_name, data_type
-from information_schema.columns
-where table_schema='public'
-  and table_name in ('ai_usage','manuals','document_chunks','notifications',
-                     'push_subscriptions','organizations','organization_members',
-                     'platform_support_tickets','platform_support_messages',
-                     'organization_entitlements','report_dispatches',
-                     'subscription_plans','file_metadata','audit_logs')
-order by table_name, ordinal_position;
-
--- 2. existing policies, so I do not collide with them
-select tablename, policyname, cmd, roles
-from pg_policies where schemaname='public' order by tablename, policyname;
-
--- 3. existing functions
-select routine_name from information_schema.routines
-where routine_schema='public' order by routine_name;
+select p.max_plants into base_limit
+  from organization_subscriptions s
+  join subscription_plans p on p.id = s.plan_id
+ where s.organization_id = new.organization_id
+   and s.status in ('active','trial');
+if base_limit is null then
+  raise exception 'Active subscription required';
+end if;
 ```
 
-Paste the results back and I will rework the migrations against reality, then
-re-run the 66 tests with your actual column names.
+`create_organization` never inserts into `organization_subscriptions`. So
+the lookup always returns nothing, the trigger always raises, and the whole
+function rolls back. **No organization can ever be created.** It is a
+deadlock: no plant without a subscription, and nothing creates one.
 
-### Option C — Keep the migrations as a greenfield reference
+I reproduced this on a real Postgres before writing the fix, and the test
+is kept so it can never silently regress:
 
-Use them only if you ever rebuild the project from scratch. Your live database
-already does more than they describe.
-
----
-
-## Two things to fix regardless of which option you choose
-
-1. **Rotate `PUSH_INTERNAL_TOKEN`.** It is readable in your public git history
-   at commit `6c367eb`. Your Supabase secret is already set, so just generate
-   a new value, update it in Supabase → Edge Functions → Secrets, and update
-   the matching GitHub Actions secret.
-
-2. **Add a delete-account page.** Google Play will not approve the app without
-   a publicly reachable one. Your `hsbfix.org` does not have it. Copy
-   `site/delete-account.html` from this package into your `hsbfix-org`
-   repository.
+```
+node tools/db-verify/repair-test.mjs
+  ✓ live version fails exactly as reported: "Active subscription required"
+  ✓ nothing was created — the whole transaction rolled back
+```
 
 ---
 
-## My mistake, plainly
+## What you need to run, in order
 
-I described the migrations as safe to apply to your live database. They were
-verified against a *reconstruction* of your schema, not the schema itself —
-and 66 passing tests against the wrong model proves only that the model is
-self-consistent. I should have been clearer that "idempotent" protects against
-re-running the same script, **not** against a schema that differs from the
-assumption. Your screenshots caught it before any damage; thank you for
-sending them.
+Three files in `supabase/repairs/`. Open each in the Supabase **SQL Editor**,
+set the row-limit dropdown beside Run to **No limit**, and run it.
+
+| Order | File | What it does |
+|---|---|---|
+| 1 | `R1-fix-organization-creation.sql` | Inserts the subscription **before** the plant. Signup works again. |
+| 2 | `R2-control-center.sql` | Adds `owner_invitations` + `signup_requests` and the six missing control RPCs. Your Control Center buttons start working. |
+| 3 | `R3-verify.sql` | Read-only. 16 checks; every row tells you what it should say. |
+
+All three are idempotent — safe to run twice. They only **add**; nothing is
+dropped or renamed.
+
+**R1 alone restores open signup. R2 then closes it**, so a workspace can only
+be created by someone you invited from the Control Center. Run R1 first even
+though R2 supersedes it: if anything goes wrong at step 2 you are still in a
+working state.
+
+After R3, look at row 13, *"companies with NO subscription"*. Any company
+created before the fix is in that broken state. The bottom of R3 has a
+commented-out block that attaches the trial plan to them — read the list
+first, then uncomment and run it.
+
+---
+
+## Why the Control Center buttons did nothing
+
+`admin.hsbfix.org` calls 15 RPCs. Six did not exist in your database:
+
+| RPC | Written in | Was it ever run? |
+|---|---|---|
+| `control_invite_owner` | `30--01-GATEKEEPER.sql` | no |
+| `control_revoke_owner_invitation` | `30--01-GATEKEEPER.sql` | no |
+| `control_delete_company` | `32--03-DELETE-AND-FIXES.sql` | no |
+| `control_delete_owner_invitation` | `32--03-DELETE-AND-FIXES.sql` | no |
+| `control_delete_signup_request` | `32--03-DELETE-AND-FIXES.sql` | no |
+| `control_purge_signup_requests` | `32--03-DELETE-AND-FIXES.sql` | no |
+
+Proof they never ran: both scripts create `owner_invitations` and
+`signup_requests`, and neither table exists in the live snapshot.
+
+The last three SQL scripts in your build order were written but never
+applied. That single fact explains the create-organization failure *and* the
+dead Control Center buttons.
+
+**One correction I made.** The packaged `control_delete_company` deleted from
+a hand-written list of 20 tables, but 61 live tables carry an
+`organization_id`. I checked every foreign key in your constraint export:
+56 already have `ON DELETE CASCADE`, 4 are `SET NULL`, and only `ai_usage`
+genuinely blocks the delete. So R2 clears the five real blockers and lets
+the database cascade the rest — shorter, and actually complete. Testing also
+caught `owner_invitations.created_org_id` blocking the delete; R2 makes it
+`ON DELETE SET NULL`.
+
+---
+
+## What is safe to run right now
+
+| Command | Safe? | Notes |
+|---|---|---|
+| `npm run deploy` | **yes** | app.hsbfix.org. Carries the push fix and the rewritten service worker. |
+| `npm run deploy:admin` | **yes** | admin.hsbfix.org. Needs R1+R2 first, or the buttons still fail. |
+| `npm run deploy:site` | **yes, now** | `site/` is your real 24-file site again. It was a 6-file reconstruction; deploying that would have destroyed hsbfix.org. |
+| `npm run db:push` | **NO — blocked** | Would create 5 duplicate tables. Use the R-scripts instead. |
+| `npm run functions:deploy` | **NO — blocked** | Would overwrite 7 live functions, including ones whose source you no longer have. |
+
+The last two are blocked by `scripts/confirm-schema.mjs` and will refuse to
+run. That guard stays.
+
+---
+
+## Still yours to do
+
+1. **Rotate `PUSH_INTERNAL_TOKEN`.** It was committed in plain text at
+   `6c367eb` and is still in git history. Change it in Supabase Secrets and
+   in the GitHub Actions secrets.
+2. **Set `DAILY_REPORTS_TOKEN` and `REPORT_FROM`** in Supabase Secrets.
+   `daily-reports` reads both and neither is set, so it cannot send.
+3. **Paste the VAPID public key** into `push-client.js` line 11, or push
+   delivery fails silently. Generate with `npx web-push generate-vapid-keys`.
+4. **Two PDFs** into `site/docs/`, named exactly as
+   `site/docs/PUT-YOUR-PDFS-HERE.txt` says, or the resources page 404s.
+5. **Recover the lost function sources** when you next have a laptop:
+   `npx supabase functions download create-owner` (also
+   `platform-admin-api` and `signup-notify`). They run live but their code
+   is not in any repo, so right now they cannot be changed or restored.
+
+---
+
+## The thing I got wrong earlier
+
+Before your package arrived I reconstructed `supabase/migrations/0001`–`0009`
+and said they were safe to apply because 66 tests passed. Those tests only
+proved the migrations were consistent *with each other*. Measured against
+your real database they would have created five duplicate tables
+(`ai_usage_events` beside `ai_usage`, `app_complaints` beside
+`platform_support_tickets`, and three more) and split your data in two.
+
+They are kept as a reference model only. Your live schema is the source of
+truth, and it is considerably richer than my reconstruction.

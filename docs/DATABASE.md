@@ -1,14 +1,18 @@
 # Database & API audit
 
-> # ⛔ STOP — read `STOP-READ-FIRST.md` before running any deploy command
+> # ⚠️ Read `STOP-READ-FIRST.md` first
 >
-> Your live database has **87 tables and 14 edge functions**, not the 55 and 8
-> these migrations assume. `npm run db:push` would create **5 duplicate
-> tables** and rewrite permissions on 32 tables it does not know about.
-> `npm run functions:deploy` would overwrite **7 working functions**.
+> **Your database needs three scripts run by hand before anything works.**
+> `create_organization` is broken on the live database — it inserts a plant
+> before creating the subscription that the plant's own trigger requires, so
+> every signup fails with *"Active subscription required"*. And six of the
+> RPCs your Control Center calls do not exist.
 >
-> **`npm run deploy` (the app) is safe and carries all the real fixes.**
-> Everything else is on hold until the migrations are adapted.
+> Fix: run `supabase/repairs/R1`, `R2`, then `R3` in the Supabase SQL Editor.
+>
+> All three deploy commands (`deploy`, `deploy:site`, `deploy:admin`) are
+> safe. `db:push` and `functions:deploy` remain blocked and should stay that
+> way — use the R-scripts instead.
 
 This was the priority of the renewal. The live schema had no migration
 history in the repository at all — it existed only inside the hosted Supabase

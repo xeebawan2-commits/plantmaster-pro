@@ -1,33 +1,29 @@
 # What goes where — your direct answers
 
-> # ⛔ STOP — read `STOP-READ-FIRST.md` before running any deploy command
+> # ⚠️ Read `STOP-READ-FIRST.md` first
 >
-> Your live database has **87 tables and 14 edge functions**, not the 55 and 8
-> these migrations assume. `npm run db:push` would create **5 duplicate
-> tables** and rewrite permissions on 32 tables it does not know about.
-> `npm run functions:deploy` would overwrite **7 working functions**.
+> **Your database needs three scripts run by hand before anything works.**
+> `create_organization` is broken on the live database — it inserts a plant
+> before creating the subscription that the plant's own trigger requires, so
+> every signup fails with *"Active subscription required"*. And six of the
+> RPCs your Control Center calls do not exist.
 >
-> **`npm run deploy` (the app) is safe and carries all the real fixes.**
-> Everything else is on hold until the migrations are adapted.
+> Fix: run `supabase/repairs/R1`, `R2`, then `R3` in the Supabase SQL Editor.
+>
+> All three deploy commands (`deploy`, `deploy:site`, `deploy:admin`) are
+> safe. `db:push` and `functions:deploy` remain blocked and should stay that
+> way — use the R-scripts instead.
 
-> ## ⚠️ Read this before you run `npm run deploy:site`
+> ## ✅ `npm run deploy:site` is now safe
 >
-> You already have a **separate repository** — `xeebawan2-commits/hsbfix-org` —
-> serving `hsbfix.org` through the Cloudflare project `plantmaster-site`. It
-> contains pages this package does **not** have:
+> `site/` previously held a 6-page reconstruction; deploying it would have
+> wiped the real hsbfix.org. It now contains your **actual 24-file site**
+> from the master package — demo, guide, pricing, resources, sitemap, robots,
+> og-image and `img/` — plus `delete-account.html`, which Google Play
+> requires and which the live site does not yet have.
 >
-> `demo.html` · `guide.html` · `pricing.html` · `resources.html` ·
-> `og-image.jpg` · `img/` · `docs/PlantMaster-Pro-Overview…`
->
-> **`npm run deploy:site` would replace that site and those pages would go
-> offline.** My `site/` folder has only 6 pages
-> (`index`, `signup`, `privacy`, `terms`, `delete-account`, `site.css`).
->
-> **So: skip `deploy:site` for now.** Deploy the app and admin, which are
-> safe, and decide about the marketing site separately — see
-> *"Your existing marketing site"* near the end of this document.
->
-> The app and admin have no such conflict.
+> Every page differs from your live original by exactly one line: a footer
+> link to the deletion page. Verified with `cmp`.
 
 You asked two things:
 
@@ -183,29 +179,35 @@ That split is fine and you can leave it exactly as it is.
 
 ### So what do I do about the marketing site?
 
-Three options. **Option A is the safe default.**
+**This is now settled: `site/` in this repo *is* your real site.**
 
-**Option A — Leave it alone (recommended for now).**
-Keep editing `hsbfix.org` in the `hsbfix-org` repo as you do today. Never run
-`npm run deploy:site`. You lose nothing: your current site is richer than mine.
-Just make sure two pages exist there, because Google Play requires them:
-- `privacy.html` ✅ you have it
-- a **delete-account** page ❌ you do *not* have one — copy
-  `site/delete-account.html` from this package into `hsbfix-org`
+I copied the live 24-file site out of your master package into `site/`, so the
+two are the same content. The only difference is `delete-account.html`, which
+Google Play requires and which the live site does not have yet, plus a footer
+link to it on every page.
 
-**Option B — Take just the missing pieces.**
-Copy `site/delete-account.html` (and anything else you like the look of) into
-`hsbfix-org`, and keep everything else as-is.
+You have two equally valid ways to publish it:
 
-**Option C — Switch fully to this package's site.**
-Only if you prefer my version. First copy your `demo.html`, `guide.html`,
-`pricing.html`, `resources.html`, `og-image.jpg`, `img/` and `docs/` into this
-package's `site/` folder, run `npm run verify:links` to confirm nothing breaks,
-*then* run `npm run deploy:site`. Skipping that copy step takes those pages
-offline.
+**Option A — Keep using the `hsbfix-org` repo (no change to your habits).**
+Copy `site/delete-account.html` into `hsbfix-org`, add a footer link to it,
+and add it to `sitemap.xml`. Cloudflare auto-builds on push as it does today.
+Ignore `npm run deploy:site` entirely.
 
-> Whichever you choose, the **delete-account page must be publicly reachable**
-> before Google Play will approve the app. It is the one hard requirement.
+**Option B — Publish from this repo.**
+Run `npm run deploy:site`. It now pushes the full real site, so nothing goes
+offline. Do this only if you want a single repo driving all three properties;
+if you do, stop pushing to `hsbfix-org` so the two cannot fight over the same
+Cloudflare project.
+
+> Either way, the **delete-account page must be publicly reachable** before
+> Google Play will approve the app. It is the one hard requirement.
+
+One fix worth knowing about: all 8 of your live pages link their favicons at
+`/img/favicon.ico`, `/img/favicon-32.png`, `/img/favicon-16.png` and
+`/img/apple-touch-icon.png`, but those four files actually sit at the site
+root. Every page on hsbfix.org is requesting four files that 404 today. I
+copied the icons into `img/` rather than editing eight live pages, so this is
+fixed in `site/`. If you stay on Option A, copy `site/img/` across too.
 
 ---
 
@@ -214,12 +216,16 @@ offline.
 Everything above can also be done through web dashboards, but it is slower and
 more error-prone:
 
-- **Database:** open `supabase/migrations/0001_foundation.sql` in a text
-  editor, paste into Supabase → SQL Editor → Run. Repeat for `0002` through
-  `0009` **in numerical order**. Do not skip or reorder.
-- **Functions:** Supabase dashboard → Edge Functions → create each of the 8 by
-  name, paste in the matching `index.ts`. Note the `_shared/` folder is
-  imported by all of them and must exist too.
+- **Database:** open `supabase/repairs/R1-fix-organization-creation.sql`,
+  paste into Supabase → SQL Editor → Run. Then `R2-control-center.sql`, then
+  `R3-verify.sql`. **Do not** paste anything from `supabase/migrations/` —
+  those describe a clean-slate database, not yours, and would create five
+  duplicate tables alongside the ones you already have.
+- **Functions:** leave them alone. All 14 are already deployed and working.
+  Three of them (`create-owner`, `platform-admin-api`, `signup-notify`) exist
+  only on Supabase — their source is in no repo, so overwriting them would be
+  unrecoverable. Download them first if you ever need to change one:
+  `npx supabase functions download create-owner`.
 - **Websites:** Cloudflare Pages → Create project → Upload assets. But you must
   first run `npm run build` locally to generate `public/` and `dist/`, because
   those are what get uploaded, not the source folders.

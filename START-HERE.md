@@ -1,14 +1,18 @@
 # START HERE — PlantMaster Pro launch package
 
-> # ⛔ STOP — read `STOP-READ-FIRST.md` before running any deploy command
+> # ⚠️ Read `STOP-READ-FIRST.md` first
 >
-> Your live database has **87 tables and 14 edge functions**, not the 55 and 8
-> these migrations assume. `npm run db:push` would create **5 duplicate
-> tables** and rewrite permissions on 32 tables it does not know about.
-> `npm run functions:deploy` would overwrite **7 working functions**.
+> **Your database needs three scripts run by hand before anything works.**
+> `create_organization` is broken on the live database — it inserts a plant
+> before creating the subscription that the plant's own trigger requires, so
+> every signup fails with *"Active subscription required"*. And six of the
+> RPCs your Control Center calls do not exist.
 >
-> **`npm run deploy` (the app) is safe and carries all the real fixes.**
-> Everything else is on hold until the migrations are adapted.
+> Fix: run `supabase/repairs/R1`, `R2`, then `R3` in the Supabase SQL Editor.
+>
+> All three deploy commands (`deploy`, `deploy:site`, `deploy:admin`) are
+> safe. `db:push` and `functions:deploy` remain blocked and should stay that
+> way — use the R-scripts instead.
 
 **Status: the code is finished.** Every build passes, every check is green, and
 nothing further needs to be written. What remains is work only you can do,
@@ -57,81 +61,80 @@ your push-notification endpoint.
 
 ---
 
-## Task 2 · Set up the database and the server functions
+## Task 2 · Repair the database
+
+Your database is already built — 83 tables, 73 functions, 135 policies. It
+does **not** need creating. It needs three specific repairs.
+
+Do **not** run `npm run db:push` or `npm run functions:deploy`. Both are
+deliberately blocked. They describe a clean-slate database and would create
+duplicate tables alongside your real ones.
 
 **Steps**
 
-1. Install the Supabase CLI: <https://supabase.com/docs/guides/cli>
+1. **Back up first.** Supabase dashboard → *Database → Backups* → take a
+   manual backup. One minute, removes all risk.
 
-2. Open a terminal in this folder and connect it to your project:
-   ```bash
-   npm install
-   supabase link --project-ref dpmmenwziplixrgylapy
-   ```
+2. Open Supabase → **SQL Editor**. Set the row-limit dropdown beside *Run*
+   to **No limit**.
 
-3. **Back up first.** In the Supabase dashboard go to
-   *Database → Backups* and take a manual backup. The migrations are written
-   to merge safely into your existing database rather than replace it, but a
-   backup costs you one minute and removes all risk.
+3. Run these three files from `supabase/repairs/`, in order. Open each,
+   copy the whole contents, paste, Run:
 
-4. Apply the database:
-   ```bash
-   npm run db:push
-   ```
+   | Order | File | Fixes |
+   |---|---|---|
+   | 1 | `R1-fix-organization-creation.sql` | signup — creating a company works again |
+   | 2 | `R2-control-center.sql` | the Control Center's dead buttons |
+   | 3 | `R3-verify.sql` | read-only; confirms 1 and 2 worked |
 
-5. Deploy the eight server functions:
-   ```bash
-   npm run functions:deploy
-   ```
+   R3 prints 16 rows, each with a *result* and a *want* column. They should
+   match. If row 13 (*companies with NO subscription*) is not `0`, the bottom
+   of R3 has a commented-out block that repairs those companies — read the
+   list it prints first.
 
-6. Create a VAPID key pair (needed for phone notifications):
-   ```bash
-   npx web-push generate-vapid-keys
-   ```
-   It prints a **Public Key** and a **Private Key**. Keep both.
-
-7. Set the secrets (replace each `...` with your real value):
-   ```bash
-   supabase secrets set \
-     GEMINI_API_KEY=... \
-     VAPID_PUBLIC_KEY=... \
-     VAPID_PRIVATE_KEY=... \
-     VAPID_SUBJECT=mailto:support@hsbfix.org \
-     PUSH_INTERNAL_TOKEN=... \
-     DAILY_REPORTS_TOKEN=... \
-     RESEND_API_KEY=... \
-     REPORT_FROM="PlantMaster Pro <reports@hsbfix.org>"
-   ```
-   - `GEMINI_API_KEY` — from <https://aistudio.google.com/apikey>
-   - `RESEND_API_KEY` — from <https://resend.com> (for the daily report email)
-   - The two tokens are the ones you generated in Task 1.
-
-8. Open `push-client.js` in this folder. On line 11 replace the value of
-   `VAPID_PUBLIC_KEY` with the **public** key from step 6.
-   > If this does not match the secret you set, phones will subscribe
-   > successfully but every notification will silently fail.
-
-9. Make yourself the platform operator. In the Supabase dashboard open
-   *SQL Editor* and run, using your own email:
+4. Make yourself the platform operator, if you are not already:
    ```sql
    insert into public.platform_admins (user_id, email)
    select id, email from auth.users where email = 'you@hsbfix.org'
    on conflict do nothing;
    ```
-   > Skip this and `admin.hsbfix.org` will lock **you** out too — the refusal
-   > is enforced by the database, not the screen.
+   > Skip this and `admin.hsbfix.org` locks **you** out too — the refusal is
+   > enforced by the database, not the screen.
 
-10. In the dashboard go to *Authentication → URL Configuration* and add all
-    three site addresses to **Redirect URLs**:
-    ```
-    https://app.hsbfix.org
-    https://admin.hsbfix.org
-    https://hsbfix.org
-    ```
-    Missing entries break password reset with an unhelpful error.
+5. Set the two secrets that are missing. Supabase → *Edge Functions →
+   Secrets*:
+   - `DAILY_REPORTS_TOKEN` — any long random string; put the same value in
+     your GitHub Actions secrets
+   - `REPORT_FROM` — e.g. `PlantMaster Pro <reports@hsbfix.org>`
 
-**Done when:** `npm run db:push` and `npm run functions:deploy` both finish
-without an error.
+   `daily-reports` reads both. Neither is set today, so it cannot send.
+
+6. Create a VAPID key pair for phone notifications, if you have not already:
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+   Set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and
+   `VAPID_SUBJECT=mailto:support@hsbfix.org` as secrets, then open
+   `push-client.js` and put the **public** key on line 11.
+   > If the two do not match, phones subscribe successfully and every
+   > notification then fails silently.
+
+7. Supabase → *Authentication → URL Configuration* → add all three addresses
+   to **Redirect URLs**:
+   ```
+   https://app.hsbfix.org
+   https://admin.hsbfix.org
+   https://hsbfix.org
+   ```
+   Missing entries break password reset with an unhelpful error.
+
+**Done when:** every row of `R3-verify.sql` matches its *want* column.
+
+> **Leave the edge functions alone.** All 14 are deployed and working. Three
+> of them — `create-owner`, `platform-admin-api`, `signup-notify` — exist
+> *only* on Supabase; their source is in no repository. Overwriting one would
+> be unrecoverable. If you ever need to change one, download it first:
+> `npx supabase functions download create-owner`.
 
 ---
 
@@ -152,20 +155,23 @@ without an error.
    npm run deploy:admin   # admin.hsbfix.org
    ```
 
-   > **Do not run `npm run deploy:site` yet.** Your `hsbfix.org` is served from
-   > a different repository (`hsbfix-org`) and has pages this package lacks —
-   > `demo`, `guide`, `pricing`, `resources`. Deploying would take them
-   > offline. See `WHAT-GOES-WHERE.md` → *Your existing marketing site* for the
-   > three options. The safe default is to leave hsbfix.org exactly as it is.
+   > `npm run deploy:site` is now safe too — `site/` holds your real 24-file
+   > site, not the old 6-page reconstruction. Run it **only** if you want this
+   > repo to drive hsbfix.org; if you do, stop pushing to the `hsbfix-org`
+   > repo so the two do not fight over the same Cloudflare project. See
+   > `WHAT-GOES-WHERE.md` → *So what do I do about the marketing site?*
 
 3. Your DNS is already correct — all three addresses are live in Cloudflare
    (`plantmaster-pro`, `plantmaster-site`, `plantmaster-admin`). Nothing to
    change.
 
 4. One page Google Play requires: a publicly reachable **account deletion**
-   page. Your `hsbfix.org` does not have one yet. Copy
-   `site/delete-account.html` from this package into your `hsbfix-org`
-   repository and push — Cloudflare will publish it automatically.
+   page. Your live `hsbfix.org` does not have one yet.
+   - If you stay on the `hsbfix-org` repo: copy `site/delete-account.html`
+     into it, add a footer link, add it to `sitemap.xml`, and push —
+     Cloudflare publishes automatically. Copy `site/img/` across too; your
+     live pages link four favicons at `/img/...` that are not there today.
+   - If you ran `npm run deploy:site`: it is already published.
 
 **Done when:** `app.hsbfix.org`, `admin.hsbfix.org` and
 `hsbfix.org/delete-account.html` all open.
