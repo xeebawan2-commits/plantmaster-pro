@@ -1,0 +1,1002 @@
+schema_line
+TABLE: action_attachments.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: action_attachments.organization_id | uuid | nullable=NO | default=none
+TABLE: action_attachments.plant_id | uuid | nullable=YES | default=none
+TABLE: action_attachments.entity_type | text | nullable=NO | default=none
+TABLE: action_attachments.entity_id | uuid | nullable=NO | default=none
+TABLE: action_attachments.file_metadata_id | uuid | nullable=NO | default=none
+TABLE: action_attachments.uploaded_by | uuid | nullable=NO | default=none
+TABLE: action_attachments.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: admin_action_logs.id | bigint | nullable=NO | default=none
+TABLE: admin_action_logs.admin_user_id | uuid | nullable=YES | default=none
+TABLE: admin_action_logs.action | text | nullable=NO | default=none
+TABLE: admin_action_logs.target_type | text | nullable=NO | default=none
+TABLE: admin_action_logs.target_id | text | nullable=YES | default=none
+TABLE: admin_action_logs.organization_id | uuid | nullable=YES | default=none
+TABLE: admin_action_logs.reason | text | nullable=YES | default=none
+TABLE: admin_action_logs.details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: admin_action_logs.correlation_id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: admin_action_logs.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: ai_usage.id | bigint | nullable=NO | default=none
+TABLE: ai_usage.organization_id | uuid | nullable=NO | default=none
+TABLE: ai_usage.plant_id | uuid | nullable=YES | default=none
+TABLE: ai_usage.user_id | uuid | nullable=YES | default=none
+TABLE: ai_usage.provider | text | nullable=YES | default=none
+TABLE: ai_usage.mode | text | nullable=YES | default=none
+TABLE: ai_usage.input_tokens | integer | nullable=YES | default=none
+TABLE: ai_usage.output_tokens | integer | nullable=YES | default=none
+TABLE: ai_usage.estimated_cost | numeric | nullable=YES | default=none
+TABLE: ai_usage.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: ai_usage.request_id | uuid | nullable=YES | default=none
+TABLE: ai_usage.model | text | nullable=YES | default=none
+TABLE: ai_usage.status | text | nullable=YES | default='completed'::text
+TABLE: ai_usage.latency_ms | integer | nullable=YES | default=none
+TABLE: ai_usage.error_code | text | nullable=YES | default=none
+TABLE: ai_usage.source_count | integer | nullable=YES | default=0
+TABLE: api_keys.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: api_keys.organization_id | uuid | nullable=NO | default=none
+TABLE: api_keys.plant_id | uuid | nullable=YES | default=none
+TABLE: api_keys.name | text | nullable=NO | default=none
+TABLE: api_keys.key_hash | text | nullable=NO | default=none
+TABLE: api_keys.key_prefix | text | nullable=NO | default=none
+TABLE: api_keys.scopes | ARRAY | nullable=NO | default='{read}'::text[]
+TABLE: api_keys.created_by | uuid | nullable=YES | default=none
+TABLE: api_keys.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: api_keys.last_used_at | timestamp with time zone | nullable=YES | default=none
+TABLE: api_keys.expires_at | timestamp with time zone | nullable=YES | default=none
+TABLE: api_keys.revoked_at | timestamp with time zone | nullable=YES | default=none
+TABLE: api_keys.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: asset_status_history.id | bigint | nullable=NO | default=none
+TABLE: asset_status_history.organization_id | uuid | nullable=NO | default=none
+TABLE: asset_status_history.plant_id | uuid | nullable=NO | default=none
+TABLE: asset_status_history.asset_id | uuid | nullable=NO | default=none
+TABLE: asset_status_history.old_state | text | nullable=YES | default=none
+TABLE: asset_status_history.new_state | text | nullable=NO | default=none
+TABLE: asset_status_history.changed_by | uuid | nullable=YES | default=none
+TABLE: asset_status_history.changed_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: assets.id | uuid | nullable=NO | default=none
+TABLE: assets.organization_id | uuid | nullable=NO | default=none
+TABLE: assets.plant_id | uuid | nullable=NO | default=none
+TABLE: assets.asset_code | text | nullable=NO | default=none
+TABLE: assets.name | text | nullable=NO | default=none
+TABLE: assets.asset_type | text | nullable=NO | default=none
+TABLE: assets.location | text | nullable=YES | default=none
+TABLE: assets.manufacturer | text | nullable=YES | default=none
+TABLE: assets.model | text | nullable=YES | default=none
+TABLE: assets.serial_number | text | nullable=YES | default=none
+TABLE: assets.rating | text | nullable=YES | default=none
+TABLE: assets.status | text | nullable=NO | default='operational'::text
+TABLE: assets.running_state | text | nullable=NO | default='shutdown'::text
+TABLE: assets.details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: assets.created_by | uuid | nullable=NO | default=none
+TABLE: assets.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: assets.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: assets.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: assets.removed_by | uuid | nullable=YES | default=none
+TABLE: assets.row_version | bigint | nullable=NO | default=1
+TABLE: assets.parent_id | uuid | nullable=YES | default=none
+TABLE: assets.meter_unit | text | nullable=YES | default=none
+TABLE: assets.current_meter_value | numeric | nullable=YES | default=0
+TABLE: assets.pm_trigger_meter_value | numeric | nullable=YES | default=none
+TABLE: attendance.id | uuid | nullable=NO | default=none
+TABLE: attendance.organization_id | uuid | nullable=NO | default=none
+TABLE: attendance.plant_id | uuid | nullable=NO | default=none
+TABLE: attendance.user_id | uuid | nullable=NO | default=none
+TABLE: attendance.work_date | date | nullable=NO | default=none
+TABLE: attendance.shift_name | text | nullable=YES | default=none
+TABLE: attendance.status | text | nullable=NO | default=none
+TABLE: attendance.check_in | timestamp with time zone | nullable=YES | default=none
+TABLE: attendance.check_out | timestamp with time zone | nullable=YES | default=none
+TABLE: attendance.notes | text | nullable=YES | default=none
+TABLE: attendance.created_by | uuid | nullable=YES | default=none
+TABLE: attendance.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: audit_logs.id | bigint | nullable=NO | default=none
+TABLE: audit_logs.organization_id | uuid | nullable=NO | default=none
+TABLE: audit_logs.plant_id | uuid | nullable=YES | default=none
+TABLE: audit_logs.user_id | uuid | nullable=YES | default=none
+TABLE: audit_logs.action | text | nullable=NO | default=none
+TABLE: audit_logs.entity_type | text | nullable=NO | default=none
+TABLE: audit_logs.entity_id | text | nullable=YES | default=none
+TABLE: audit_logs.details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: audit_logs.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: backup_jobs.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: backup_jobs.job_type | text | nullable=NO | default=none
+TABLE: backup_jobs.status | text | nullable=NO | default='requested'::text
+TABLE: backup_jobs.provider | text | nullable=NO | default='supabase_managed'::text
+TABLE: backup_jobs.requested_by | uuid | nullable=NO | default=none
+TABLE: backup_jobs.started_at | timestamp with time zone | nullable=YES | default=none
+TABLE: backup_jobs.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: backup_jobs.backup_reference | text | nullable=YES | default=none
+TABLE: backup_jobs.size_bytes | bigint | nullable=YES | default=none
+TABLE: backup_jobs.checksum | text | nullable=YES | default=none
+TABLE: backup_jobs.error | text | nullable=YES | default=none
+TABLE: backup_jobs.metadata | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: backup_jobs.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: billing_events.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: billing_events.provider | text | nullable=NO | default=none
+TABLE: billing_events.provider_event_id | text | nullable=NO | default=none
+TABLE: billing_events.organization_id | uuid | nullable=YES | default=none
+TABLE: billing_events.event_type | text | nullable=NO | default=none
+TABLE: billing_events.status | text | nullable=NO | default='received'::text
+TABLE: billing_events.payload_hash | text | nullable=YES | default=none
+TABLE: billing_events.error | text | nullable=YES | default=none
+TABLE: billing_events.received_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: billing_events.processed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: checklist_items.id | uuid | nullable=NO | default=none
+TABLE: checklist_items.template_id | uuid | nullable=NO | default=none
+TABLE: checklist_items.sort_order | integer | nullable=NO | default=none
+TABLE: checklist_items.label | text | nullable=NO | default=none
+TABLE: checklist_items.input_type | text | nullable=NO | default=none
+TABLE: checklist_items.unit | text | nullable=YES | default=none
+TABLE: checklist_items.required | boolean | nullable=YES | default=true
+TABLE: checklist_items.limits | jsonb | nullable=YES | default='{}'::jsonb
+TABLE: checklist_runs.id | uuid | nullable=NO | default=none
+TABLE: checklist_runs.organization_id | uuid | nullable=NO | default=none
+TABLE: checklist_runs.plant_id | uuid | nullable=NO | default=none
+TABLE: checklist_runs.template_id | uuid | nullable=NO | default=none
+TABLE: checklist_runs.asset_id | uuid | nullable=YES | default=none
+TABLE: checklist_runs.performed_by | uuid | nullable=NO | default=none
+TABLE: checklist_runs.shift_name | text | nullable=YES | default=none
+TABLE: checklist_runs.status | text | nullable=NO | default=none
+TABLE: checklist_runs.notes | text | nullable=YES | default=none
+TABLE: checklist_runs.performed_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: checklist_runs.designation | text | nullable=YES | default=none
+TABLE: checklist_runs.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: checklist_runs.supervisor_approved_by | uuid | nullable=YES | default=none
+TABLE: checklist_runs.supervisor_approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: checklist_runs.signature_data | text | nullable=YES | default=none
+TABLE: checklist_templates.id | uuid | nullable=NO | default=none
+TABLE: checklist_templates.organization_id | uuid | nullable=NO | default=none
+TABLE: checklist_templates.plant_id | uuid | nullable=NO | default=none
+TABLE: checklist_templates.asset_id | uuid | nullable=YES | default=none
+TABLE: checklist_templates.name | text | nullable=NO | default=none
+TABLE: checklist_templates.schedule | text | nullable=YES | default=none
+TABLE: checklist_templates.shift_name | text | nullable=YES | default=none
+TABLE: checklist_templates.instructions | text | nullable=YES | default=none
+TABLE: checklist_templates.active | boolean | nullable=YES | default=true
+TABLE: checklist_templates.created_by | uuid | nullable=YES | default=none
+TABLE: checklist_templates.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: checklist_templates.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: checklist_templates.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: checklist_templates.removed_by | uuid | nullable=YES | default=none
+TABLE: checklist_templates.row_version | bigint | nullable=NO | default=1
+TABLE: checklist_values.id | uuid | nullable=NO | default=none
+TABLE: checklist_values.run_id | uuid | nullable=NO | default=none
+TABLE: checklist_values.item_id | uuid | nullable=NO | default=none
+TABLE: checklist_values.value | jsonb | nullable=NO | default=none
+TABLE: checklist_values.failed | boolean | nullable=NO | default=false
+TABLE: checklist_values.note | text | nullable=YES | default=none
+TABLE: code_registry.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: code_registry.organization_id | uuid | nullable=NO | default=none
+TABLE: code_registry.plant_id | uuid | nullable=YES | default=none
+TABLE: code_registry.code_value | text | nullable=NO | default=none
+TABLE: code_registry.code_format | text | nullable=NO | default='QR_CODE'::text
+TABLE: code_registry.entity_type | text | nullable=NO | default=none
+TABLE: code_registry.entity_id | text | nullable=NO | default=none
+TABLE: code_registry.label | text | nullable=YES | default=none
+TABLE: code_registry.active | boolean | nullable=NO | default=true
+TABLE: code_registry.created_by | uuid | nullable=YES | default=none
+TABLE: code_registry.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: code_registry.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: company_feature_blocks.organization_id | uuid | nullable=NO | default=none
+TABLE: company_feature_blocks.feature | text | nullable=NO | default=none
+TABLE: company_feature_blocks.blocked | boolean | nullable=NO | default=true
+TABLE: company_feature_blocks.reason | text | nullable=NO | default=none
+TABLE: company_feature_blocks.blocked_by | uuid | nullable=NO | default=none
+TABLE: company_feature_blocks.expires_at | timestamp with time zone | nullable=YES | default=none
+TABLE: company_feature_blocks.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: complimentary_access.organization_id | uuid | nullable=NO | default=none
+TABLE: complimentary_access.access_type | text | nullable=NO | default='complimentary'::text
+TABLE: complimentary_access.starts_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: complimentary_access.ends_at | timestamp with time zone | nullable=YES | default=none
+TABLE: complimentary_access.reason | text | nullable=NO | default=none
+TABLE: complimentary_access.never_auto_suspend | boolean | nullable=NO | default=true
+TABLE: complimentary_access.granted_by | uuid | nullable=NO | default=none
+TABLE: complimentary_access.revoked_at | timestamp with time zone | nullable=YES | default=none
+TABLE: complimentary_access.revoked_by | uuid | nullable=YES | default=none
+TABLE: complimentary_access.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: complimentary_access.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: condition_alarms.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: condition_alarms.organization_id | uuid | nullable=NO | default=none
+TABLE: condition_alarms.plant_id | uuid | nullable=NO | default=none
+TABLE: condition_alarms.asset_id | uuid | nullable=YES | default=none
+TABLE: condition_alarms.recording_id | uuid | nullable=NO | default=none
+TABLE: condition_alarms.alarm_type | text | nullable=NO | default=none
+TABLE: condition_alarms.severity | text | nullable=NO | default=none
+TABLE: condition_alarms.message | text | nullable=NO | default=none
+TABLE: condition_alarms.metric | text | nullable=YES | default=none
+TABLE: condition_alarms.measured_value | numeric | nullable=YES | default=none
+TABLE: condition_alarms.limit_value | numeric | nullable=YES | default=none
+TABLE: condition_alarms.acknowledged_by | uuid | nullable=YES | default=none
+TABLE: condition_alarms.acknowledged_at | timestamp with time zone | nullable=YES | default=none
+TABLE: condition_alarms.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: condition_entity_links.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: condition_entity_links.organization_id | uuid | nullable=NO | default=none
+TABLE: condition_entity_links.recording_id | uuid | nullable=NO | default=none
+TABLE: condition_entity_links.entity_type | text | nullable=NO | default=none
+TABLE: condition_entity_links.entity_id | text | nullable=NO | default=none
+TABLE: condition_entity_links.relation | text | nullable=NO | default='evidence'::text
+TABLE: condition_entity_links.linked_by | uuid | nullable=NO | default=none
+TABLE: condition_entity_links.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: condition_recordings.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: condition_recordings.organization_id | uuid | nullable=NO | default=none
+TABLE: condition_recordings.plant_id | uuid | nullable=NO | default=none
+TABLE: condition_recordings.asset_id | uuid | nullable=YES | default=none
+TABLE: condition_recordings.measurement_point_id | uuid | nullable=YES | default=none
+TABLE: condition_recordings.recording_type | text | nullable=NO | default=none
+TABLE: condition_recordings.title | text | nullable=NO | default=none
+TABLE: condition_recordings.operating_condition | text | nullable=YES | default=none
+TABLE: condition_recordings.rpm | numeric | nullable=YES | default=none
+TABLE: condition_recordings.load_percent | numeric | nullable=YES | default=none
+TABLE: condition_recordings.temperature | numeric | nullable=YES | default=none
+TABLE: condition_recordings.duration_seconds | numeric | nullable=YES | default=none
+TABLE: condition_recordings.sample_rate | numeric | nullable=YES | default=none
+TABLE: condition_recordings.device_info | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: condition_recordings.calibration_status | text | nullable=NO | default='uncalibrated'::text
+TABLE: condition_recordings.audio_path | text | nullable=YES | default=none
+TABLE: condition_recordings.audio_mime_type | text | nullable=YES | default=none
+TABLE: condition_recordings.audio_size_bytes | bigint | nullable=YES | default=none
+TABLE: condition_recordings.waveform | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: condition_recordings.spectrum | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: condition_recordings.vibration_samples | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: condition_recordings.metrics | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: condition_recordings.ai_analysis | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: condition_recordings.manual_sources | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: condition_recordings.baseline_id | uuid | nullable=YES | default=none
+TABLE: condition_recordings.comparison | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: condition_recordings.is_baseline | boolean | nullable=NO | default=false
+TABLE: condition_recordings.status | text | nullable=NO | default='completed'::text
+TABLE: condition_recordings.condition_status | text | nullable=NO | default='unverified'::text
+TABLE: condition_recordings.notes | text | nullable=YES | default=none
+TABLE: condition_recordings.created_by | uuid | nullable=NO | default=none
+TABLE: condition_recordings.worker_name | text | nullable=NO | default=none
+TABLE: condition_recordings.designation | text | nullable=YES | default=none
+TABLE: condition_recordings.shift_name | text | nullable=YES | default=none
+TABLE: condition_recordings.approved_by | uuid | nullable=YES | default=none
+TABLE: condition_recordings.approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: condition_recordings.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: condition_recordings.removed_by | uuid | nullable=YES | default=none
+TABLE: condition_recordings.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: condition_recordings.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: daily_logs.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: daily_logs.organization_id | uuid | nullable=NO | default=none
+TABLE: daily_logs.plant_id | uuid | nullable=NO | default=none
+TABLE: daily_logs.log_date | date | nullable=NO | default=CURRENT_DATE
+TABLE: daily_logs.shift_name | text | nullable=NO | default=none
+TABLE: daily_logs.category | text | nullable=NO | default='operations'::text
+TABLE: daily_logs.entry | text | nullable=NO | default=none
+TABLE: daily_logs.created_by | uuid | nullable=NO | default=none
+TABLE: daily_logs.worker_name | text | nullable=NO | default=none
+TABLE: daily_logs.designation | text | nullable=YES | default=none
+TABLE: daily_logs.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: data_retention_policies.organization_id | uuid | nullable=NO | default=none
+TABLE: data_retention_policies.operational_days | integer | nullable=NO | default=1095
+TABLE: data_retention_policies.audit_days | integer | nullable=NO | default=2190
+TABLE: data_retention_policies.ai_prompt_days | integer | nullable=NO | default=0
+TABLE: data_retention_policies.soft_delete_grace_days | integer | nullable=NO | default=30
+TABLE: data_retention_policies.legal_hold | boolean | nullable=NO | default=false
+TABLE: data_retention_policies.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: data_retention_policies.updated_by | uuid | nullable=YES | default=none
+TABLE: deletion_requests.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: deletion_requests.organization_id | uuid | nullable=NO | default=none
+TABLE: deletion_requests.requested_by | uuid | nullable=NO | default=none
+TABLE: deletion_requests.request_type | text | nullable=NO | default=none
+TABLE: deletion_requests.target_user_id | uuid | nullable=YES | default=none
+TABLE: deletion_requests.status | text | nullable=NO | default='requested'::text
+TABLE: deletion_requests.reason | text | nullable=YES | default=none
+TABLE: deletion_requests.scheduled_for | timestamp with time zone | nullable=YES | default=none
+TABLE: deletion_requests.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: deletion_requests.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: document_chunks.id | bigint | nullable=NO | default=none
+TABLE: document_chunks.manual_id | uuid | nullable=NO | default=none
+TABLE: document_chunks.page_number | integer | nullable=YES | default=none
+TABLE: document_chunks.content | text | nullable=NO | default=none
+TABLE: document_chunks.embedding | USER-DEFINED | nullable=YES | default=none
+TABLE: document_chunks.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: file_metadata.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: file_metadata.organization_id | uuid | nullable=NO | default=none
+TABLE: file_metadata.plant_id | uuid | nullable=YES | default=none
+TABLE: file_metadata.asset_id | uuid | nullable=YES | default=none
+TABLE: file_metadata.bucket | text | nullable=NO | default='plant-files'::text
+TABLE: file_metadata.object_path | text | nullable=NO | default=none
+TABLE: file_metadata.file_name | text | nullable=NO | default=none
+TABLE: file_metadata.mime_type | text | nullable=YES | default=none
+TABLE: file_metadata.size_bytes | bigint | nullable=YES | default=none
+TABLE: file_metadata.category | text | nullable=YES | default=none
+TABLE: file_metadata.uploaded_by | uuid | nullable=NO | default=none
+TABLE: file_metadata.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: file_metadata.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: file_metadata.removed_by | uuid | nullable=YES | default=none
+TABLE: inventory_transactions.id | uuid | nullable=NO | default=none
+TABLE: inventory_transactions.spare_id | uuid | nullable=NO | default=none
+TABLE: inventory_transactions.quantity | numeric | nullable=NO | default=none
+TABLE: inventory_transactions.transaction_type | text | nullable=NO | default=none
+TABLE: inventory_transactions.reference | text | nullable=YES | default=none
+TABLE: inventory_transactions.performed_by | uuid | nullable=YES | default=none
+TABLE: inventory_transactions.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: invitations.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: invitations.organization_id | uuid | nullable=NO | default=none
+TABLE: invitations.plant_id | uuid | nullable=YES | default=none
+TABLE: invitations.email | text | nullable=YES | default=none
+TABLE: invitations.role | text | nullable=NO | default=none
+TABLE: invitations.token | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: invitations.expires_at | timestamp with time zone | nullable=NO | default=(now() + '7 days'::interval)
+TABLE: invitations.accepted_at | timestamp with time zone | nullable=YES | default=none
+TABLE: invitations.created_by | uuid | nullable=YES | default=none
+TABLE: invitations.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: invitations.worker_details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: legal_acceptances.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: legal_acceptances.document_id | uuid | nullable=NO | default=none
+TABLE: legal_acceptances.organization_id | uuid | nullable=YES | default=none
+TABLE: legal_acceptances.user_id | uuid | nullable=NO | default=none
+TABLE: legal_acceptances.accepted_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: legal_acceptances.locale | text | nullable=YES | default=none
+TABLE: legal_acceptances.user_agent_hash | text | nullable=YES | default=none
+TABLE: legal_documents.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: legal_documents.document_type | text | nullable=NO | default=none
+TABLE: legal_documents.version | text | nullable=NO | default=none
+TABLE: legal_documents.title | text | nullable=NO | default=none
+TABLE: legal_documents.content | text | nullable=NO | default=none
+TABLE: legal_documents.effective_at | timestamp with time zone | nullable=NO | default=none
+TABLE: legal_documents.active | boolean | nullable=NO | default=true
+TABLE: legal_documents.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: legal_documents.required | boolean | nullable=NO | default=false
+TABLE: legal_documents.acceptance_scope | text | nullable=NO | default='all_users'::text
+TABLE: legal_documents.published_by | uuid | nullable=YES | default=none
+TABLE: legal_documents.published_at | timestamp with time zone | nullable=YES | default=none
+TABLE: loto_procedures.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: loto_procedures.plant_id | uuid | nullable=NO | default=none
+TABLE: loto_procedures.asset_id | uuid | nullable=NO | default=none
+TABLE: loto_procedures.work_order_id | uuid | nullable=YES | default=none
+TABLE: loto_procedures.applied_by | uuid | nullable=NO | default=none
+TABLE: loto_procedures.applied_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: loto_procedures.removed_by | uuid | nullable=YES | default=none
+TABLE: loto_procedures.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: loto_procedures.notes | text | nullable=YES | default=none
+TABLE: maintenance_completions.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: maintenance_completions.organization_id | uuid | nullable=NO | default=none
+TABLE: maintenance_completions.plant_id | uuid | nullable=NO | default=none
+TABLE: maintenance_completions.plan_id | uuid | nullable=NO | default=none
+TABLE: maintenance_completions.work_done | text | nullable=NO | default=none
+TABLE: maintenance_completions.worker_id | uuid | nullable=NO | default=none
+TABLE: maintenance_completions.worker_name | text | nullable=NO | default=none
+TABLE: maintenance_completions.designation | text | nullable=YES | default=none
+TABLE: maintenance_completions.shift_name | text | nullable=NO | default=none
+TABLE: maintenance_completions.tools_used | text | nullable=YES | default=none
+TABLE: maintenance_completions.parts_used | text | nullable=YES | default=none
+TABLE: maintenance_completions.measurements | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: maintenance_completions.root_cause | text | nullable=YES | default=none
+TABLE: maintenance_completions.corrective_action | text | nullable=YES | default=none
+TABLE: maintenance_completions.downtime_minutes | integer | nullable=YES | default=none
+TABLE: maintenance_completions.signature_data | text | nullable=YES | default=none
+TABLE: maintenance_completions.completed_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: maintenance_completions.supervisor_approved_by | uuid | nullable=YES | default=none
+TABLE: maintenance_completions.supervisor_approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: maintenance_plans.id | uuid | nullable=NO | default=none
+TABLE: maintenance_plans.organization_id | uuid | nullable=NO | default=none
+TABLE: maintenance_plans.plant_id | uuid | nullable=NO | default=none
+TABLE: maintenance_plans.asset_id | uuid | nullable=YES | default=none
+TABLE: maintenance_plans.title | text | nullable=NO | default=none
+TABLE: maintenance_plans.frequency | text | nullable=NO | default=none
+TABLE: maintenance_plans.priority | text | nullable=YES | default='medium'::text
+TABLE: maintenance_plans.description | text | nullable=NO | default=none
+TABLE: maintenance_plans.assigned_to | uuid | nullable=YES | default=none
+TABLE: maintenance_plans.next_due | date | nullable=YES | default=none
+TABLE: maintenance_plans.status | text | nullable=YES | default='pending'::text
+TABLE: maintenance_plans.created_by | uuid | nullable=YES | default=none
+TABLE: maintenance_plans.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: maintenance_plans.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: maintenance_plans.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: maintenance_plans.removed_by | uuid | nullable=YES | default=none
+TABLE: maintenance_plans.last_completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: maintenance_plans.last_completed_by | uuid | nullable=YES | default=none
+TABLE: maintenance_plans.row_version | bigint | nullable=NO | default=1
+TABLE: manuals.id | uuid | nullable=NO | default=none
+TABLE: manuals.organization_id | uuid | nullable=NO | default=none
+TABLE: manuals.plant_id | uuid | nullable=YES | default=none
+TABLE: manuals.asset_id | uuid | nullable=YES | default=none
+TABLE: manuals.title | text | nullable=NO | default=none
+TABLE: manuals.manufacturer | text | nullable=YES | default=none
+TABLE: manuals.model | text | nullable=YES | default=none
+TABLE: manuals.storage_path | text | nullable=NO | default=none
+TABLE: manuals.mime_type | text | nullable=YES | default=none
+TABLE: manuals.size_bytes | bigint | nullable=YES | default=none
+TABLE: manuals.status | text | nullable=YES | default='uploaded'::text
+TABLE: manuals.uploaded_by | uuid | nullable=YES | default=none
+TABLE: manuals.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: material_requests.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: material_requests.organization_id | uuid | nullable=NO | default=none
+TABLE: material_requests.plant_id | uuid | nullable=NO | default=none
+TABLE: material_requests.spare_id | uuid | nullable=NO | default=none
+TABLE: material_requests.requested_by | uuid | nullable=NO | default=none
+TABLE: material_requests.quantity | integer | nullable=NO | default=1
+TABLE: material_requests.urgency | text | nullable=NO | default='normal'::text
+TABLE: material_requests.notes | text | nullable=YES | default=none
+TABLE: material_requests.status | text | nullable=NO | default='pending'::text
+TABLE: material_requests.managed_by | uuid | nullable=YES | default=none
+TABLE: material_requests.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: material_requests.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: material_requests.purchase_order_id | uuid | nullable=YES | default=none
+TABLE: measurement_points.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: measurement_points.organization_id | uuid | nullable=NO | default=none
+TABLE: measurement_points.plant_id | uuid | nullable=NO | default=none
+TABLE: measurement_points.asset_id | uuid | nullable=YES | default=none
+TABLE: measurement_points.name | text | nullable=NO | default=none
+TABLE: measurement_points.direction | text | nullable=YES | default=none
+TABLE: measurement_points.description | text | nullable=YES | default=none
+TABLE: measurement_points.reference_photo_path | text | nullable=YES | default=none
+TABLE: measurement_points.active | boolean | nullable=NO | default=true
+TABLE: measurement_points.created_by | uuid | nullable=YES | default=none
+TABLE: measurement_points.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: notifications.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: notifications.organization_id | uuid | nullable=NO | default=none
+TABLE: notifications.plant_id | uuid | nullable=YES | default=none
+TABLE: notifications.user_id | uuid | nullable=YES | default=none
+TABLE: notifications.title | text | nullable=NO | default=none
+TABLE: notifications.body | text | nullable=YES | default=none
+TABLE: notifications.read_at | timestamp with time zone | nullable=YES | default=none
+TABLE: notifications.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: notifications.severity | text | nullable=YES | default='normal'::text
+TABLE: organization_entitlements.organization_id | uuid | nullable=NO | default=none
+TABLE: organization_entitlements.entitlement | text | nullable=NO | default=none
+TABLE: organization_entitlements.enabled | boolean | nullable=NO | default=none
+TABLE: organization_entitlements.numeric_limit | bigint | nullable=YES | default=none
+TABLE: organization_entitlements.expires_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organization_entitlements.reason | text | nullable=YES | default=none
+TABLE: organization_entitlements.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organization_entitlements.updated_by | uuid | nullable=YES | default=none
+TABLE: organization_members.organization_id | uuid | nullable=NO | default=none
+TABLE: organization_members.user_id | uuid | nullable=NO | default=none
+TABLE: organization_members.role | text | nullable=NO | default=none
+TABLE: organization_members.active | boolean | nullable=NO | default=true
+TABLE: organization_members.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organization_members.permissions | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: organization_members.deactivated_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organization_members.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organization_settings.organization_id | uuid | nullable=NO | default=none
+TABLE: organization_settings.app_name | text | nullable=YES | default='PlantMaster Pro'::text
+TABLE: organization_settings.plant_display_name | text | nullable=YES | default=none
+TABLE: organization_settings.logo_path | text | nullable=YES | default=none
+TABLE: organization_settings.primary_color | text | nullable=YES | default='#3b82f6'::text
+TABLE: organization_settings.secondary_color | text | nullable=YES | default='#06b6d4'::text
+TABLE: organization_settings.theme | text | nullable=YES | default='industrial'::text
+TABLE: organization_settings.pattern | text | nullable=YES | default='grid'::text
+TABLE: organization_settings.address | text | nullable=YES | default=none
+TABLE: organization_settings.contact | text | nullable=YES | default=none
+TABLE: organization_settings.email | text | nullable=YES | default=none
+TABLE: organization_settings.report_time | time without time zone | nullable=YES | default='11:00:00'::time without time zone
+TABLE: organization_settings.footer_text | text | nullable=YES | default=none
+TABLE: organization_settings.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: organization_settings.report_recipients | ARRAY | nullable=NO | default='{}'::text[]
+TABLE: organization_settings.report_approval_required | boolean | nullable=NO | default=true
+TABLE: organization_settings.letterhead_path | text | nullable=YES | default=none
+TABLE: organization_settings.signatories | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: organization_subscriptions.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: organization_subscriptions.organization_id | uuid | nullable=NO | default=none
+TABLE: organization_subscriptions.plan_id | uuid | nullable=NO | default=none
+TABLE: organization_subscriptions.status | text | nullable=NO | default='trial'::text
+TABLE: organization_subscriptions.provider | text | nullable=YES | default=none
+TABLE: organization_subscriptions.provider_customer_id | text | nullable=YES | default=none
+TABLE: organization_subscriptions.provider_subscription_id | text | nullable=YES | default=none
+TABLE: organization_subscriptions.current_period_start | timestamp with time zone | nullable=NO | default=now()
+TABLE: organization_subscriptions.current_period_end | timestamp with time zone | nullable=YES | default=none
+TABLE: organization_subscriptions.trial_ends_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organization_subscriptions.cancel_at_period_end | boolean | nullable=NO | default=false
+TABLE: organization_subscriptions.grace_ends_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organization_subscriptions.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organization_subscriptions.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organizations.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: organizations.name | text | nullable=NO | default=none
+TABLE: organizations.slug | text | nullable=YES | default=none
+TABLE: organizations.logo_path | text | nullable=YES | default=none
+TABLE: organizations.created_by | uuid | nullable=NO | default=none
+TABLE: organizations.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: organizations.commercial_status | text | nullable=NO | default='active'::text
+TABLE: organizations.status_reason | text | nullable=YES | default=none
+TABLE: organizations.trial_ends_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organizations.suspended_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organizations.deletion_scheduled_at | timestamp with time zone | nullable=YES | default=none
+TABLE: organizations.commercial_updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: permits.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: permits.plant_id | uuid | nullable=NO | default=none
+TABLE: permits.work_order_id | uuid | nullable=NO | default=none
+TABLE: permits.permit_type | text | nullable=NO | default=none
+TABLE: permits.status | text | nullable=NO | default='pending'::text
+TABLE: permits.requested_by | uuid | nullable=NO | default=none
+TABLE: permits.approved_by | uuid | nullable=YES | default=none
+TABLE: permits.approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: permits.expires_at | timestamp with time zone | nullable=YES | default=none
+TABLE: permits.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: plant_members.plant_id | uuid | nullable=NO | default=none
+TABLE: plant_members.user_id | uuid | nullable=NO | default=none
+TABLE: plant_members.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: plantmaster_sync.site_id | text | nullable=NO | default=none
+TABLE: plantmaster_sync.data | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: plantmaster_sync.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: plants.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: plants.organization_id | uuid | nullable=NO | default=none
+TABLE: plants.name | text | nullable=NO | default=none
+TABLE: plants.location | text | nullable=YES | default=none
+TABLE: plants.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_admins.user_id | uuid | nullable=NO | default=none
+TABLE: platform_admins.active | boolean | nullable=NO | default=true
+TABLE: platform_admins.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_admins.created_by | uuid | nullable=YES | default=none
+TABLE: platform_admins.admin_role | text | nullable=NO | default='super_admin'::text
+TABLE: platform_admins.permissions | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: platform_admins.display_name | text | nullable=YES | default=none
+TABLE: platform_admins.last_login_at | timestamp with time zone | nullable=YES | default=none
+TABLE: platform_admins.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_notifications.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: platform_notifications.severity | text | nullable=NO | default=none
+TABLE: platform_notifications.title | text | nullable=NO | default=none
+TABLE: platform_notifications.body | text | nullable=YES | default=none
+TABLE: platform_notifications.component | text | nullable=YES | default=none
+TABLE: platform_notifications.organization_id | uuid | nullable=YES | default=none
+TABLE: platform_notifications.read_at | timestamp with time zone | nullable=YES | default=none
+TABLE: platform_notifications.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_support_messages.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: platform_support_messages.ticket_id | uuid | nullable=NO | default=none
+TABLE: platform_support_messages.user_id | uuid | nullable=NO | default=none
+TABLE: platform_support_messages.message | text | nullable=NO | default=none
+TABLE: platform_support_messages.internal | boolean | nullable=NO | default=false
+TABLE: platform_support_messages.attachment_path | text | nullable=YES | default=none
+TABLE: platform_support_messages.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_support_tickets.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: platform_support_tickets.ticket_number | bigint | nullable=NO | default=nextval('platform_ticket_number_seq'::regclass)
+TABLE: platform_support_tickets.organization_id | uuid | nullable=YES | default=none
+TABLE: platform_support_tickets.opened_by | uuid | nullable=NO | default=none
+TABLE: platform_support_tickets.owner_email | text | nullable=YES | default=none
+TABLE: platform_support_tickets.category | text | nullable=NO | default=none
+TABLE: platform_support_tickets.priority | text | nullable=NO | default='medium'::text
+TABLE: platform_support_tickets.status | text | nullable=NO | default='new'::text
+TABLE: platform_support_tickets.subject | text | nullable=NO | default=none
+TABLE: platform_support_tickets.description | text | nullable=NO | default=none
+TABLE: platform_support_tickets.app_version | text | nullable=YES | default=none
+TABLE: platform_support_tickets.device_info | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: platform_support_tickets.assigned_to | uuid | nullable=YES | default=none
+TABLE: platform_support_tickets.related_incident_id | uuid | nullable=YES | default=none
+TABLE: platform_support_tickets.resolution | text | nullable=YES | default=none
+TABLE: platform_support_tickets.resolved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: platform_support_tickets.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: platform_support_tickets.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: problem_cases.id | uuid | nullable=NO | default=none
+TABLE: problem_cases.organization_id | uuid | nullable=NO | default=none
+TABLE: problem_cases.plant_id | uuid | nullable=NO | default=none
+TABLE: problem_cases.asset_id | uuid | nullable=YES | default=none
+TABLE: problem_cases.title | text | nullable=NO | default=none
+TABLE: problem_cases.symptoms | text | nullable=NO | default=none
+TABLE: problem_cases.alarm_code | text | nullable=YES | default=none
+TABLE: problem_cases.readings | jsonb | nullable=YES | default='{}'::jsonb
+TABLE: problem_cases.mode | text | nullable=YES | default='offline'::text
+TABLE: problem_cases.ai_answer | jsonb | nullable=YES | default=none
+TABLE: problem_cases.actual_cause | text | nullable=YES | default=none
+TABLE: problem_cases.verified_solution | text | nullable=YES | default=none
+TABLE: problem_cases.status | text | nullable=YES | default='open'::text
+TABLE: problem_cases.created_by | uuid | nullable=YES | default=none
+TABLE: problem_cases.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: problem_cases.resolved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: profiles.id | uuid | nullable=NO | default=none
+TABLE: profiles.full_name | text | nullable=NO | default=''::text
+TABLE: profiles.avatar_path | text | nullable=YES | default=none
+TABLE: profiles.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: profiles.employee_id | text | nullable=YES | default=none
+TABLE: profiles.designation | text | nullable=YES | default=none
+TABLE: profiles.skills | ARRAY | nullable=NO | default='{}'::text[]
+TABLE: profiles.contact | text | nullable=YES | default=none
+TABLE: profiles.default_shift | text | nullable=YES | default='General Shift'::text
+TABLE: profiles.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: profiles.labor_rate_hourly | numeric | nullable=YES | default=0.00
+TABLE: purchase_order_lines.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: purchase_order_lines.purchase_order_id | uuid | nullable=NO | default=none
+TABLE: purchase_order_lines.spare_id | uuid | nullable=YES | default=none
+TABLE: purchase_order_lines.description | text | nullable=NO | default=none
+TABLE: purchase_order_lines.quantity | numeric | nullable=NO | default=none
+TABLE: purchase_order_lines.unit | text | nullable=YES | default='pcs'::text
+TABLE: purchase_order_lines.unit_price | numeric | nullable=NO | default=0
+TABLE: purchase_order_lines.line_total | numeric | nullable=NO | default=0
+TABLE: purchase_order_lines.received_qty | numeric | nullable=NO | default=0
+TABLE: purchase_order_lines.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: purchase_orders.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: purchase_orders.organization_id | uuid | nullable=NO | default=none
+TABLE: purchase_orders.plant_id | uuid | nullable=NO | default=none
+TABLE: purchase_orders.po_number | text | nullable=NO | default=none
+TABLE: purchase_orders.supplier_id | uuid | nullable=YES | default=none
+TABLE: purchase_orders.status | text | nullable=NO | default='draft'::text
+TABLE: purchase_orders.currency | text | nullable=NO | default='PKR'::text
+TABLE: purchase_orders.subtotal | numeric | nullable=NO | default=0
+TABLE: purchase_orders.tax_percent | numeric | nullable=NO | default=0
+TABLE: purchase_orders.tax_amount | numeric | nullable=NO | default=0
+TABLE: purchase_orders.total | numeric | nullable=NO | default=0
+TABLE: purchase_orders.expected_date | date | nullable=YES | default=none
+TABLE: purchase_orders.received_date | date | nullable=YES | default=none
+TABLE: purchase_orders.notes | text | nullable=YES | default=none
+TABLE: purchase_orders.requested_by | uuid | nullable=YES | default=none
+TABLE: purchase_orders.approved_by | uuid | nullable=YES | default=none
+TABLE: purchase_orders.approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: purchase_orders.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: purchase_orders.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: purchase_orders.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: push_cursors.organization_id | uuid | nullable=NO | default=none
+TABLE: push_cursors.last_created_at | timestamp with time zone | nullable=NO | default='1970-01-01 00:00:00+00'::timestamp with time zone
+TABLE: push_cursors.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: push_subscriptions.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: push_subscriptions.organization_id | uuid | nullable=NO | default=none
+TABLE: push_subscriptions.user_id | uuid | nullable=NO | default=none
+TABLE: push_subscriptions.endpoint | text | nullable=NO | default=none
+TABLE: push_subscriptions.p256dh | text | nullable=NO | default=none
+TABLE: push_subscriptions.auth | text | nullable=NO | default=none
+TABLE: push_subscriptions.ua | text | nullable=YES | default=none
+TABLE: push_subscriptions.last_error_at | timestamp with time zone | nullable=YES | default=none
+TABLE: push_subscriptions.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: qa_environments.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: qa_environments.name | text | nullable=NO | default=none
+TABLE: qa_environments.organization_id | uuid | nullable=YES | default=none
+TABLE: qa_environments.plant_id | uuid | nullable=YES | default=none
+TABLE: qa_environments.isolation_organization_id | uuid | nullable=YES | default=none
+TABLE: qa_environments.status | text | nullable=NO | default='creating'::text
+TABLE: qa_environments.user_ids | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: qa_environments.seed_summary | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: qa_environments.last_error | text | nullable=YES | default=none
+TABLE: qa_environments.created_by | uuid | nullable=NO | default=none
+TABLE: qa_environments.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: qa_environments.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: qa_environments.deleted_at | timestamp with time zone | nullable=YES | default=none
+TABLE: qa_manual_checks.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: qa_manual_checks.run_id | uuid | nullable=NO | default=none
+TABLE: qa_manual_checks.category | text | nullable=NO | default=none
+TABLE: qa_manual_checks.check_name | text | nullable=NO | default=none
+TABLE: qa_manual_checks.instructions | text | nullable=NO | default=none
+TABLE: qa_manual_checks.status | text | nullable=NO | default='pending'::text
+TABLE: qa_manual_checks.result_notes | text | nullable=YES | default=none
+TABLE: qa_manual_checks.tested_by | uuid | nullable=YES | default=none
+TABLE: qa_manual_checks.tested_at | timestamp with time zone | nullable=YES | default=none
+TABLE: qa_test_results.id | bigint | nullable=NO | default=none
+TABLE: qa_test_results.run_id | uuid | nullable=NO | default=none
+TABLE: qa_test_results.category | text | nullable=NO | default=none
+TABLE: qa_test_results.test_name | text | nullable=NO | default=none
+TABLE: qa_test_results.status | text | nullable=NO | default=none
+TABLE: qa_test_results.expected | text | nullable=YES | default=none
+TABLE: qa_test_results.actual | text | nullable=YES | default=none
+TABLE: qa_test_results.error | text | nullable=YES | default=none
+TABLE: qa_test_results.duration_ms | integer | nullable=YES | default=none
+TABLE: qa_test_results.evidence | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: qa_test_results.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: qa_test_runs.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: qa_test_runs.environment_id | uuid | nullable=NO | default=none
+TABLE: qa_test_runs.status | text | nullable=NO | default='running'::text
+TABLE: qa_test_runs.include_ai | boolean | nullable=NO | default=false
+TABLE: qa_test_runs.total_tests | integer | nullable=NO | default=0
+TABLE: qa_test_runs.passed | integer | nullable=NO | default=0
+TABLE: qa_test_runs.failed | integer | nullable=NO | default=0
+TABLE: qa_test_runs.blocked | integer | nullable=NO | default=0
+TABLE: qa_test_runs.app_version | text | nullable=YES | default=none
+TABLE: qa_test_runs.runner_version | text | nullable=NO | default='1.0.0'::text
+TABLE: qa_test_runs.started_by | uuid | nullable=NO | default=none
+TABLE: qa_test_runs.started_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: qa_test_runs.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: qa_test_runs.summary | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: quota_overrides.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: quota_overrides.organization_id | uuid | nullable=NO | default=none
+TABLE: quota_overrides.metric | text | nullable=NO | default=none
+TABLE: quota_overrides.override_type | text | nullable=NO | default=none
+TABLE: quota_overrides.value | bigint | nullable=YES | default=none
+TABLE: quota_overrides.starts_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: quota_overrides.ends_at | timestamp with time zone | nullable=YES | default=none
+TABLE: quota_overrides.reason | text | nullable=NO | default=none
+TABLE: quota_overrides.active | boolean | nullable=NO | default=true
+TABLE: quota_overrides.created_by | uuid | nullable=NO | default=none
+TABLE: quota_overrides.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: quota_overrides.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: report_dispatches.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: report_dispatches.organization_id | uuid | nullable=NO | default=none
+TABLE: report_dispatches.plant_id | uuid | nullable=YES | default=none
+TABLE: report_dispatches.report_date | date | nullable=NO | default=none
+TABLE: report_dispatches.recipient | text | nullable=NO | default=none
+TABLE: report_dispatches.summary | text | nullable=YES | default=none
+TABLE: report_dispatches.status | text | nullable=YES | default='pending'::text
+TABLE: report_dispatches.approved_by | uuid | nullable=YES | default=none
+TABLE: report_dispatches.sent_at | timestamp with time zone | nullable=YES | default=none
+TABLE: report_dispatches.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: restore_drills.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: restore_drills.backup_job_id | uuid | nullable=YES | default=none
+TABLE: restore_drills.status | text | nullable=NO | default='planned'::text
+TABLE: restore_drills.environment | text | nullable=NO | default='non_production'::text
+TABLE: restore_drills.rpo_minutes | integer | nullable=YES | default=none
+TABLE: restore_drills.rto_minutes | integer | nullable=YES | default=none
+TABLE: restore_drills.database_verified | boolean | nullable=YES | default=none
+TABLE: restore_drills.storage_verified | boolean | nullable=YES | default=none
+TABLE: restore_drills.notes | text | nullable=YES | default=none
+TABLE: restore_drills.performed_by | uuid | nullable=YES | default=none
+TABLE: restore_drills.scheduled_at | timestamp with time zone | nullable=YES | default=none
+TABLE: restore_drills.started_at | timestamp with time zone | nullable=YES | default=none
+TABLE: restore_drills.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: restore_drills.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: scan_entity_links.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: scan_entity_links.organization_id | uuid | nullable=NO | default=none
+TABLE: scan_entity_links.scan_session_id | uuid | nullable=NO | default=none
+TABLE: scan_entity_links.entity_type | text | nullable=NO | default=none
+TABLE: scan_entity_links.entity_id | text | nullable=NO | default=none
+TABLE: scan_entity_links.relation | text | nullable=NO | default='attachment'::text
+TABLE: scan_entity_links.linked_by | uuid | nullable=NO | default=none
+TABLE: scan_entity_links.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: scan_pages.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: scan_pages.session_id | uuid | nullable=NO | default=none
+TABLE: scan_pages.page_number | integer | nullable=NO | default=none
+TABLE: scan_pages.storage_path | text | nullable=YES | default=none
+TABLE: scan_pages.enhanced_path | text | nullable=YES | default=none
+TABLE: scan_pages.mime_type | text | nullable=YES | default=none
+TABLE: scan_pages.size_bytes | bigint | nullable=YES | default=none
+TABLE: scan_pages.width | integer | nullable=YES | default=none
+TABLE: scan_pages.height | integer | nullable=YES | default=none
+TABLE: scan_pages.rotation | integer | nullable=NO | default=0
+TABLE: scan_pages.enhancement | text | nullable=YES | default='original'::text
+TABLE: scan_pages.extracted_text | text | nullable=YES | default=none
+TABLE: scan_pages.structured_result | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: scan_pages.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: scan_sessions.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: scan_sessions.organization_id | uuid | nullable=NO | default=none
+TABLE: scan_sessions.plant_id | uuid | nullable=YES | default=none
+TABLE: scan_sessions.mode | text | nullable=NO | default=none
+TABLE: scan_sessions.source_type | text | nullable=NO | default='camera'::text
+TABLE: scan_sessions.status | text | nullable=NO | default='draft'::text
+TABLE: scan_sessions.title | text | nullable=YES | default=none
+TABLE: scan_sessions.original_path | text | nullable=YES | default=none
+TABLE: scan_sessions.enhanced_path | text | nullable=YES | default=none
+TABLE: scan_sessions.thumbnail_path | text | nullable=YES | default=none
+TABLE: scan_sessions.mime_type | text | nullable=YES | default=none
+TABLE: scan_sessions.file_name | text | nullable=YES | default=none
+TABLE: scan_sessions.file_size | bigint | nullable=YES | default=none
+TABLE: scan_sessions.detected_codes | jsonb | nullable=NO | default='[]'::jsonb
+TABLE: scan_sessions.extracted_text | text | nullable=YES | default=none
+TABLE: scan_sessions.structured_result | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: scan_sessions.confidence | text | nullable=YES | default=none
+TABLE: scan_sessions.safety_notes | text | nullable=YES | default=none
+TABLE: scan_sessions.linked_entity_type | text | nullable=YES | default=none
+TABLE: scan_sessions.linked_entity_id | text | nullable=YES | default=none
+TABLE: scan_sessions.created_by | uuid | nullable=NO | default=none
+TABLE: scan_sessions.worker_name | text | nullable=NO | default=none
+TABLE: scan_sessions.designation | text | nullable=YES | default=none
+TABLE: scan_sessions.shift_name | text | nullable=YES | default=none
+TABLE: scan_sessions.approved_by | uuid | nullable=YES | default=none
+TABLE: scan_sessions.approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: scan_sessions.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: scan_sessions.removed_by | uuid | nullable=YES | default=none
+TABLE: scan_sessions.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: scan_sessions.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: sensor_devices.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: sensor_devices.organization_id | uuid | nullable=NO | default=none
+TABLE: sensor_devices.plant_id | uuid | nullable=YES | default=none
+TABLE: sensor_devices.name | text | nullable=NO | default=none
+TABLE: sensor_devices.sensor_type | text | nullable=NO | default=none
+TABLE: sensor_devices.manufacturer | text | nullable=YES | default=none
+TABLE: sensor_devices.model | text | nullable=YES | default=none
+TABLE: sensor_devices.serial_number | text | nullable=YES | default=none
+TABLE: sensor_devices.calibration_date | date | nullable=YES | default=none
+TABLE: sensor_devices.calibration_due | date | nullable=YES | default=none
+TABLE: sensor_devices.protocol_details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: sensor_devices.active | boolean | nullable=NO | default=true
+TABLE: sensor_devices.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: shift_assignments.id | uuid | nullable=NO | default=none
+TABLE: shift_assignments.organization_id | uuid | nullable=NO | default=none
+TABLE: shift_assignments.plant_id | uuid | nullable=NO | default=none
+TABLE: shift_assignments.user_id | uuid | nullable=NO | default=none
+TABLE: shift_assignments.shift_name | text | nullable=NO | default=none
+TABLE: shift_assignments.work_date | date | nullable=NO | default=none
+TABLE: shift_assignments.status | text | nullable=YES | default='scheduled'::text
+TABLE: shift_assignments.created_by | uuid | nullable=YES | default=none
+TABLE: shift_assignments.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: shift_handovers.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: shift_handovers.organization_id | uuid | nullable=NO | default=none
+TABLE: shift_handovers.plant_id | uuid | nullable=NO | default=none
+TABLE: shift_handovers.work_date | date | nullable=NO | default=CURRENT_DATE
+TABLE: shift_handovers.from_shift | text | nullable=NO | default=none
+TABLE: shift_handovers.to_shift | text | nullable=NO | default=none
+TABLE: shift_handovers.summary | text | nullable=NO | default=none
+TABLE: shift_handovers.pending_work | text | nullable=YES | default=none
+TABLE: shift_handovers.safety_notes | text | nullable=YES | default=none
+TABLE: shift_handovers.created_by | uuid | nullable=NO | default=none
+TABLE: shift_handovers.worker_name | text | nullable=NO | default=none
+TABLE: shift_handovers.designation | text | nullable=YES | default=none
+TABLE: shift_handovers.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: spares.id | uuid | nullable=NO | default=none
+TABLE: spares.organization_id | uuid | nullable=NO | default=none
+TABLE: spares.plant_id | uuid | nullable=NO | default=none
+TABLE: spares.part_number | text | nullable=YES | default=none
+TABLE: spares.description | text | nullable=NO | default=none
+TABLE: spares.asset_id | uuid | nullable=YES | default=none
+TABLE: spares.stock | numeric | nullable=YES | default=0
+TABLE: spares.min_stock | numeric | nullable=YES | default=0
+TABLE: spares.unit | text | nullable=YES | default=none
+TABLE: spares.unit_cost | numeric | nullable=YES | default=none
+TABLE: spares.bin_location | text | nullable=YES | default=none
+TABLE: spares.supplier | text | nullable=YES | default=none
+TABLE: spares.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: spares.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: spares.removed_by | uuid | nullable=YES | default=none
+TABLE: spares.row_version | bigint | nullable=NO | default=1
+TABLE: storage_reservations.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: storage_reservations.organization_id | uuid | nullable=NO | default=none
+TABLE: storage_reservations.user_id | uuid | nullable=NO | default=none
+TABLE: storage_reservations.bytes | bigint | nullable=NO | default=none
+TABLE: storage_reservations.file_name | text | nullable=YES | default=none
+TABLE: storage_reservations.mime_type | text | nullable=YES | default=none
+TABLE: storage_reservations.status | text | nullable=NO | default='reserved'::text
+TABLE: storage_reservations.expires_at | timestamp with time zone | nullable=NO | default=(now() + '00:15:00'::interval)
+TABLE: storage_reservations.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: storage_usage_events.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: storage_usage_events.organization_id | uuid | nullable=NO | default=none
+TABLE: storage_usage_events.user_id | uuid | nullable=YES | default=none
+TABLE: storage_usage_events.event_type | text | nullable=NO | default=none
+TABLE: storage_usage_events.object_path | text | nullable=YES | default=none
+TABLE: storage_usage_events.bytes | bigint | nullable=NO | default=0
+TABLE: storage_usage_events.file_metadata_id | uuid | nullable=YES | default=none
+TABLE: storage_usage_events.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: subscription_plans.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: subscription_plans.code | text | nullable=NO | default=none
+TABLE: subscription_plans.name | text | nullable=NO | default=none
+TABLE: subscription_plans.description | text | nullable=YES | default=none
+TABLE: subscription_plans.active | boolean | nullable=NO | default=true
+TABLE: subscription_plans.currency | text | nullable=NO | default='USD'::text
+TABLE: subscription_plans.price_monthly | numeric | nullable=NO | default=0
+TABLE: subscription_plans.price_yearly | numeric | nullable=NO | default=0
+TABLE: subscription_plans.max_workers | integer | nullable=NO | default=5
+TABLE: subscription_plans.max_plants | integer | nullable=NO | default=1
+TABLE: subscription_plans.max_storage_bytes | bigint | nullable=NO | default=524288000
+TABLE: subscription_plans.max_bandwidth_bytes_month | bigint | nullable=NO | default='2147483648'::bigint
+TABLE: subscription_plans.max_files | integer | nullable=NO | default=500
+TABLE: subscription_plans.max_file_bytes | bigint | nullable=NO | default=52428800
+TABLE: subscription_plans.ai_requests_month | integer | nullable=NO | default=50
+TABLE: subscription_plans.ai_requests_day | integer | nullable=NO | default=10
+TABLE: subscription_plans.ai_requests_minute_user | integer | nullable=NO | default=3
+TABLE: subscription_plans.ai_input_tokens_month | bigint | nullable=NO | default=250000
+TABLE: subscription_plans.ai_output_tokens_month | bigint | nullable=NO | default=100000
+TABLE: subscription_plans.retention_days | integer | nullable=NO | default=365
+TABLE: subscription_plans.features | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: subscription_plans.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: subscription_plans.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: suppliers.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: suppliers.organization_id | uuid | nullable=NO | default=none
+TABLE: suppliers.plant_id | uuid | nullable=YES | default=none
+TABLE: suppliers.name | text | nullable=NO | default=none
+TABLE: suppliers.contact_person | text | nullable=YES | default=none
+TABLE: suppliers.phone | text | nullable=YES | default=none
+TABLE: suppliers.email | text | nullable=YES | default=none
+TABLE: suppliers.address | text | nullable=YES | default=none
+TABLE: suppliers.ntn | text | nullable=YES | default=none
+TABLE: suppliers.strn | text | nullable=YES | default=none
+TABLE: suppliers.payment_terms | text | nullable=YES | default='Net 30'::text
+TABLE: suppliers.currency | text | nullable=NO | default='PKR'::text
+TABLE: suppliers.rating | numeric | nullable=YES | default=none
+TABLE: suppliers.notes | text | nullable=YES | default=none
+TABLE: suppliers.active | boolean | nullable=NO | default=true
+TABLE: suppliers.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: suppliers.created_by | uuid | nullable=YES | default=none
+TABLE: suppliers.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: suppliers.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: support_messages.id | uuid | nullable=NO | default=none
+TABLE: support_messages.thread_id | uuid | nullable=NO | default=none
+TABLE: support_messages.user_id | uuid | nullable=NO | default=none
+TABLE: support_messages.message | text | nullable=NO | default=none
+TABLE: support_messages.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: support_threads.id | uuid | nullable=NO | default=none
+TABLE: support_threads.organization_id | uuid | nullable=NO | default=none
+TABLE: support_threads.plant_id | uuid | nullable=NO | default=none
+TABLE: support_threads.asset_id | uuid | nullable=YES | default=none
+TABLE: support_threads.subject | text | nullable=NO | default=none
+TABLE: support_threads.priority | text | nullable=YES | default='medium'::text
+TABLE: support_threads.status | text | nullable=YES | default='open'::text
+TABLE: support_threads.created_by | uuid | nullable=NO | default=none
+TABLE: support_threads.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: support_threads.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: system_incidents.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: system_incidents.organization_id | uuid | nullable=YES | default=none
+TABLE: system_incidents.severity | text | nullable=NO | default=none
+TABLE: system_incidents.component | text | nullable=NO | default=none
+TABLE: system_incidents.event_type | text | nullable=NO | default=none
+TABLE: system_incidents.message | text | nullable=NO | default=none
+TABLE: system_incidents.correlation_id | text | nullable=YES | default=none
+TABLE: system_incidents.details | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: system_incidents.status | text | nullable=NO | default='open'::text
+TABLE: system_incidents.first_seen_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: system_incidents.last_seen_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: system_incidents.resolved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: technical_experiences.id | uuid | nullable=NO | default=none
+TABLE: technical_experiences.organization_id | uuid | nullable=NO | default=none
+TABLE: technical_experiences.plant_id | uuid | nullable=NO | default=none
+TABLE: technical_experiences.asset_id | uuid | nullable=YES | default=none
+TABLE: technical_experiences.problem | text | nullable=NO | default=none
+TABLE: technical_experiences.symptoms | text | nullable=YES | default=none
+TABLE: technical_experiences.tests | text | nullable=YES | default=none
+TABLE: technical_experiences.root_cause | text | nullable=NO | default=none
+TABLE: technical_experiences.solution | text | nullable=NO | default=none
+TABLE: technical_experiences.tools | text | nullable=YES | default=none
+TABLE: technical_experiences.parts | text | nullable=YES | default=none
+TABLE: technical_experiences.downtime | text | nullable=YES | default=none
+TABLE: technical_experiences.approved | boolean | nullable=YES | default=false
+TABLE: technical_experiences.created_by | uuid | nullable=YES | default=none
+TABLE: technical_experiences.created_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: tool_transactions.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: tool_transactions.organization_id | uuid | nullable=NO | default=none
+TABLE: tool_transactions.plant_id | uuid | nullable=NO | default=none
+TABLE: tool_transactions.tool_id | uuid | nullable=NO | default=none
+TABLE: tool_transactions.transaction_type | text | nullable=NO | default=none
+TABLE: tool_transactions.holder_id | uuid | nullable=YES | default=none
+TABLE: tool_transactions.condition | text | nullable=YES | default=none
+TABLE: tool_transactions.notes | text | nullable=YES | default=none
+TABLE: tool_transactions.performed_by | uuid | nullable=NO | default=none
+TABLE: tool_transactions.worker_name | text | nullable=NO | default=none
+TABLE: tool_transactions.designation | text | nullable=YES | default=none
+TABLE: tool_transactions.shift_name | text | nullable=YES | default=none
+TABLE: tool_transactions.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: tools.id | uuid | nullable=NO | default=none
+TABLE: tools.organization_id | uuid | nullable=NO | default=none
+TABLE: tools.plant_id | uuid | nullable=NO | default=none
+TABLE: tools.tool_code | text | nullable=YES | default=none
+TABLE: tools.name | text | nullable=NO | default=none
+TABLE: tools.specification | text | nullable=YES | default=none
+TABLE: tools.condition | text | nullable=YES | default=none
+TABLE: tools.calibration_due | date | nullable=YES | default=none
+TABLE: tools.status | text | nullable=YES | default='available'::text
+TABLE: tools.holder_id | uuid | nullable=YES | default=none
+TABLE: tools.updated_at | timestamp with time zone | nullable=YES | default=now()
+TABLE: tools.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: tools.removed_by | uuid | nullable=YES | default=none
+TABLE: tools.row_version | bigint | nullable=NO | default=1
+TABLE: usage_adjustments.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: usage_adjustments.organization_id | uuid | nullable=NO | default=none
+TABLE: usage_adjustments.metric | text | nullable=NO | default=none
+TABLE: usage_adjustments.period_start | date | nullable=NO | default=none
+TABLE: usage_adjustments.quantity | bigint | nullable=NO | default=none
+TABLE: usage_adjustments.reason | text | nullable=NO | default=none
+TABLE: usage_adjustments.created_by | uuid | nullable=NO | default=none
+TABLE: usage_adjustments.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: usage_counters.organization_id | uuid | nullable=NO | default=none
+TABLE: usage_counters.metric | text | nullable=NO | default=none
+TABLE: usage_counters.period_start | date | nullable=NO | default=none
+TABLE: usage_counters.period_end | date | nullable=NO | default=none
+TABLE: usage_counters.quantity | bigint | nullable=NO | default=0
+TABLE: usage_counters.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: usage_events.id | uuid | nullable=NO | default=gen_random_uuid()
+TABLE: usage_events.organization_id | uuid | nullable=NO | default=none
+TABLE: usage_events.user_id | uuid | nullable=YES | default=none
+TABLE: usage_events.metric | text | nullable=NO | default=none
+TABLE: usage_events.quantity | bigint | nullable=NO | default=1
+TABLE: usage_events.source | text | nullable=YES | default=none
+TABLE: usage_events.reference_id | text | nullable=YES | default=none
+TABLE: usage_events.status | text | nullable=NO | default='recorded'::text
+TABLE: usage_events.metadata | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: usage_events.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: work_orders.id | uuid | nullable=NO | default=none
+TABLE: work_orders.organization_id | uuid | nullable=NO | default=none
+TABLE: work_orders.plant_id | uuid | nullable=NO | default=none
+TABLE: work_orders.asset_id | uuid | nullable=YES | default=none
+TABLE: work_orders.title | text | nullable=NO | default=none
+TABLE: work_orders.description | text | nullable=NO | default=none
+TABLE: work_orders.priority | text | nullable=NO | default='medium'::text
+TABLE: work_orders.status | text | nullable=NO | default='open'::text
+TABLE: work_orders.assigned_to | uuid | nullable=YES | default=none
+TABLE: work_orders.due_at | timestamp with time zone | nullable=YES | default=none
+TABLE: work_orders.created_by | uuid | nullable=NO | default=none
+TABLE: work_orders.created_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: work_orders.updated_at | timestamp with time zone | nullable=NO | default=now()
+TABLE: work_orders.removed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: work_orders.removed_by | uuid | nullable=YES | default=none
+TABLE: work_orders.work_done | text | nullable=YES | default=none
+TABLE: work_orders.designation | text | nullable=YES | default=none
+TABLE: work_orders.shift_name | text | nullable=YES | default=none
+TABLE: work_orders.tools_used | text | nullable=YES | default=none
+TABLE: work_orders.parts_used | text | nullable=YES | default=none
+TABLE: work_orders.measurements | jsonb | nullable=NO | default='{}'::jsonb
+TABLE: work_orders.root_cause | text | nullable=YES | default=none
+TABLE: work_orders.corrective_action | text | nullable=YES | default=none
+TABLE: work_orders.downtime_minutes | integer | nullable=YES | default=none
+TABLE: work_orders.completed_by | uuid | nullable=YES | default=none
+TABLE: work_orders.completed_at | timestamp with time zone | nullable=YES | default=none
+TABLE: work_orders.supervisor_approved_by | uuid | nullable=YES | default=none
+TABLE: work_orders.supervisor_approved_at | timestamp with time zone | nullable=YES | default=none
+TABLE: work_orders.signature_data | text | nullable=YES | default=none
+TABLE: work_orders.row_version | bigint | nullable=NO | default=1
+TABLE: work_orders.started_at | timestamp with time zone | nullable=YES | default=none
+TABLE: work_orders.labor_minutes | integer | nullable=YES | default=0
+TABLE: work_orders.total_cost | numeric | nullable=YES | default=0.00

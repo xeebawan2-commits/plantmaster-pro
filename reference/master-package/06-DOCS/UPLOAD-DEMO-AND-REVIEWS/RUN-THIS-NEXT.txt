@@ -1,0 +1,67 @@
+RUN PART-2-ONLY.sql  - that is the whole job
+================================================================
+
+You have already done the two hard bits:
+
+    Part 1 (security fix)        DONE
+    Created demo@hsbfix.org      DONE
+
+One thing left.
+
+
+WHAT TO DO
+
+  1. Open the file  PART-2-ONLY.sql
+  2. Select ALL of it and copy
+  3. Supabase -> SQL Editor -> paste -> Run
+
+That is it. It is a short file, about 200 lines, and it
+contains nothing except the demo company build.
+
+
+WHY A SEPARATE FILE
+
+The big file works, but Part 2 sits around line 192 of 413.
+On a phone that means scrolling a long way and trying to
+select the right chunk without catching Part 1 by accident.
+Easier to just hand you the piece you still need.
+
+You do not need to run the big file again. Part 1 is done
+and it stays done.
+
+
+WHAT YOU SHOULD SEE
+
+A table at the bottom of the screen:
+
+    result       PART 1 + PART 2 DONE
+    company      PlantMaster Demo Mill
+    status       active
+    assets       6
+    work_orders  6
+    demo_role    viewer
+
+If it says "PART 1 DONE - security fix applied" instead, then
+the script could not find the login. Go to
+Authentication -> Users and check:
+
+    - the email is exactly  demo@hsbfix.org
+      (no capital letters, no trailing space)
+    - the user is confirmed. If the Confirmed column is empty,
+      delete that user and create it again with
+      Auto Confirm ticked.
+
+
+AFTER IT WORKS
+
+Sign in at app.hsbfix.org:
+
+    demo@hsbfix.org
+    PlantMasterDemo2026
+
+Try to create a work order. It MUST refuse - that is the
+point of the read-only lock. If it lets you create one,
+tell me and I will tighten it.
+
+Then you have a real demo login to give prospects, alongside
+the no-login demo page at hsbfix.org/demo.html

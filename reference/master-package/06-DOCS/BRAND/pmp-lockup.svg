@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 150" width="660" height="150">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(15, 12)">
+    <polygon points="60,5 110,33 110,91 60,119 10,91 10,33"
+             fill="url(#shieldGrad)" stroke="#3B82F6" stroke-width="2"/>
+    <path d="M 30,85 L 30,58 L 48,46 L 48,58 L 66,46 L 66,58 L 84,46 L 84,85 Z" fill="#334155"/>
+    <rect x="74" y="32" width="6" height="18" fill="#475569"/>
+    <path d="M 40,82 L 72,50 C 76,46 82,46 86,50 C 90,54 90,60 86,64 L 54,96 C 50,100 44,100 40,96 Z"
+          fill="url(#amberGrad)"/>
+    <circle cx="80" cy="56" r="4" fill="#0F172A"/>
+    <circle cx="30" cy="35" r="4" fill="#10B981"/>
+  </g>
+
+  <!-- Web-safe stack. sans-serif last so it never falls back to a serif. -->
+  <text x="146" y="46"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-weight="700" font-size="17" fill="#64748B" letter-spacing="4.5">HSB FIX</text>
+
+  <!-- single text element: PRO can no longer collide, it flows -->
+  <text x="146" y="86"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-weight="700" font-size="30" fill="#0F172A" letter-spacing="0.5"
+        textLength="370" lengthAdjust="spacingAndGlyphs">PLANTMASTER <tspan fill="#D97706">PRO</tspan></text>
+
+  <line x1="146" y1="100" x2="516" y2="100" stroke="#D97706" stroke-width="2.5" stroke-linecap="round"/>
+
+  <text x="146" y="120"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-weight="600" font-size="11" fill="#475569" letter-spacing="2.4"
+        textLength="370" lengthAdjust="spacingAndGlyphs">MAINTENANCE MANAGEMENT SYSTEM</text>
+</svg>

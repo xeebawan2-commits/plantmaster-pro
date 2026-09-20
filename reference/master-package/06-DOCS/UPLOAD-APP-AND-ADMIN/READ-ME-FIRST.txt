@@ -1,0 +1,64 @@
+TWO UPLOADS. KEEP THEM SEPARATE.
+
+
+==============================================
+FOLDER 1 - CUSTOMER-APP  ->  app.hsbfix.org
+==============================================
+
+Upload these to the repo for app.hsbfix.org:
+
+  index.html          top level, overwrite
+  theme-pro.css       top level, overwrite
+  service-worker.js   top level, overwrite
+  favicon.ico         top level, NEW
+  favicon-32.png      top level, NEW
+  apple-touch-icon.png  top level, NEW
+  icons/icon-192.png     INSIDE the icons folder, overwrite
+  icons/icon-512.png     INSIDE the icons folder, overwrite
+  icons/maskable-512.png INSIDE the icons folder, overwrite
+
+  CAREFUL: the three icon files go inside the existing
+  "icons" folder, not the top level. This is the same
+  mistake that happened with the website images.
+
+WHAT CHANGED
+  - The generic hexagon-clock on the login screen is now
+    your real HSB logo.
+  - "A PRODUCT OF HSB Fix Services" now appears under the
+    login form, and on the password reset screen.
+  - The browser tab icon is now the HSB mark instead of
+    the green PM square.
+  - Version bumped to 4.47.0 so phones fetch the new files
+    instead of showing the cached old version.
+
+
+==============================================
+FOLDER 2 - ADMIN-PANEL  ->  admin.hsbfix.org
+==============================================
+
+Upload these to the repo for admin.hsbfix.org:
+
+  index.html            overwrite
+  favicon.ico           NEW
+  favicon-32.png        NEW
+  apple-touch-icon.png  NEW
+
+WHAT CHANGED
+  - The grey "PM" square in the browser tab is now the HSB
+    mark in teal. Nothing else on the panel changed.
+
+
+==============================================
+AFTER UPLOADING
+==============================================
+
+Wait 2-3 minutes, then on your phone open app.hsbfix.org
+and pull down to refresh. If you still see the old login,
+close the tab completely and reopen it - the app caches
+itself deliberately so it works offline.
+
+You should see the HSB logo at the top of the login panel,
+and "A PRODUCT OF HSB FIX SERVICES" at the bottom.
+
+Then check the tab strip: website, app and control centre
+should all now show the same HSB square.

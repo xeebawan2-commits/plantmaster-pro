@@ -1,0 +1,219 @@
+================================================================
+ EMAIL IS READY — support@hsbfix.org receives mail.
+ Use it for both the Gartner form and G2.
+ Check BOTH inbox and spam for the verification email.
+================================================================
+
+================================================================
+ SUBMIT TODAY — GARTNER FORM (Capterra + GetApp + SoftwareAdvice)
+ One form. About 30 minutes. Free.
+================================================================
+
+Do this ONE form and you appear on all three sites. Do not
+submit to Capterra, GetApp and Software Advice separately.
+
+  URL:      https://www.capterra.com/vendors/sign-up
+  Cost:     Rs 0
+  Approval: 1 to 3 business days
+
+Have the LISTING-ASSETS folder open before you start.
+
+
+----------------------------------------------------------------
+ FIELD BY FIELD — copy the right-hand side
+----------------------------------------------------------------
+
+Product name        PlantMaster Pro
+                    (exactly this — no tagline, no "AI CMMS")
+
+Company name        HSB Fix Services
+                    (no Pvt Ltd / Inc / LLC — against their rules)
+
+Website             https://hsbfix.org
+Demo / trial URL    https://hsbfix.org/demo.html
+Pricing page        https://hsbfix.org/pricing.html
+
+Your email          Use an @hsbfix.org address if you have one.
+                    A Gmail address weakens the application and
+                    G2 will reject it outright later.
+
+Primary category    CMMS Software
+Other categories    Maintenance Management
+                    Preventive Maintenance
+                    Facility Management
+                    Fixed Asset Management
+
+Founded             2025
+Company size        Small business, Mid-market
+Languages           English, Urdu
+Countries           Pakistan, United Arab Emirates, Bangladesh,
+                    India, Saudi Arabia
+Deployment          Cloud / SaaS / Web-based
+                    Mobile — Android (web app)
+                    Mobile — iPhone / iPad (web app)
+Support             Email, WhatsApp, Phone, Knowledge base
+Training            Live online, Documentation, In person
+Integrations        LEAVE BLANK. Do not invent any.
+
+
+----------------------------------------------------------------
+ DESCRIPTION — paste exactly, do not reword
+----------------------------------------------------------------
+
+Checked against all seven rejection rules: 203 words, no
+first person, no superlatives, no call to action, no URL,
+no phone, no company suffix, no symbols.
+
+PlantMaster Pro is maintenance management software for
+industrial plants, built for textile mills, food processing
+units, and manufacturing sites in South Asia. It covers work
+orders, preventive maintenance schedules, asset registers with
+QR code scanning, spare parts inventory, purchase orders, and
+technician attendance.
+
+The system includes an AI troubleshooting assistant that reads
+the equipment manuals a plant uploads and answers fault
+questions from those documents, citing the page number the
+answer came from. Where a manual does not cover the question,
+the assistant reports that rather than generating an
+untraceable answer.
+
+A condition monitoring module uses a standard smartphone
+microphone to record a thirty second sample from running
+equipment and compares it against a baseline recorded when the
+machine was healthy, highlighting the frequency bands that have
+changed. No additional sensors or wiring are required.
+
+Voice input accepts both Urdu and English, allowing shop floor
+staff to raise jobs by speaking rather than typing. A daily
+summary email reports open work, overdue tasks, and equipment
+flagged for attention.
+
+Pricing is charged per plant rather than per user, with four
+tiers covering small workshops through to multi site
+operations. The software runs in a web browser on any phone,
+tablet or desktop without installation.
+
+
+----------------------------------------------------------------
+ PRICING — enter real figures
+----------------------------------------------------------------
+
+Transparent numbers outperform "contact us" on these sites.
+
+  Free trial       Yes, 7 days
+  Free version     No
+  Starting price   PKR 7,500 per month (about USD 27)
+  Pricing model    Flat rate, per plant, per month
+
+  Basic          PKR  7,500/mo     5 users,  1 plant
+  Essential      PKR 12,000/mo    10 users,  1 plant
+  Professional   PKR 24,000/mo    25 users,  1 plant
+  Enterprise     PKR 40,000/mo   100 users,  2 plants
+
+
+----------------------------------------------------------------
+ FEATURE CHECKLIST — tick these
+----------------------------------------------------------------
+
+  Work order management        Preventive maintenance
+  Asset tracking               Inventory management
+  Purchase orders              Mobile access
+  Barcode / QR scanning        Predictive maintenance
+  Scheduling                   Technician management
+  Reporting and analytics      Document management
+  Audit trail                  Multi-location
+  Alerts and notifications     Calibration management
+  Service history              Vendor management
+
+Do NOT tick anything about SAP, ERP integration, IoT sensors
+or API access. You do not have those and a false tick can pull
+the listing down.
+
+
+----------------------------------------------------------------
+ IMAGES — upload in this exact order
+----------------------------------------------------------------
+
+Logo:  logo-300x300.png
+
+Screenshots, six of them, in this order:
+
+   1.  05-work-orders.png
+   2.  03-checks-tools-parts.png
+   3.  01-ai-problem-solver.png
+   4.  11-daily-plant-report.png
+   5.  09-reports-export.png
+   6.  06-asset-register.png
+
+Why this order. The first image is shown largest and most
+visitors never scroll past the third. Work orders first proves
+immediately that this is a complete CMMS and not a gadget.
+Then the AI result — the ranked safe checks with tools and
+parts — because that is the thing no competitor shows. Then
+the solver input screen, which happens to display the Urdu and
+English toggle.
+
+DO NOT upload these three, even though they are in the folder:
+
+  02-diagnostic-answer.png   reads "0 plant source(s)" because
+                             the demo company has no manuals
+                             loaded yet. It undercuts the exact
+                             claim the description makes about
+                             citing manual pages.
+
+  04-dashboard.png           carries a yellow "Push alerts are
+                             not fully on yet — Finish setup"
+                             banner. It reads as unfinished.
+
+  08-condition-monitoring.png  shows an empty form plus a
+                             warning notice. The feature is
+                             real but the picture sells nothing.
+
+Spares that are safe if a site asks for more than six:
+  10-unified-scanner.png, 07-analytics-kpis.png
+
+Worth doing later: once manuals are loaded into the demo
+company, retake 02. An answer showing a real page citation
+would be the strongest single image you could possibly lead
+with. Ask me and I will walk you through seeding them.
+
+
+----------------------------------------------------------------
+ IF THEY PHONE YOU
+----------------------------------------------------------------
+
+A Gartner salesperson will very likely call within a week.
+
+  Say: you want to stay on the free Launch listing for now.
+
+Decline pay-per-click. It starts at USD 2 per click with a
+USD 500 per month minimum — roughly Rs 138,000 a month. That
+is not sensible with zero reviews on the profile.
+
+The free tier already includes the listing, review collection,
+review responses and badge display. You are not missing
+anything by saying no.
+
+
+----------------------------------------------------------------
+ AFTER IT IS APPROVED
+----------------------------------------------------------------
+
+  1. Tell me it is live and I will do the G2 submission sheet
+     the same way. G2 is a separate company — reviews do not
+     transfer between them.
+
+  2. Do not write a review yourself, and do not ask family or
+     staff to. They detect it by IP, device and writing style,
+     and removal is permanent.
+
+  3. The first real customer you sign is the moment to start
+     collecting reviews. The templates are ready in
+     06-DOCS/HOW-TO-GET-REVIEWS.txt
+
+Realistic expectation: 0 to 3 enquiries a month at first.
+Traffic becomes meaningful around 10 reviews. The real win
+today is that when someone googles "PlantMaster Pro" to check
+you are a real company, they find you listed beside MaintainX
+and UpKeep.

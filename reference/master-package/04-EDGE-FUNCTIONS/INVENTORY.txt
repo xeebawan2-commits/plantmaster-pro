@@ -1,0 +1,123 @@
+EDGE FUNCTIONS — PlantMaster Pro
+Project: dpmmenwziplixrgylapy
+Checked live: 15 September 2026
+
+All 10 confirmed running. Each replied to a live test request.
+A "401 Authentication required" reply is the correct, healthy
+answer to an unauthenticated poke — it proves the function is
+up and its security is working.
+
+Base address for all of them:
+  https://dpmmenwziplixrgylapy.supabase.co/functions/v1/<name>
+
+THE SOURCE CODE IS NOT IN THIS FOLDER, and cannot be. Supabase
+does not serve function source over the internet. See the
+README for the CLI commands that download it.
+
+
+===============================================================
+  USED BY THE CONTROL CENTRE
+===============================================================
+
+create-owner                                   live (401)
+---------------------------------------------------------------
+  Creates the login for a new company owner after you approve
+  their request. This is the engine behind the Approve button.
+
+  POST, with headers:
+      apikey: <anon key>
+      Authorization: Bearer <your session token>
+  Body:
+      { "email": "...", "invitation_id": "..." }
+  Returns:
+      { "email", "password", "app_url" }
+
+  If "password" comes back missing, that account already
+  existed — the panel shows this as "already registered"
+  rather than an error.
+
+
+platform-admin-api                             live (401)
+---------------------------------------------------------------
+  Handles customer files. Called through the Supabase client
+  rather than by URL:
+
+      sb.functions.invoke('platform-admin-api', {
+        body: { action, file_id, reason, confirmation }
+      })
+
+  action: "storage_signed_url"
+      Returns { url } — a temporary private link to open or
+      download a customer's file.
+
+  action: "storage_delete"
+      Permanently deletes a file. Requires
+      confirmation: "DELETE FILE" exactly, or it refuses.
+
+
+===============================================================
+  USED BY THE PUBLIC WEBSITE
+===============================================================
+
+signup-notify                                  live (400)
+---------------------------------------------------------------
+  Sends the acknowledgement email when someone completes the
+  enquiry form on hsbfix.org.
+
+  Body: { "request_id": "..." }  or  { "email": "..." }
+  Replied "request_id or email is required" to an empty test,
+  which confirms it is running.
+
+
+===============================================================
+  USED BY THE CUSTOMER APP
+===============================================================
+
+vision-scanner                                 live (401)
+---------------------------------------------------------------
+  Reads nameplates, gauges and equipment labels from a photo.
+  Behind the camera scanner.
+
+condition-analyzer                             live (401)
+---------------------------------------------------------------
+  Analyses vibration, temperature and condition readings and
+  reports on machine health.
+
+smart-responder                                live (401)
+---------------------------------------------------------------
+  The AI assistant that answers maintenance questions.
+
+ingest-manual                                  live (401)
+---------------------------------------------------------------
+  Takes an uploaded equipment manual, splits it into passages
+  and indexes them (the document_chunks table) so the AI can
+  quote from it.
+
+delete-manual                                  live (401)
+---------------------------------------------------------------
+  Removes a manual and every indexed passage belonging to it.
+
+voice-translate                                live (401)
+---------------------------------------------------------------
+  Speech to text for voice entry, with translation.
+
+web-push                                       live (403)
+---------------------------------------------------------------
+  Sends push notifications to phones. Replied "Forbidden",
+  which is correct for an unsigned request.
+
+
+===============================================================
+  IF YOU EVER NEED TO REDEPLOY ONE
+===============================================================
+
+  On a computer, with the Supabase CLI:
+
+      npx supabase login
+      npx supabase link --project-ref dpmmenwziplixrgylapy
+      npx supabase functions download create-owner
+      npx supabase functions deploy create-owner
+
+  Their API keys (Gemini, email, push) are set as secrets
+  inside Supabase, under Edge Functions > Secrets. Those are
+  not stored in the function code and not in this backup.

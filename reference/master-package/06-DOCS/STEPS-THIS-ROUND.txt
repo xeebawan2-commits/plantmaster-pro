@@ -1,0 +1,158 @@
+===============================================================
+  WHAT CHANGED THIS ROUND — AND THE ORDER TO DO IT IN
+  15 September 2026
+===============================================================
+
+  You were right on both counts.
+
+  1. Selling only a logo is thin. The company name already
+     shows in the top bar for free, so "buy this to get your
+     logo" is a weak offer. The paid feature is now the WHOLE
+     Company Profile — name, logo, colours, theme, address,
+     contact number, email, report time and document footer.
+     That is a real thing to sell: their identity on every
+     report, work order and document they hand to management.
+
+  2. Ticking a module per company did nothing. That is now
+     fixed properly, with a new table.
+
+
+  THREE STEPS, IN THIS ORDER
+  --------------------------
+  Do the SQL FIRST. The panel expects the new table.
+
+
+---------------------------------------------------------------
+  STEP 1 — RUN THE SQL   (2 minutes)
+---------------------------------------------------------------
+
+  File:  10-COMPANY-FEATURES.sql
+         (in the upload-admin-panel folder)
+
+  Supabase dashboard > SQL Editor > paste the whole file > Run.
+
+  Safe to run more than once. It will print a short table at
+  the end; all three rows should say "created" or "removed".
+
+  What it does:
+
+  a) Creates company_feature_grants — the missing half of the
+     system. Until now there was only a "blocks" table, which
+     is why the panel could take a module away but never add
+     one.
+
+  b) Removes an old restriction on the blocks table. Its
+     feature column only accepted five names (gemini,
+     deep_search, vision_scanner, condition_analysis,
+     uploads). Blocking anything else was failing silently.
+     All 21 modules work now.
+
+  c) Adds organization_effective_features() — one function
+     that works out what a company can actually use:
+
+         package features
+           + extras granted to that company
+           - things blocked for that company
+
+  d) Sets the security rules: only you can change these;
+     a company can read its own entitlements; nobody can
+     grant themselves anything.
+
+
+---------------------------------------------------------------
+  STEP 2 — UPLOAD THE FILES
+---------------------------------------------------------------
+
+  ADMIN repository (admin.hsbfix.org) — 4 files:
+      app.js, admin.css, index.html, config.js
+
+  CUSTOMER APP repository (app.hsbfix.org) — 3 files:
+      app.js, index.html, service-worker.js
+
+  Do not skip index.html and service-worker.js on the
+  customer app — they force phones to fetch the new version
+  instead of running the old cached one.
+
+  (10-COMPANY-FEATURES.sql is for Supabase, not for GitHub.
+  You do not upload it anywhere.)
+
+
+---------------------------------------------------------------
+  STEP 3 — SWITCH THINGS ON
+---------------------------------------------------------------
+
+  FOR EVERYONE ON A PACKAGE:
+      More > Plans & packages > open the package
+      > tick the modules you want
+      > tick "Company profile & branding"
+      > Save
+
+  FOR ONE COMPANY ONLY (this is the new part):
+      Companies > the company > Edit
+      > Modules for this company
+      > tick anything you want to ADD for them
+      > untick anything you want to TAKE AWAY
+      > Save
+
+  Every module is now tickable. A module their package does
+  not include says "not in their package" — tick it anyway
+  and they get it. Once saved it says "extra for this
+  company".
+
+  This is how you sell an add-on without making a whole new
+  package.
+
+
+---------------------------------------------------------------
+  WHAT THE CUSTOMER SEES NOW
+---------------------------------------------------------------
+
+  WITHOUT the feature:
+    The Company Profile page shows a notice saying it is a
+    paid feature, with a WhatsApp button that opens a message
+    to you. All twelve fields are visible but greyed out.
+
+  WITH the feature:
+    Everything unlocked, live colour preview works.
+
+  Their existing logo and details are NEVER removed. If you
+  take the feature away they simply cannot make further
+  changes — what they already saved keeps working. That was
+  the bug you caught, and it stays fixed.
+
+
+---------------------------------------------------------------
+  HOW TO TEST
+---------------------------------------------------------------
+
+  1. Run the SQL. Check the three result rows.
+  2. Upload both repositories, hard refresh.
+  3. Open Companies > Pakistan Synthetic Limited > Edit.
+     The orange warning about running the SQL should be GONE.
+     Tick "Work orders" (not in their package) and Save.
+  4. Reopen the editor. Work orders should still be ticked,
+     now labelled "extra for this company".
+  5. Open the customer app and confirm the logo is showing.
+  6. Tick "Company profile & branding" for them, hard refresh
+     the customer app, and confirm the profile page unlocks.
+
+
+---------------------------------------------------------------
+  IF SOMETHING IS WRONG
+---------------------------------------------------------------
+
+  Orange warning still in the company editor
+      The SQL did not run, or ran with an error. Re-run it and
+      read the notices at the bottom of the Supabase output.
+
+  "Could not add <module>"
+      The grants table exists but the write was refused.
+      Confirm you are logged in as xeebawan2@gmail.com.
+
+  Profile still locked after ticking the feature
+      The phone is using the cached old app. Close all tabs of
+      app.hsbfix.org and reopen, or clear that site's data.
+
+  Nothing changed at all in the panel
+      admin.css changed this round too — make sure all four
+      admin files were uploaded, then hard refresh.

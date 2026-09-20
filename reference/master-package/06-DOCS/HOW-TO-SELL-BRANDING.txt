@@ -1,0 +1,270 @@
+===============================================================
+  SELLING COMPANY BRANDING AS A PAID FEATURE
+  PlantMaster Pro — HSB Fix Services
+  15 September 2026
+===============================================================
+
+
+  THE SITUATION TODAY
+  -------------------
+
+  The branding page already works. Logo, application name,
+  colours, theme and pattern all save and apply correctly.
+
+  But there is NO plan check on it anywhere. I searched both
+  apps. Every company on every plan can brand itself right
+  now, including the free 7-day trial.
+
+  So nothing needs building. It needs a lock.
+
+
+  WHAT YOU ARE SELLING — BE PRECISE
+  ---------------------------------
+
+  WORKS TODAY, per company:
+    - Logo in the app header
+    - Application name in the header and browser tab
+    - Primary and secondary colours
+    - Theme and background pattern
+    - Branding carried onto documents and reports
+
+  DOES NOT WORK, shared by everyone:
+    - The icon and name on the phone home screen when the
+      app is installed. One fixed file, manifest.webmanifest,
+      says "PlantMaster Pro Multi-User" for all customers.
+    - The login screen before sign-in. "PlantMaster Pro" is
+      written into index.html.
+
+  Sell it as "your branding inside the app and on your
+  reports". Do NOT sell it as "your own app". A customer who
+  pays for white-label, installs it, and sees your name on
+  their home screen will feel misled. Full home-screen
+  branding is a separate, larger job — see the last section.
+
+
+  THE SPLIT — WHAT IS PAID AND WHAT STAYS FREE
+  --------------------------------------------
+
+  PAID (the "white_label" feature):
+    Company logo
+    Application name
+    Primary colour
+    Secondary colour
+    Theme
+    Pattern
+
+  FREE ON EVERY PLAN:
+    Plant display name
+    Company address
+    Contact number
+    Company email
+    Daily report time
+    Document footer
+
+  Reason: the free ones are operational, not branding. Every
+  customer needs their own address and phone number on a work
+  order, even on the cheapest plan. Locking those makes a
+  cheap plan feel broken rather than making the paid plan
+  feel valuable.
+
+
+===============================================================
+  STEP 1 — ADD THE FEATURE KEY (admin panel)
+===============================================================
+
+  File: app.js in the admin panel, around line 595.
+  Add one line to the end of the MODULES list:
+
+      { key:'white_label',  label:'Company branding (logo, name, colours)' }
+
+  That is the whole change on the admin side.
+
+  Because both plan editors are generated from MODULES, the
+  tick-box appears automatically in:
+    - Packages > edit a package        (applies to ALL customers)
+    - Companies > edit one company     (applies to THAT company)
+
+  This is exactly how your other 20 features already behave.
+
+
+===============================================================
+  STEP 2 — HOW TO SELL IT, BOTH WAYS
+===============================================================
+
+  BUNDLED INTO A PACKAGE
+    Packages > Professional > tick "Company branding" > Save.
+    Every customer on Professional gets it immediately.
+    Leave it unticked on Basic, Essential and Trial.
+
+  AS A PAID ADD-ON FOR ONE CUSTOMER
+    Companies > the company > edit > tick "Company branding".
+
+    IMPORTANT LIMITATION, know this before you promise it:
+    the per-company editor can currently only take a feature
+    AWAY, not add one. It works by writing a "block" row. So
+    ticking a box the customer's package does not include
+    will not switch it on.
+
+    Two ways to handle an add-on customer today:
+
+    (a) Move them up to a package that includes branding.
+        Simplest, no code.
+
+    (b) Make a copy of their package with branding ticked —
+        for example "Essential + Branding" — and move that
+        one customer onto it. This is the normal way SaaS
+        businesses handle a bespoke deal and needs no code.
+
+    If you would rather tick a box on any company regardless
+    of package, that needs a grants table to mirror the
+    existing blocks table. Ask and it can be added.
+
+
+===============================================================
+  STEP 3 — LOCK IT IN THE CUSTOMER APP
+===============================================================
+
+  This is the part that actually stops a customer using it.
+  File: app.js in the customer app.
+
+  3a. Read the entitlement when the profile page loads.
+
+      In renderCompanyProfile(), before building the HTML,
+      fetch the plan and check the flag:
+
+          const ent = await sb.rpc('organization_plan_summary',
+                          { p_organization_id: org.id });
+          const canBrand = !!(ent.data?.plan?.features?.white_label);
+
+  3b. For the six paid fields, when canBrand is false:
+        - add the  disabled  attribute to the input
+        - show the upgrade note described below
+
+      Keep the fields VISIBLE and greyed out, not hidden.
+      A locked field the customer can see is an advert for
+      the upgrade. A hidden one teaches them nothing.
+
+      Suggested wording for the note:
+
+          Company branding is part of the Professional plan.
+          Contact HSB Fix Services on WhatsApp to enable your
+          own logo, name and colours.
+
+      Link it to  https://wa.me/923162364074  so an interested
+      customer reaches you in one tap.
+
+  3c. Enforce it on save as well, not only in the form.
+
+      In saveCompanyProfile(), if canBrand is false, strip the
+      six paid keys out of the payload before the upsert:
+
+          if(!canBrand){
+            delete payload.app_name;
+            delete payload.primary_color;
+            delete payload.secondary_color;
+            delete payload.theme;
+            delete payload.pattern;
+            // and skip the logo upload entirely
+          }
+
+      Without this, a customer could re-enable a disabled
+      field with the browser's developer tools and save.
+
+
+===============================================================
+  HOW STRONG IS THIS LOCK
+===============================================================
+
+  Honest answer: it stops ordinary users, not a determined
+  technical one.
+
+  The customer app talks to the database directly, so someone
+  who knows how could write to organization_settings from the
+  browser console and bypass the app entirely.
+
+  Proper enforcement is a database rule that refuses the write
+  unless the company's plan includes white_label. That is the
+  correct long-term fix and is worth adding once this is
+  earning money.
+
+  For now: your customers are plant and maintenance managers,
+  not people hunting for a bypass. The UI lock is a reasonable
+  place to launch from. Just know the difference between a
+  lock and a deterrent.
+
+
+===============================================================
+  WHAT TO CHARGE
+===============================================================
+
+  Your current plans:
+    Trial 7 days   free
+    Basic          PKR 29 / month
+    Essential      PKR 12,000 / month
+    Professional   PKR 24,000 / month
+    Enterprise     free (internal)
+
+  Branding is a classic reason to move up a tier rather than
+  a large standalone charge. Two sensible options:
+
+    - Bundle it into Professional. It becomes a concrete
+      reason to pay 24,000 instead of 12,000, and the jump
+      pays for itself many times over versus a small add-on
+      fee.
+
+    - Or offer it to an Essential customer as a bespoke
+      package at, say, PKR 3,000-5,000 a month, using method
+      (b) in Step 2.
+
+  Branding costs you nothing per customer to deliver — no
+  storage to speak of, no AI calls. Price it on what it is
+  worth to them, which is looking like their own system in
+  front of their own management, not on what it costs you.
+
+  Also worth knowing: a customer with their own logo and
+  colours on the screen every day is markedly less likely to
+  leave. It is a retention feature as much as a revenue one.
+
+
+===============================================================
+  LATER — FULL HOME-SCREEN WHITE-LABEL
+===============================================================
+
+  To make the installed app show the customer's own icon and
+  name on their phone, you need:
+
+    1. A manifest generated per company rather than the one
+       fixed manifest.webmanifest file. It has to be served
+       with the customer's name and icon in it, which means
+       something dynamic — a small edge function, or a
+       separate small file per branded customer.
+
+    2. Icons in the required sizes, generated from whatever
+       logo the customer uploads, at 192px and 512px plus a
+       maskable version.
+
+    3. The login screen reading the company's branding before
+       sign-in. Harder than it sounds: the app does not know
+       which company the visitor belongs to until they log
+       in. Usually solved by giving each branded customer
+       their own web address, for example
+       customername.hsbfix.org.
+
+  That third point is the real work, and it is what a
+  customer paying for genuine white-label will eventually
+  expect. Worth doing once two or three customers are paying
+  for branding — not before.
+
+
+===============================================================
+  SUMMARY
+===============================================================
+
+  1. Add one line to MODULES in the admin app.js.
+  2. Tick the box on Professional and Enterprise.
+  3. Add the entitlement check and the save-side strip in the
+     customer app.
+  4. Sell it as in-app and document branding, not as a
+     separate app.
+  5. Revisit the home-screen manifest when customers are
+     paying for it.

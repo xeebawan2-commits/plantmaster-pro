@@ -1,0 +1,126 @@
+===============================================================
+  TWO PROBLEMS — WHAT THEY WERE AND WHAT I DID
+  15 September 2026
+===============================================================
+
+
+---------------------------------------------------------------
+  1. THE LOGO DISAPPEARED  —  MY MISTAKE, NOW FIXED
+---------------------------------------------------------------
+
+  What I did wrong:
+
+  I added a rule that stripped the logo and colours at login
+  for any company whose package does not include branding.
+  Pakistan Synthetic Limited does not have branding ticked
+  yet, so the app correctly, and very unhelpfully, removed
+  the logo you had already uploaded.
+
+  Why that was the wrong call:
+
+  Branding they already saved is theirs. Taking it away
+  because of a change on our side is punishing the customer
+  for our decision. The gate should stop someone setting NEW
+  branding, not confiscate what is already in use.
+
+  What I changed:
+
+  Existing branding is now always applied at login, whatever
+  the package says. The logo comes straight back — no data
+  was lost, it was only being hidden.
+
+  I also found and fixed a second bug in the same area: after
+  saving the profile on an unpaid plan, the app referred to a
+  variable that did not exist, which would have thrown an
+  error mid-save. It now re-reads the saved row and re-applies
+  the full branding, so saving an address change can never
+  wipe a logo.
+
+  If you ever DO want branding removed when someone stops
+  paying, open app.js and change this line near the top of
+  the branding section:
+
+      const STRIP_BRANDING_ON_DOWNGRADE=false;
+
+  to true. I have left it false, which I recommend.
+
+
+---------------------------------------------------------------
+  2. "NOT IN THEIR PACKAGE" ON ALMOST EVERY MODULE
+---------------------------------------------------------------
+
+  This one is NOT a bug. The panel is reporting the truth.
+
+  That screen was the per-company editor, and it reads
+  directly from the package the company is on. It showed
+  Gemini AI and AI deep search ticked and everything else
+  marked "not in their package", which means exactly that:
+  the package Pakistan Synthetic Limited is on has only
+  those two modules switched on. Everything else was never
+  enabled on the package itself.
+
+  The other half of the confusion: ticking those boxes did
+  nothing. That is the limitation I mentioned earlier. The
+  per-company editor can only take a module AWAY from what
+  the package grants. It physically cannot add one, because
+  it works by writing "block" rows — there is no "grant" row
+  to write.
+
+  So you were ticking boxes that silently did nothing, which
+  is a terrible experience and my fault for leaving it
+  looking clickable.
+
+  What I changed in the admin panel:
+
+  - A module the package does not include is now shown
+    greyed out and cannot be ticked.
+  - Its label says "not in their package, ticking does
+    nothing" instead of just "not in their package".
+  - A note at the top of the list explains where to go
+    instead.
+
+
+---------------------------------------------------------------
+  HOW TO ACTUALLY TURN THE MODULES ON
+---------------------------------------------------------------
+
+  You almost certainly want them on for everyone on that
+  package, which is the global editor:
+
+      admin.hsbfix.org
+        > More
+        > Plans & packages
+        > open the package Pakistan Synthetic Limited is on
+        > tick every module you want
+        > tick "Company branding" too
+        > Save
+
+  That applies to every customer on that package immediately.
+
+  Then reopen the per-company editor and you will see the
+  modules ticked and editable, with no "not in their package"
+  labels.
+
+  Use the per-company editor only when you want to take
+  something away from one customer, or add extra workers,
+  storage or AI requests for them.
+
+  If you want a module for ONE customer only and not others
+  on the same package, make a copy of the package with that
+  module ticked and move that customer onto the copy.
+
+
+---------------------------------------------------------------
+  UPLOAD
+---------------------------------------------------------------
+
+  Customer app repository (app.hsbfix.org) — 3 files:
+      app.js, index.html, service-worker.js
+
+  Admin repository (admin.hsbfix.org) — 4 files:
+      app.js, admin.css, index.html, config.js
+
+  admin.css changed this time as well, so do not skip it.
+
+  After uploading, hard refresh both. The logo should be back
+  on the customer app straight away.

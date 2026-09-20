@@ -1,0 +1,19 @@
+THREE FILES. TWO ARE SQL, ONE IS A WEB PAGE.
+
+STEP 1 - Supabase SQL editor, run this:
+    11-USAGE-SHOWS-REAL-LIMITS.sql
+  Fixes the customer's Plan screen so it shows the limits
+  you actually granted them, not just the package defaults.
+  Safe, read-only, re-runnable.
+
+STEP 2 - Supabase SQL editor, run this (optional):
+    12-PUBLIC-PRICING-FEED.sql
+  Lets the website read your live packages so the pricing
+  page updates itself when you change a plan.
+
+STEP 3 - only if you ran step 2:
+    pricing.html  ->  upload to the hsbfix.org repository
+  Already wired to the feed. If the feed is missing it just
+  shows the written prices, so it cannot break the page.
+
+Full explanation: 06-DOCS/PACKAGES-AND-USAGE-TRACKING.txt

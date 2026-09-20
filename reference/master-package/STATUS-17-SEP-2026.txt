@@ -1,0 +1,204 @@
+PLANTMASTER PRO — PROJECT STATUS
+Generated 17 September 2026
+=================================================================
+
+WEBSITE — hsbfix.org
+  7 of 8 files are LIVE and byte-identical to this package.
+  Verified by md5 against the live server on 17 Sep 2026.
+
+      index.html      LIVE   (includes the new proof section)
+      styles.css      LIVE
+      pricing.html    LIVE
+      guide.html      LIVE
+      privacy.html    LIVE
+      terms.html      LIVE
+      signup.html     LIVE
+      demo.html       NOT UPLOADED  <-- the one outstanding item
+
+  demo.html is in /home/user/UPLOAD-NOW/ ready to drag into GitHub.
+
+WHAT WENT LIVE LAST
+  A real side-by-side proof section on the homepage, sitting under
+  "Record the work. Then get help fixing it."
+
+  It shows one real question run in two accounts:
+    LEFT   no manuals   conf 0.85, 0 plant sources, generic 6-cause list
+    RIGHT  manuals      conf 0.90, 8 plant sources, names the MAM 6080
+                        controller, cites Jaguar 55KW pages 28-31
+
+  Every word copied from real app output. Nothing invented.
+  No customer is named. Do not add "Pakistan Synthetic Limited" or
+  their logo without written permission.
+
+EMAIL ADDRESSES — now consistent on all 7 pages
+      +92 316 236 4074        (WhatsApp link)
+      support@hsbfix.org
+      hsbfix.pk@gmail.com
+      app.hsbfix.org
+
+  info@hsbfix.org is GONE from the whole project (was only on demo.html).
+
+  Two addresses intentionally left alone:
+      demo@hsbfix.org      = the demo LOGIN username, not a contact
+      no-reply@hsbfix.org  = the Resend SMTP sender for invitations
+
+  NOTE: if you see "[email protected]" on your phone, that is your
+  BROWSER masking mailto: links, not the website. The live HTML has the
+  real addresses in plain text. Your phone number is not masked because
+  it is a wa.me link, not a mailto: link.
+
+AI COST — measured, not estimated
+  Model in use: gemini-3.1-flash-lite ($0.25 in / $1.50 out per 1M)
+  Fallback:     gemini-3.7-flash
+
+      ~Rs 0.57 per Deep Search
+      1,000 searches/month  = Rs 568
+      3,000 searches/month  = Rs 1,704
+      10,000 searches/month = Rs 5,678
+
+      A 25-user plant doing 20 searches/day costs Rs 341/month
+      against a Rs 24,000 plan = 1.4% of revenue.
+
+  WARNING — do not set GEMINI_GOOGLE_GROUNDING_ENABLED=true without
+  thinking. Google Search grounding costs $14 per 1,000 searches after
+  5,000 free/month, roughly 25x the entire token bill. The "G Google
+  Search" button in the app just opens google.com and costs nothing.
+
+DEMO ACCOUNT — working, read-only
+      app.hsbfix.org
+      demo@hsbfix.org / PlantMasterDemo2026
+      Org "PlantMaster Demo Mill", plant "Korangi Spinning Unit"
+      6 assets, 6 work orders, role = viewer (writes are blocked by RLS)
+
+  It has NO manuals loaded, which is why it returns "0 plant source(s)".
+  That is now a selling point, not a bug - it is the left-hand column of
+  the homepage proof section.
+
+NEXT STEPS, IN ORDER
+  1. Upload demo.html  (last website item)
+  2. Add demo.html to the sitemap
+  3. Gartner submission - one form creates Capterra + GetApp +
+     SoftwareAdvice. See 06-DOCS/DIRECTORY-LISTINGS-PACK.txt
+  4. G2 submission at g2.com/products/new
+     Use the demo login for screenshots. Copy must be third person,
+     no superlatives, no CTAs, no contact details, 200-300 words.
+  5. Review collection - see 06-DOCS/HOW-TO-GET-REVIEWS.txt
+  6. On-site testimonials - BLOCKED until real customer quotes exist.
+     No invented reviews anywhere.
+  7. Recover the create-owner edge function source:
+       npx supabase link --project-ref dpmmenwziplixrgylapy
+       npx supabase functions download create-owner
+
+KEY SETTINGS
+  Supabase project   dpmmenwziplixrgylapy
+  Storage bucket     plant-files (private)
+  Super admin        xeebawan2@gmail.com
+  SMTP               Resend, smtp.resend.com:465, no-reply@hsbfix.org
+  Version            4.47.0
+  Hosting cost       nil
+
+================================================================
+UPDATE — 17 Sep 2026, later session
+================================================================
+APP v4.47.4 — LIVE AND VERIFIED
+  - bottom nav 5 columns at all widths
+  - #toast no longer blocks taps (pointer-events/visibility)
+  - demo gate at app.hsbfix.org/?demo=1
+  - friendly error messages (pmFriendlyError inside toast)
+  - teal read-only ribbon for role=viewer
+
+DATABASE — BOTH SCRIPTS RUN, DEMO IS NOW READ-ONLY
+  14-DEMO-READONLY-HARDENING.sql   is_org_writer + loto read/write
+  15-BLOCK-VIEWER-WRITES.sql       pm_is_viewer_only + restrictive
+                                   INSERT/UPDATE/DELETE policies
+  Verified live: demo account refused on Apply LOTO.
+
+  IMPORTANT — THIS ONLY AFFECTS role='viewer'.
+  Invited staff (operator, technician, engineer, supervisor,
+  manager, owner) are NOT affected and can write normally.
+  Only the demo account is a viewer.
+
+WEBSITE
+  sitemap.xml and demo.html confirmed live.
+  WhatsApp buttons shortened to "Ask a question" on demo.html
+  and index.html (pricing.html already used it).
+
+NEXT: directory listings (Gartner one form -> Capterra/GetApp/
+SoftwareAdvice, then G2), then review collection.
+
+================================================================
+REBRAND COMPLETE — 17 Sep 2026, verified live
+================================================================
+LOGO  hexagon shield: factory + wrench + green uptime dot.
+      Source SVG: 06-DOCS/BRAND/pmp-icon-square.svg
+      Lockup:     06-DOCS/BRAND/pmp-lockup.svg
+
+  Replaced in 12 icon files across website/app/admin, plus
+  LISTING-ASSETS/logo-300x300.png.
+
+  IMPORTANT - the old "HSB" tile was NOT an image file:
+    website   .logo-mark = CSS box with letters typed in HTML
+    app login = inline SVG data-URI inside theme-pro.css,
+                colour written URL-encoded as %2322d3ee
+  Both now draw the hexagon. The encoded %23 form is why the
+  first colour sweep missed it. ALWAYS grep for %23<hex> and
+  rgba() forms, not just #<hex>.
+
+COLOURS  teal/cyan -> blue, taken from the logo
+  website  #0F9B8E -> #2563EB   (5.2:1 on white, AA pass)
+  app      #22D3EE -> #3B82F6   (5.1:1 on dark,  AA pass)
+  admin    #13B8A8 -> #3B82F6
+  accent   amber  #D97706  (decorative only - 2.1:1 on white
+                            so it must never carry text)
+  success  green  #10B981
+  Two different blues on purpose: no single blue passes
+  contrast on both a white page and a near-black one.
+
+  58 swaps total (43 plain + 1 encoded + 12 rgba + 2 marks).
+  Zero cyan remains in any form.
+
+VERSIONS  app 4.48.1 · admin assets ?v=1.8.0
+  admin.css and admin app.js had NO version param before -
+  browsers would have cached old teal forever.
+
+VERIFIED LIVE  all 3 sites HTTP 200, all 7 website pages carry
+  the hexagon header, favicon 5,742 B identical on all three,
+  icon-512 31,548 B, SW plantmaster-pro-v4.48.1.
+
+STILL OPEN
+  1. Capterra/Gartner form  -> SUBMIT-TODAY.txt (ready)
+  2. G2 after that
+  3. 11 listing screenshots still show the OLD cyan UI.
+     Honest and usable, but retaking the six listed in
+     SUBMIT-TODAY.txt would match the live product.
+  4. Review collection once first customer signs.
+
+================================================================
+HOSTING MOVED TO CLOUDFLARE PAGES — 17 Sep 2026
+================================================================
+All three sites now served by Cloudflare (verified: server:
+cloudflare, cf-ray headers on hsbfix.org, app.hsbfix.org and
+admin.hsbfix.org). Moved from GitHub Pages so the repos can be
+PRIVATE. GitHub Pages free tier requires public repos;
+Cloudflare Pages deploys private repos at no cost.
+
+CLOUDFLARE PAGES LIMITS TO REMEMBER
+  25 MiB   maximum per single file  <-- matters for video
+  20,000   maximum number of files
+  Video over 25 MB will FAIL to deploy. Host video on YouTube
+  (unlisted is fine) and embed it, or use Cloudflare R2.
+
+EMAIL — inbound now works
+  hsbfix.org MX -> fwd1/fwd2.porkbun.com (Porkbun forwarding)
+  support@ info@ sales@ hello@  all forward to Gmail
+  SPF added: v=spf1 include:_spf.porkbun.com ~all
+  Resend untouched on send.hsbfix.org (outbound only).
+  Forwarded mail can land in spam - SPF breaks on ANY forward.
+  Fix is a Gmail filter on "to: hsbfix.org" -> never spam.
+
+DIRECTORY LISTINGS — no documents required
+  Capterra/G2 verify the WEBSITE, not paperwork. All 8
+  published rejection criteria audited and PASSED.
+  Use ONLY capterra.com/vendors/sign-up (NOT Peer Insights,
+  which requires mid-to-large enterprise customers).
+  See 06-DOCS/WHAT-THEY-WILL-ASK.txt and SUBMIT-TODAY.txt

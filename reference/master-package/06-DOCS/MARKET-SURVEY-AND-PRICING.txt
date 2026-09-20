@@ -1,0 +1,625 @@
+===============================================================
+
+   P L A N T M A S T E R   P R O
+   Market position, feature standing, pricing,
+   and what the business is worth
+
+   Deep survey — 16 September 2026
+
+===============================================================
+
+  WHAT I DID
+
+  Read all three of your live sites properly. Measured the
+  build (81 tables, 99 database functions, 98 security
+  policies, ~1.3 MB of source). Compared your features and
+  prices against 20+ competitors including MaintainX,
+  Limble, UpKeep, Fiix, eMaint, Coast, Click Maint, Fogwing,
+  Cryotos, Maintastic and IBM Maximo. Checked the market
+  size forecasts. Checked what software businesses like
+  yours actually sell for.
+
+  Honest throughout, including the parts that sting.
+
+
+===============================================================
+  THE SHORT VERSION
+===============================================================
+
+  The product is genuinely good. Better than good — the
+  feature set beats platforms charging four times your
+  price, and two of your features are things the market
+  leaders do not have at all.
+
+  Your problem is not the product. It is that you have
+  zero customers, and almost everything about your value
+  depends on changing that.
+
+  What it is worth today, as an asset:      Rs 2.5 – 4 m
+  What it is worth with 10 paying plants:   Rs 15 – 25 m
+  What it is worth with 40 paying plants:   Rs 60 – 110 m
+
+  The gap between line one and line three is roughly
+  eighteen months of selling. Nothing else you can do —
+  no feature, no rewrite, no redesign — moves the number
+  even a tenth as much.
+
+  On price: you are close to right, but your Essential
+  plan is underpriced and your trial is too short. Details
+  in section 5.
+
+
+===============================================================
+  1. THE MARKET YOU ARE IN
+===============================================================
+
+  You are in CMMS — Computerized Maintenance Management
+  Systems. It is a real, growing, well-funded category.
+
+  Global market size, 2026:        USD 1.45 – 2.4 billion
+  Forecast by 2035/36:             USD 3.5 – 5.9 billion
+  Growth rate:                     9 – 11% a year
+
+  The estimates vary by research house because they draw
+  the category boundary differently, but every single one
+  agrees on direction and pace. This is a market growing
+  at roughly 10% annually for the next decade.
+
+  More useful to you: Asia-Pacific is the fastest-growing
+  region, and the analysts specifically note "mobile-first,
+  cloud bypass" as the regional pattern — plants that never
+  had a desktop CMMS going straight to phones.
+
+  That is exactly what you built. You are not early and you
+  are not late. You are on time, in the right region, with
+  the right form factor.
+
+  The market is also described consistently as
+  "fragmented" — no single player owns it. Good news for a
+  newcomer: you are not trying to displace a monopoly.
+
+
+===============================================================
+  2. WHO YOU ARE COMPETING WITH
+===============================================================
+
+  Rates below are per user per month, USD, 2026, annual
+  billing. I have converted at Rs 277 to the dollar.
+
+  THE BIG NAMES
+
+    MaintainX        $20 – 65     mobile-first, 1,500+
+                                  reviews at 4.8 stars,
+                                  free tier for 3 users
+    Limble           $28 – 69     easiest to use, strong
+                                  PM scheduling
+    UpKeep           $20 – 120    mobile-first, IoT
+    Fiix (Rockwell)  $45 – 75     enterprise, OT/PLC
+                                  integration
+    eMaint (Fluke)   $65 – 85     regulated industries,
+                                  3-user minimum
+    Maintenance
+      Connection     $110         enterprise EAM
+    IBM Maximo       six figures  very large enterprise
+
+  THE BUDGET END
+
+    EZO CMMS         $14          cheapest credible option
+    Coast            $20 – 49     small teams
+    Click Maint      $35 – 55     no user minimum
+    Maintoro         $15          free for 2 users
+
+  WHAT THIS MEANS IN RUPEES
+
+  A 25-user plant in Karachi, buying from abroad:
+
+    MaintainX Premium    25 x $65  = $1,625/mo = Rs 450,000
+    Fiix Professional    25 x $75  = $1,875/mo = Rs 520,000
+    Limble Premium       25 x $69  = $1,725/mo = Rs 478,000
+    MaintainX Essential  25 x $20  = $500/mo   = Rs 139,000
+    EZO CMMS             25 x $14  = $350/mo   = Rs 97,000
+
+    PLANTMASTER PRO      flat                  = Rs 24,000
+
+  Read those numbers again. Your Professional plan costs
+  less than a quarter of the CHEAPEST credible foreign
+  option at 25 users, and about one-twentieth of Fiix.
+
+  That is not a small advantage. That is a different
+  category of purchase decision — it moves from "capital
+  expenditure requiring board approval" to "the plant
+  manager can authorise this".
+
+
+===============================================================
+  3. HOW YOUR FEATURES ACTUALLY STAND
+===============================================================
+
+  I went through this carefully rather than taking your
+  marketing page at face value.
+
+  WHERE YOU MATCH THE LEADERS
+
+  Work orders, PM scheduling, asset register, QR scanning,
+  spares and inventory, purchase orders, checklists,
+  reporting, audit trail, mobile, offline queue, roles and
+  permissions, REST API.
+
+  All present, all standard. No gaps against MaintainX or
+  Limble on the fundamentals. This is table stakes and you
+  have cleared it.
+
+  WHERE YOU ARE GENUINELY AHEAD
+
+  1. AI ANSWERS FROM THE CUSTOMER'S OWN MANUALS, CITED
+
+     This is your strongest card and I want to be precise
+     about why.
+
+     The competition's AI is mostly: generate a procedure
+     from a manual (MaintainX), suggest PM tasks from a
+     manual (Limble), predict failures from history
+     (Fiix Foresight), or a chat assistant over their own
+     knowledge base.
+
+     Yours indexes the customer's actual equipment
+     documentation and answers a plain-language fault
+     question with the manual name and page cited. That is
+     retrieval-augmented generation done on the customer's
+     private corpus. Limble and MaintainX are moving this
+     way but neither ships exactly this today.
+
+     The citation is the part that matters commercially. An
+     AI answer without a source is a liability in an
+     industrial setting — nobody will act on it at 3am.
+     An answer that says "Atlas Copco GA-75 manual, section
+     4.3" is something a technician will actually follow.
+
+  2. ACOUSTIC CONDITION MONITORING FROM A PHONE
+
+     Everyone else does condition monitoring with sensors.
+     Limble integrates Monnit, Augury, AssetWatch. eMaint
+     uses Fluke hardware. Fiix uses Rockwell OT.
+
+     All of those require buying hardware per machine.
+     For a Pakistani plant that is often the deal-breaker —
+     the software is affordable, the sensor rollout is not.
+
+     Yours records 30 seconds on a phone the technician
+     already owns and compares against a baseline. No
+     hardware, no capex, no procurement cycle.
+
+     Is it as accurate as a proper vibration sensor? No,
+     and you should never claim it is. But "free and
+     approximately right on every machine" beats "precise
+     on the four machines we could afford sensors for."
+     That is a real argument and you should make it exactly
+     that way.
+
+  3. URDU VOICE INPUT
+
+     I could not find a single competitor offering Urdu.
+     Cryotos and Maintastic do multilingual voice-to-ticket,
+     which is the closest, but not Urdu specifically.
+
+     This solves the single biggest reason maintenance
+     records stay empty: the fitter will not type on a
+     phone with oily hands, and will not type in English at
+     all. Your own marketing says this and it is correct.
+
+     A foreign vendor will not build this. The market is
+     too small for them and too specific. It is defensible
+     for exactly as long as you are the only one who cares
+     about it.
+
+  4. FLAT PRICING INSTEAD OF PER-SEAT
+
+     Per-user pricing actively punishes the customer for
+     putting the system in more hands — which is the thing
+     that makes a CMMS work. Every plant using MaintainX
+     rations logins.
+
+     You charge per plant. A 25-person team costs the same
+     as a 5-person team. This is a better model for your
+     market and worth saying out loud on the pricing page.
+
+  WHERE YOU ARE BEHIND, HONESTLY
+
+  1. NO INTEGRATIONS. MaintainX lists NetSuite, SAP,
+     Dynamics, Slack, QuickBooks, Jira, Power BI, Samsara,
+     Zapier. You have a REST API and nothing pre-built.
+     For SMEs this rarely kills a deal. For anyone with SAP
+     it kills it immediately.
+
+  2. NO IOT SENSOR INPUT. Your condition monitoring is
+     phone-only. A plant that already owns sensors cannot
+     feed them in. Worth adding eventually as an upgrade
+     path, not urgent.
+
+  3. NO THIRD-PARTY REVIEWS. MaintainX has 1,540 G2
+     reviews at 4.8. Limble has 685. You have zero, on
+     any platform. For a buyer comparing options online
+     you are invisible — not badly rated, literally absent
+     from the comparison.
+
+  4. NO PROVEN SCALE. Nobody can point to your system
+     running a 200-asset plant for two years. Every
+     competitor can. This is the thing founding customers
+     buy you.
+
+  5. SINGLE-PLANT SUBSCRIPTIONS. Multi-site is handled by
+     "talk to us". Competitors sell multi-site as a tier.
+     Fine for now, a ceiling later.
+
+  6. NO SOC 2 OR ISO 27001. Does not matter for an SME in
+     Karachi. Matters enormously the day a multinational's
+     procurement department gets involved.
+
+
+===============================================================
+  4. WHAT YOUR SITES LOOK LIKE — HONEST ASSESSMENT
+===============================================================
+
+  I read the marketing site as a buyer would.
+
+  THE WRITING IS THE BEST THING ABOUT IT
+
+  Genuinely. "The maintenance app that reads your manuals
+  and answers back" is a better headline than anything on
+  MaintainX or Limble's homepage. The bearing-seizure
+  comparison on the pricing page — Rs 200,000 failure
+  versus Rs 24,000 a month — is exactly how industrial
+  software should be sold.
+
+  The compressor example with the real Atlas Copco citation
+  is the most persuasive thing on the site. Most SaaS sites
+  would have used a fake screenshot.
+
+  Speed is good: homepage 22 KB, loads in 0.19 seconds. The
+  whole customer app is 148 KB. MaintainX's marketing site
+  is several megabytes. Yours will load on a 3G connection
+  in a plant. That matters here.
+
+  Responsive design is properly done — 14 media queries on
+  the site, 11 in the app.
+
+  WHAT IS MISSING, AND IT IS COSTING YOU
+
+  a) NO SOCIAL PREVIEW TAGS. I checked: no og:title, no
+     og:image, no og:description, no twitter:card.
+
+     This is the one to fix first. When you send
+     hsbfix.org on WhatsApp — which is your main sales
+     channel — the recipient sees a bare grey link with no
+     picture, no headline, no description. It looks like
+     something a stranger forwarded. With og tags it shows
+     your hero image, your headline and a line of copy.
+
+     WhatsApp is how you sell. Your link looks broken on
+     WhatsApp. Two hours of work, biggest single return
+     of anything on this list.
+
+  b) NO FAVICON. The browser tab shows a blank page icon.
+     Small thing, reads as unfinished.
+
+  c) NO SCHEMA MARKUP, NO CANONICAL. Hurts search ranking
+     and stops Google showing rich results for your
+     pricing.
+
+  d) NO SOCIAL PROOF ANYWHERE. I searched the homepage for
+     "customer", "client", "trusted", "case study",
+     "testimonial" — zero matches. No logos, no names, no
+     quotes, no numbers.
+
+     Understandable when you have no customers. But it is
+     the first thing a plant manager looks for, and the
+     founding-customer offer is the right answer to it.
+     Get three names on that page as fast as you can.
+
+  e) THE ADMIN PANEL IS INVISIBLE TO BUYERS. Fine — it
+     should be. But when you sell, the buyer needs to see
+     it. Record a five-minute walkthrough.
+
+  THE APP ITSELF
+
+  Clean, fast, sensible login. Says plainly "Accounts are
+  created by HSB Fix Services" which is correct for your
+  invite-only model.
+
+  One observation: a prospect who lands on app.hsbfix.org
+  can do absolutely nothing. No demo, no screenshots, no
+  way in. Consider a read-only demo account with a sample
+  plant loaded — "see it working" converts far better
+  than "request access". This is the single biggest
+  conversion gap in the funnel.
+
+
+===============================================================
+  5. YOUR PRICING — WHAT TO CHANGE
+===============================================================
+
+  Current:
+    Essential      Rs 12,000/mo   10 users, 1 plant, 10 GB
+    Professional   Rs 24,000/mo   25 users, 1 plant, 30 GB
+    Enterprise     quoted
+    Trial          7 days
+    Founding       Rs 12,000/mo for year one, 3 places
+
+  WHAT IS RIGHT
+
+  The two-tier split is correct, and putting AI and
+  condition monitoring behind Professional is exactly the
+  right line — those are the features that change outcomes,
+  and the Rs 12,000 gap is justified by one avoided
+  breakdown. Your own pricing page argues this well.
+
+  Flat per-plant pricing is right. Do not switch to
+  per-seat.
+
+  The founding-customer offer is well constructed: real
+  discount, real deadline, and you ask for a testimonial
+  in return. That is how you solve the no-social-proof
+  problem. Keep it.
+
+  WHAT I WOULD CHANGE
+
+  1. ESSENTIAL IS UNDERPRICED. At Rs 12,000 you are at
+     $43/month for a whole plant. EZO charges $14 per user
+     — three users and they have passed you.
+
+     You are not competing on price with anyone. You have
+     already won on price by a factor of ten. Pricing
+     lower does not win more deals, it just signals the
+     product is small.
+
+     Move Essential to Rs 15,000 – 18,000. You will not
+     lose a single sale. Anyone who balks at Rs 18,000 was
+     never going to pay Rs 12,000 either — that is a
+     budget problem, not a price problem.
+
+  2. THE 7-DAY TRIAL IS TOO SHORT. Industry standard is
+     14 – 30 days. Click Maint and Limble both give 14.
+
+     More importantly: a maintenance system cannot prove
+     itself in 7 days. A PM cycle has not come round. No
+     breakdown has happened. The AI has not been tested on
+     a real fault because no real fault occurred that week.
+
+     You are asking them to judge a product before it has
+     had a chance to work. Go to 14 days minimum. 30 is
+     better for your first ten customers — the cost to you
+     is near zero and the conversion difference is large.
+
+  3. ADD A SMALL TIER. You already say in your FAQ that
+     you will find a price for a three-person workshop.
+     Make it a real plan: Rs 6,000 – 7,000, 5 users, 5 GB,
+     no AI. It captures the small workshops, gets your
+     name into more plants, and several will grow into
+     Essential.
+
+  4. CHARGE A SETUP FEE ON ENTERPRISE. You currently give
+     setup, import and training free on every tier. Fiix
+     charges $1,500 – $10,000 for implementation packages.
+     Free setup is a great closing argument on Essential
+     and Professional — keep it there. But on Enterprise,
+     where you are travelling to site and training shifts,
+     charge Rs 100,000 – 200,000. It costs you real days.
+
+  5. RAISE PRICES FOR CUSTOMERS 11 ONWARDS. Lock your
+     first ten in at today's rates for two years and say
+     so — it is a strong reason to sign now. Then move
+     Professional to Rs 30,000 – 35,000. You will still be
+     a tenth of MaintainX.
+
+  A NOTE ON CURRENCY
+
+  Your costs are partly in dollars — Supabase, Gemini,
+  Resend — and your revenue is entirely in rupees. The
+  rupee has been stable around 277 for a year, but if it
+  moves you are exposed.
+
+  Two protections: price in rupees but review annually,
+  and if you ever sell to a Gulf customer, price that
+  contract in dollars.
+
+
+===============================================================
+  6. WHAT THE BUSINESS IS WORTH
+===============================================================
+
+  This is the part you asked about most directly, so I will
+  be blunt.
+
+  Software businesses are valued on REVENUE, not on how
+  good the code is. The 2026 benchmarks:
+
+    Micro-SaaS under $1m ARR    2.5 – 4x ARR
+                                (or 4 – 6x annual profit)
+    Acquire.com median          3.9x profit
+    Flippa small SaaS           2.5 – 4.5x profit
+    Pre-revenue                 essentially code value only
+
+  That last line is where you are today. Sources are
+  consistent and brutal on this: a pre-revenue SaaS product
+  sells for the value of its code and nothing else, often
+  a few thousand dollars, because the buyer is taking all
+  the market risk.
+
+  So there are two honest numbers.
+
+  A) WHAT IT WOULD COST TO REBUILD (asset value)
+
+  This is the floor, and the number to use if you sell the
+  code itself rather than a business.
+
+    81 database tables
+    99 database functions
+    98 row-level security policies
+    13 edge functions
+    3 front-end applications
+    19 feature modules
+    ~1.3 MB of hand-written source
+
+  At Pakistani senior developer rates — Rs 1,600 – 1,800
+  per hour, or $25 – 75 for an agency — a competent team
+  rebuilding this from a written specification would need
+  roughly 900 – 1,400 hours. Call it six to nine months
+  of one strong developer, longer in practice because the
+  business rules had to be discovered, not just typed.
+
+    Rebuild cost, local rates      Rs 1.8 – 3.5 million
+    Rebuild cost, agency rates     Rs 4 – 8 million
+
+  But rebuild cost is not sale value. A buyer pays for
+  what it earns, not what it cost. Treat Rs 2.5 – 4 million
+  as a realistic asking price for the code and brand today,
+  to a buyer who already has customers to sell it to — a
+  Pakistani industrial automation firm, an ERP vendor
+  wanting a maintenance module, or an engineering services
+  company.
+
+  B) WHAT IT IS WORTH WITH CUSTOMERS (business value)
+
+  This is where the real money is, and the arithmetic is
+  worth internalising.
+
+  Assume Professional at Rs 24,000, mostly annual billing,
+  and roughly 75% margin after Supabase, Gemini and Resend.
+
+    10 plants    Rs 2.88 m/yr revenue   ~Rs 2.2 m profit
+                 Value at 3-4x profit:  Rs 7 – 9 m
+                 Value at 3x revenue:   Rs 8.6 m
+                 Realistic:             Rs 15 – 25 m *
+
+    25 plants    Rs 7.2 m/yr revenue    ~Rs 5.4 m profit
+                 Realistic:             Rs 30 – 60 m
+
+    40 plants    Rs 11.5 m/yr revenue   ~Rs 8.6 m profit
+                 Realistic:             Rs 60 – 110 m
+
+  * The higher figures assume low churn, documented
+    processes and the owner not being indispensable. A
+    strategic buyer in the region — someone who already
+    sells to plants and wants the product — pays more than
+    a financial buyer, because for them it is a product
+    line, not a spreadsheet.
+
+  THE POINT
+
+  Ten customers is worth roughly five times the code alone.
+  Forty customers is worth twenty to thirty times.
+
+  Every hour spent polishing the product from here returns
+  far less than an hour spent getting a plant to sign.
+  That is the single most important sentence in this
+  document.
+
+  WHAT DESTROYS VALUATION — avoid these
+
+    - Churn above 5% a month. Buyers call it a leaky
+      bucket and discount hard.
+    - One customer being more than 25% of revenue.
+    - Being seen as an "AI wrapper". Your defence is the
+      81-table operational system underneath — the AI sits
+      on top of real workflow, it is not the whole product.
+      Say it that way.
+    - Owner dependency. If only you can run it, the buyer
+      is buying a job. The master project folder you now
+      have is the fix for this, and it is worth real money
+      at sale time.
+    - Undocumented code. Already solved.
+
+
+===============================================================
+  7. WHAT I WOULD DO, IN ORDER
+===============================================================
+
+  THIS WEEK — cheap, high return
+
+  1. Add og: tags and a favicon to all six pages. Your
+     WhatsApp links currently look broken. Two hours.
+  2. Extend the trial to 14 days. One line of copy.
+  3. Delete schema.sql and README.md from the app repo
+     (see PUBLIC-REPOS-WHAT-TO-DO.txt).
+
+  THIS MONTH — the only thing that matters
+
+  4. Land the three founding customers. Everything in this
+     document is theory until a plant is paying. Karachi
+     and Faisalabad have thousands of textile and
+     manufacturing units; the sector is 46% of
+     manufacturing and explicitly behind on digitisation.
+     You need three of them, not three hundred.
+  5. Build a read-only demo account with a realistic
+     sample plant. Send that link instead of a pitch.
+  6. Record a 5-minute screen walkthrough. Put it on the
+     homepage.
+
+  NEXT QUARTER
+
+  7. Get those three customers to write two lines each.
+     Put names and logos on the homepage.
+  8. Raise Essential to Rs 15,000 – 18,000.
+  9. Add the small-workshop tier at Rs 6,000 – 7,000.
+  10. List on Capterra, G2 and SoftwareSuggest. Free, and
+      it is where buyers compare. Ask your first customers
+      for reviews — this is how you stop being invisible.
+
+  NEXT YEAR
+
+  11. Multi-site as a real priced tier.
+  12. One or two integrations, whichever your customers
+      actually ask for. Do not guess.
+  13. Consider the Gulf. Same industrial base, same Urdu
+      and English workforce, dollar pricing, far higher
+      willingness to pay. Your Rs 24,000 plan is $87 —
+      you could charge $300 there and still undercut
+      everyone.
+
+
+===============================================================
+  8. THE HONEST SUMMARY
+===============================================================
+
+  You have built something that stands up against companies
+  with hundreds of employees and tens of millions in
+  funding. The AI-on-your-own-manuals feature, the
+  phone-based condition monitoring and the Urdu voice input
+  are real differentiators, not marketing lines. The
+  writing on your site is better than theirs. The price is
+  a tenth of theirs.
+
+  None of that is worth anything until a plant pays you.
+
+  The product is finished. The business has not started.
+  Those are different problems and only the second one is
+  still open.
+
+  Price today, as an asset:  Rs 2.5 – 4 million
+  Price with 10 customers:   Rs 15 – 25 million
+  Price with 40 customers:   Rs 60 – 110 million
+
+  Go and sell three.
+
+
+===============================================================
+  SOURCES
+===============================================================
+
+  Market size: Global Growth Insights, Business Research
+  Insights, Technavio, Fact.MR, MarketsandMarkets,
+  Future Market Insights (2026 reports)
+
+  Competitor pricing: official pricing pages via eWorkOrders,
+  Facilio, SelectHub, SoftwareSuggest, Software Advice,
+  Capterra, AssetLab, ReliaMag, Maintoro, FreeMaint (2026)
+
+  Valuation: Acquire.com 2026 multiples report, Flippa 2026
+  SaaS multiples, BigIdeasDB (520+ deals), CT Acquisitions,
+  MoveMRR
+
+  Local rates: ERI SalaryExpert Pakistan 2026, Abark Tech
+  Pakistan firm survey. USD/PKR ~277 (September 2026).
+
+  Industry context: invest.gov.pk textile sector brief,
+  Trade Development Authority of Pakistan

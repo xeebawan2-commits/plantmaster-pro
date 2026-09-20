@@ -1,0 +1,143 @@
+================================================================
+ DO YOU NEED DOCUMENTS? — SHORT ANSWER: NO
+ What Capterra and G2 actually check before approving
+================================================================
+
+NO PAPERWORK IS REQUIRED.
+
+  No business registration certificate
+  No NTN / tax number
+  No incorporation papers
+  No bank statement
+  No ID card or passport
+  No customer contracts
+  No invoices
+
+These are free software directory listings, not a payment
+processor or a bank. Nobody is doing KYC on you.
+
+Do not send documents even if a salesperson later suggests it.
+
+
+----------------------------------------------------------------
+ WHAT THEY ACTUALLY VERIFY: YOUR WEBSITE
+----------------------------------------------------------------
+
+Their catalog team opens hsbfix.org and decides from public
+information alone. Gartner states plainly that they evaluate
+"using publicly available information, such as a vendor's
+website" and that they do NOT accept internal documents.
+
+So your website IS the application. I audited it against every
+published rejection reason, live, just now:
+
+  1. Public website, in English                  PASS
+  2. Product clearly described on the site       PASS
+  3. Listing name matches site name              PASS (12x)
+  4. Transparent pricing published               PASS
+  5. Real CTA - trial AND demo, not a waitlist   PASS
+  6. Company-domain email, not Gmail             PASS
+  7. Sold as a suite, not separate modules       PASS
+  8. B2B prepackaged, not B2C or bespoke         PASS
+
+All eight clear. This is why the demo page and the pricing
+page mattered so much - they are the two things that most
+often get a new vendor rejected.
+
+
+----------------------------------------------------------------
+ WHAT THEY WILL ASK YOU, IN THE FORM
+----------------------------------------------------------------
+
+Only ordinary business details. All of it is already written
+out for you in SUBMIT-TODAY.txt:
+
+  Company name, your name, role, phone number
+  Company-domain email      -> support@hsbfix.org
+  Website, demo URL, pricing URL
+  Product name and category
+  200-300 word description  (written, compliance-checked)
+  Pricing tiers             (written)
+  Feature checklist         (written)
+  Logo + screenshots        (ready in LISTING-ASSETS)
+
+Nothing there needs a lawyer or an accountant.
+
+
+----------------------------------------------------------------
+ WHAT THEY WILL ASK AFTERWARDS: A SALES CALL
+----------------------------------------------------------------
+
+Expect a call or email within roughly a week of approval.
+This is the only real "inquiry" you will get.
+
+They will ask:
+  - how many customers you have
+  - your monthly marketing budget
+  - whether you want pay-per-click placement
+
+Answer honestly. Zero customers is fine - plenty of listed
+vendors are early stage. It does not affect your free listing.
+
+Then decline the paid tier. Pay-per-click starts at USD 2 per
+click with a USD 500/month minimum, roughly Rs 138,000 a
+month. That is indefensible with no reviews on the profile.
+
+Say: "We will stay on the free Launch listing for now."
+
+They may push twice. The free listing is not withdrawn if you
+say no - it is a real product tier, not bait.
+
+
+----------------------------------------------------------------
+ THE ONE HONEST RISK
+----------------------------------------------------------------
+
+Gartner PEER INSIGHTS (a different Gartner product) requires
+vendors to sell to mid-to-large enterprises and excludes small
+business solutions. If anyone steers you there, you will not
+qualify yet.
+
+That is NOT what you are applying to. Capterra, GetApp and
+Software Advice explicitly serve small business and mid-market
+buyers, and that is where SUBMIT-TODAY.txt points you.
+
+Use ONLY this URL:  https://www.capterra.com/vendors/sign-up
+
+
+----------------------------------------------------------------
+ IF THEY DO COME BACK WITH A QUESTION
+----------------------------------------------------------------
+
+The likeliest queries, and your answers:
+
+  "Is this generally available or still in beta?"
+     Generally available. Live product, paying tiers
+     published, working demo, 7-day trial.
+
+  "Who are your customers?"
+     Industrial plants in Pakistan - textile mills, food
+     processing, manufacturing. Early stage. Say so plainly.
+
+  "Can we see the product?"
+     https://hsbfix.org/demo.html - no login needed.
+     Or app.hsbfix.org/?demo=1 with the demo credentials.
+     This is your strongest answer. Most early vendors
+     cannot show a working product at all.
+
+  "Do you integrate with anything?"
+     Not yet. Say nothing rather than invent integrations -
+     a false claim can pull the listing later.
+
+Answer in plain English, keep it short, do not oversell.
+
+
+----------------------------------------------------------------
+ BOTTOM LINE
+----------------------------------------------------------------
+
+Nothing is blocking you. No documents to gather, nothing to
+prepare, no registration to obtain first.
+
+The work is done. What remains is about 30 minutes of typing
+into their form, copying from SUBMIT-TODAY.txt.

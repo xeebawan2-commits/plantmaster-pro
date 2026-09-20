@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""
+Recolour PlantMaster Pro from teal/cyan to the logo's blue + amber.
+
+Rules chosen from WCAG contrast maths (see notes at bottom):
+  light website  -> #2563EB  (5.2:1 on white, white text passes)
+  dark app/admin -> #3B82F6  (5.1:1 on #0D1117)
+  amber          -> ACCENT ONLY, never an interactive control
+"""
+import io, re, sys, os
+
+ROOT = '/home/user/PlantMasterPro-MASTER'
+
+# ---------------------------------------------------------------- website
+SITE = {
+    '#0f9b8e': '#2563eb',   # --brand
+    '#0c7d72': '#1d4ed8',   # --brand-2  (hover/darker)
+    '#e6f4f2': '#e8effd',   # --brand-soft tint
+    '#c2410c': '#d97706',   # --accent -> logo amber
+}
+
+# ---------------------------------------------------------------- app
+APP = {
+    '#22d3ee': '#3b82f6',   # pro accent
+    '#0ea5e9': '#2563eb',   # pro accent 2 / brand-primary
+    '#38bdf8': '#60a5fa',   # primary (light blue on dark)
+    '#0284c7': '#1d4ed8',   # primary-strong
+    '#7dd3fc': '#93c5fd',   # active border
+    '#06b6d4': '#3b82f6',
+    '#0891b2': '#2563eb',
+    '#0e7490': '#1e40af',
+}
+
+# ---------------------------------------------------------------- admin
+ADMIN = {
+    '#13b8a8': '#3b82f6',   # --brand
+    '#0f9b8e': '#2563eb',   # --brand-dark
+}
+
+def apply(path, table, label):
+    if not os.path.exists(path):
+        print('  MISSING %s' % path); return 0
+    s = io.open(path, encoding='utf-8').read()
+    orig = s
+    total = 0
+    for old, new in table.items():
+        # case-insensitive, both #abc123 forms
+        pat = re.compile(re.escape(old), re.I)
+        n = len(pat.findall(s))
+        if n:
+            s = pat.sub(new, s)
+            total += n
+    if s != orig:
+        io.open(path, 'w', encoding='utf-8').write(s)
+    print('  %-46s %3d swaps' % (label, total))
+    return total
+
+def main():
+    grand = 0
+    print('WEBSITE')
+    grand += apply(f'{ROOT}/01-WEBSITE/styles.css', SITE, 'styles.css')
+    for f in sorted(os.listdir(f'{ROOT}/01-WEBSITE')):
+        if f.endswith('.html'):
+            grand += apply(f'{ROOT}/01-WEBSITE/{f}', {**SITE, **APP}, f)
+
+    print('CUSTOMER APP')
+    for f in ['styles.css', 'theme-pro.css', 'ui-v4.5.css', 'scanner-v4.8.css',
+              'condition-v4.9.css', 'solver-v4.11.css', 'index.html']:
+        grand += apply(f'{ROOT}/02-CUSTOMER-APP/{f}', APP, f)
+
+    print('ADMIN PANEL')
+    for f in ['admin.css', 'index.html']:
+        grand += apply(f'{ROOT}/03-ADMIN-PANEL/{f}', {**ADMIN, **APP}, f)
+
+    print('\nTOTAL %d colour swaps' % grand)
+
+if __name__ == '__main__':
+    main()
+
+# WCAG notes, measured not guessed:
+#   #2563EB on #FFFFFF = 5.2:1  PASS normal text, white button text PASS
+#   #3B82F6 on #0D1117 = 5.1:1  PASS normal text
+#   #1D4ED8 on #FFFFFF = 6.7:1  PASS  (hover state, darker = stronger)
+#   #F59E0B on #FFFFFF = 2.1:1  FAILS -> amber must never carry text on light
+#   #D97706 on #FFFFFF = 3.2:1  large text only -> decorative accent use only

@@ -1,0 +1,144 @@
+================================================================
+ DIRECTORY LISTING ASSETS — COMPLETE
+ PlantMaster Pro / HSB Fix Services
+ Updated 17 September 2026
+================================================================
+
+11 screenshots + logo. All 1920x1080. All from the demo account.
+No real customer data in any of them. Ready to upload as they are.
+
+  logo-300x300.png              transparent PNG
+  01-ai-problem-solver.png      asking the question
+  02-diagnostic-answer.png      answer + confidence + source count
+  03-checks-tools-parts.png     ordered checks, tools, parts
+  04-dashboard.png              module dashboard
+  05-work-orders.png            work order list
+  06-asset-register.png         asset register
+  07-analytics-kpis.png         MTTR / MTBF / downtime
+  08-condition-monitoring.png   phone mic + vibration
+  09-reports-export.png         CSV / Excel / Word / PDF
+  10-unified-scanner.png        QR, barcode, document, nameplate
+  11-daily-plant-report.png     auto daily report
+
+
+----------------------------------------------------------------
+ WHICH ONES TO UPLOAD, AND IN WHAT ORDER   (revised 17 Sep)
+----------------------------------------------------------------
+
+Upload SIX, in this order:
+
+   1.  05-work-orders.png
+   2.  03-checks-tools-parts.png
+   3.  01-ai-problem-solver.png
+   4.  11-daily-plant-report.png
+   5.  09-reports-export.png
+   6.  06-asset-register.png
+
+Work orders leads because it proves a complete CMMS at a
+glance. The ranked checks/tools/parts screen is second because
+it is the output no competitor produces.
+
+HOLD BACK these three:
+
+  02-diagnostic-answer.png     shows "0 plant source(s)" - the
+                               demo company has no manuals yet,
+                               so it contradicts the manual
+                               citation claim
+  04-dashboard.png             yellow "Push alerts are not
+                               fully on yet" banner
+  08-condition-monitoring.png  empty form plus a warning box
+
+Safe spares: 10-unified-scanner.png, 07-analytics-kpis.png
+
+Retake 02 after manuals are seeded into the demo company. An
+answer citing a real manual page would be the best lead image
+available.
+
+----------------------------------------------------------------
+
+Capterra and G2 both show the FIRST image largest, and most
+visitors never scroll past the third. Upload in this order:
+
+   1.  02-diagnostic-answer.png     <- lead with this
+   2.  04-dashboard.png
+   3.  01-ai-problem-solver.png
+   4.  05-work-orders.png
+   5.  08-condition-monitoring.png
+   6.  07-analytics-kpis.png
+
+Lead with the diagnostic answer because it shows the confidence
+score and source count together - the thing no competitor has.
+The dashboard second proves it is a complete CMMS and not just
+an AI toy.
+
+If a site allows more than 6, add the rest in file order.
+
+
+----------------------------------------------------------------
+ TWO THINGS YOU MAY WANT TO RE-SHOOT LATER
+----------------------------------------------------------------
+
+Not blockers. Upload what you have now.
+
+  04-dashboard.png shows an orange "Push alerts are not fully
+  on yet - Finish setup" banner. It is honest and harmless, but
+  if you enable notifications on the demo account and re-shoot,
+  the screen looks cleaner.
+
+  07-analytics-kpis.png shows MTTR 0 mins and Total Downtime
+  0 hrs, because no work order in the demo account has been
+  completed with times logged. A reviewer will not care. If you
+  want it to look livelier, complete one work order on the OWNER
+  account for the demo company and re-shoot.
+
+Send me any re-shoots and I will reframe them to match.
+
+
+----------------------------------------------------------------
+ WHAT I EXCLUDED, AND WHY
+----------------------------------------------------------------
+
+From the 13 you sent, I did not use:
+
+  the login screen          shows a password field being typed
+  Company Profile & Theme   shows "branding is a paid feature"
+                            and an empty "No logo uploaded" box
+  People / Members          thin - one member called Demo User
+  Plan & Usage              shows your internal plan limits and
+                            Gemini request counters
+
+None are harmful, they just do not sell anything. The Plan &
+Usage one is better kept private - it exposes your quota design.
+
+Also excluded, from the older batch: every admin panel shot.
+Those contain real customer emails and company names.
+
+
+----------------------------------------------------------------
+ CAPTION TEXT
+----------------------------------------------------------------
+
+Each image already has its caption rendered beside it. If a form
+asks for a separate caption field, retype the heading shown in
+the image. Do not add marketing words - the platforms reject
+superlatives and calls to action in captions.
+
+
+----------------------------------------------------------------
+ WHERE THESE GO
+----------------------------------------------------------------
+
+  Gartner form (Capterra + GetApp + Software Advice, ONE form)
+      https://www.capterra.com/vendors/sign-up
+
+  G2
+      https://www.g2.com/products/new
+
+  SoftwareSuggest, GoodFirms, SourceForge, Crozdesk, AlternativeTo
+
+Same logo and same screenshots everywhere.
+
+All the written submission text - description, categories,
+feature list, pricing - is already prepared in:
+
+      06-DOCS/DIRECTORY-LISTINGS-PACK.txt

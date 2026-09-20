@@ -1,0 +1,120 @@
+================================================================
+ STOP — FIX YOUR EMAIL BEFORE SUBMITTING ANYTHING
+ 17 September 2026
+================================================================
+
+I checked your DNS. There is a problem that would have wasted
+days, and it is better you know now than after submitting.
+
+  hsbfix.org        MX records:  NONE
+  send.hsbfix.org   MX records:  send.forge.rmta.net  (Resend)
+
+Resend is a SENDING service. It pushes your daily report
+emails out. It does not give you an inbox.
+
+  => support@hsbfix.org can SEND but CANNOT RECEIVE.
+
+With no MX record on the root domain, any mail sent to
+support@hsbfix.org is rejected by the sending server before it
+is even delivered. It does not land in spam. It does not land
+anywhere. It bounces.
+
+G2 and Capterra both work by emailing you a verification link.
+You would sit waiting for a link that physically cannot arrive.
+
+
+----------------------------------------------------------------
+ THE FIX — FREE, ABOUT 15 MINUTES
+----------------------------------------------------------------
+
+Your domain is at Porkbun, and Porkbun gives 20 free email
+forwarding addresses with every domain. Forwarding means mail
+sent to support@hsbfix.org is delivered into your existing
+Gmail inbox.
+
+  1. Log in to porkbun.com
+  2. Domain Management -> hsbfix.org
+  3. Find "Email Forwarding" -> Add
+  4. Forward:  support@hsbfix.org
+     To:       your working Gmail address
+  5. Save.
+
+Porkbun adds the MX records for you automatically.
+
+  6. Wait 15-30 minutes for DNS to propagate.
+  7. TEST IT. From your Gmail, send a message to
+     support@hsbfix.org. If it appears back in your inbox,
+     it works. Do not skip this test.
+
+While you are there, add these too - all free, all useful:
+     info@hsbfix.org      -> same Gmail
+     sales@hsbfix.org     -> same Gmail
+     xeebawan2@hsbfix.org -> same Gmail
+
+WILL THIS BREAK RESEND?
+  No. Resend sends from send.hsbfix.org, a subdomain with its
+  own MX record. Adding MX records to the root domain does not
+  touch it. Your daily report emails keep working exactly as
+  they do now.
+
+  One caution: do NOT delete or edit anything under
+  send.hsbfix.org while you are in the DNS panel.
+
+
+----------------------------------------------------------------
+ SEPARATE ISSUE — "Masters Pro" ON CAPTERRA
+----------------------------------------------------------------
+
+You saw Masters Pro sitting on the Capterra dashboard. I
+looked it up.
+
+  Masters Pro - capterra.com/p/10001449
+  4.7 stars, 10 reviews, $22/month
+  It is an APPOINTMENT BOOKING app for barbers and salons.
+  Reviews mention appointments, clients, weekly earnings,
+  reminder texts, and switching from Booksy.
+
+It is not a competitor. It is not in your category. It was
+showing because Capterra puts "compare popular choices" blocks
+on many pages.
+
+DOES THE NAME CLASH WITH "PlantMaster Pro"?
+  No. Different name, different category (Project Management
+  vs CMMS), different buyers. No conflict.
+
+Genuinely similar names already listed in YOUR category:
+  MaintMaster           CMMS, Swedish, well reviewed
+  Maintenance Pro CMMS  4.4 stars, 10 reviews
+
+Neither blocks you. "PlantMaster Pro" is distinct from both.
+But it does tell you something useful: "Master" and "Pro" are
+common words in this space, so your listing has to work harder
+to stand out. That is exactly why the description leads with
+manual-reading AI and phone-microphone monitoring rather than
+generic CMMS language.
+
+
+----------------------------------------------------------------
+ REVISED ORDER OF WORK
+----------------------------------------------------------------
+
+  1. Set up Porkbun email forwarding          15 min
+  2. TEST that support@hsbfix.org receives    5 min
+  3. THEN the Gartner form  -> SUBMIT-TODAY.txt
+  4. THEN G2, using the same verified address
+
+Do not do step 3 before step 2 works. Every directory sends a
+verification email, and a bounced verification can mark the
+domain as undeliverable on their side - which is much harder
+to undo than simply waiting.
+
+
+ON THE G2 SCREEN YOU ARE LOOKING AT
+-----------------------------------
+"Continue with LinkedIn" is offered and works without any of
+this. If you already have a LinkedIn account, that is the
+fastest route and it satisfies their business validation.
+
+But still fix the email. You need a working business inbox for
+customer replies, review notifications and password resets
+regardless of how you sign in today.

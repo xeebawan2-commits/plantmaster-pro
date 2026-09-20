@@ -20,7 +20,10 @@ const problems = [], warnings = [];
 const sources = [];
 const walk = (dir) => {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (['node_modules','.git','public','dist','android','tools'].includes(e.name)) continue;
+    // 'reference' holds the owner's archived master package — read-only source
+    // material, not shipping code. Scanning it would treat its edge-function
+    // calls as requirements of this app.
+    if (['node_modules','.git','public','dist','android','tools','reference'].includes(e.name)) continue;
     const p = join(dir, e.name);
     if (e.isDirectory()) walk(p);
     else if (/\.(js|html|yml|yaml)$/.test(e.name)) sources.push(p);

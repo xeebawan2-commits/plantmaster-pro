@@ -1,0 +1,73 @@
+YOUR RUN WORKED. HERE IS WHAT HAPPENED.
+================================================================
+
+  "Success. No rows returned"
+
+That was a PASS, not a failure. Part 1 ran and the security
+fix is now applied to your database.
+
+
+WHY YOU COULD NOT FIND PART 2
+
+Part 2 is in the file - it starts around line 192, the big
+"build the demo company" block. Your screenshot was actually
+showing it.
+
+It DID run. It stopped early on purpose, because the login
+demo@hsbfix.org does not exist yet. It tried to tell you so,
+using a Postgres "raise notice".
+
+The Supabase SQL Editor does not display notice output
+anywhere. No panel, no tab. So my explanation went into the
+void and you were left with a blank result and no idea what
+had happened.
+
+That is my mistake - I used the one output channel that tool
+cannot show. Fixed.
+
+
+WHAT IS DIFFERENT IN VERSION 4
+
+The file now ends with a STATUS REPORT TABLE. The SQL Editor
+always displays a table, so you will always see what
+happened, in plain words, including what to do next.
+
+It can never return "no rows" again.
+
+
+WHAT TO DO NOW
+
+You have already done run 1, so just two steps left:
+
+  1. Supabase -> Authentication -> Users -> Add user
+         -> Create new user
+
+       Email:        demo@hsbfix.org
+       Password:     PlantMasterDemo2026
+       Auto Confirm: TICK THE BOX
+
+     Without Auto Confirm the login will not work.
+
+  2. Paste this whole file again and press Run.
+
+
+WHAT YOU SHOULD SEE
+
+A table at the bottom with:
+
+    result       PART 1 + PART 2 DONE
+    company      PlantMaster Demo Mill
+    status       active
+    assets       6
+    work_orders  6
+    demo_role    viewer
+
+If it instead says "PART 1 DONE - security fix applied", the
+user was not created or Auto Confirm was not ticked. The
+next_step column will tell you.
+
+
+THEN TEST THE LOCK
+
+Sign in at app.hsbfix.org as demo@hsbfix.org and try to
+create a work order. It must refuse. If it lets you, tell me.

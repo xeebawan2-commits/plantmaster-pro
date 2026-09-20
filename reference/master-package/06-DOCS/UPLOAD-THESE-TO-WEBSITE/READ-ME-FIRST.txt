@@ -1,0 +1,22 @@
+UPLOAD ONLY THE 6 HTML FILES IN THIS FOLDER
+to the top level of the hsbfix.org repository.
+
+  index.html  pricing.html  signup.html
+  guide.html  privacy.html  terms.html
+
+WHY THIS IS A SECOND UPLOAD
+  Your first upload worked. The HTML went in correctly and
+  the 5 image files went in too, but they landed inside the
+  img/ folder instead of the top level.
+
+  Rather than make you move them, I have changed the HTML
+  to look inside img/ where they already are. Same result,
+  less work, nothing to delete.
+
+DO NOT re-upload the images, the favicon, sitemap.xml or
+robots.txt. Those are all already live and correct.
+
+THEN TEST
+  Send yourself:  https://hsbfix.org/?2
+  The ?2 matters - WhatsApp caches a link for about a week,
+  so the plain address may still show the old bare version.

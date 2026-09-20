@@ -1,0 +1,230 @@
+===============================================================
+  PASSWORD RESET — HOW IT WAS FIXED
+  15 September 2026  /  completed 16 September 2026
+===============================================================
+
+  *** DONE. Custom SMTP is connected and email is working. ***
+
+  Everything below is kept as the record of what was wrong
+  and how it was solved. You do not need to do any of it
+  again. Read it only if email ever breaks — the causes and
+  the exact settings are all here.
+
+  If mail stops arriving one day, check these three first:
+    1. Supabase > Authentication > Logs (names the real
+       reason, usually a rate limit or a credential error)
+    2. Resend dashboard — is the API key still active, is
+       the domain still Verified, are you within the
+       100/day free allowance
+    3. Your hsbfix.org DNS — if the SPF/DKIM records are
+       ever removed or changed, delivery silently drops
+       into spam
+
+
+  ---------------------------------------------------------
+  THE ORIGINAL REPORT
+  ---------------------------------------------------------
+
+  You reported two things:
+
+    A. Control Center says "email sent" but nothing arrives.
+    B. Customer app email arrives, but the link opens
+       hsbfix.org instead of the password screen.
+
+  Both are mostly SUPABASE DASHBOARD SETTINGS, not code.
+  I have fixed the code side too, but the dashboard work is
+  what actually makes them work. It takes about 15 minutes.
+
+
+===============================================================
+  PROBLEM A — "SENT" BUT NEVER DELIVERED
+===============================================================
+
+  THE CAUSE
+
+  Your project is still using Supabase's built-in mailer.
+  It has two hard limits that explain exactly what you saw:
+
+    1. It only delivers to PRE-AUTHORISED ADDRESSES — in
+       practice, the email address on your own Supabase
+       account. Anyone else gets nothing.
+
+    2. It sends only 2 EMAILS PER HOUR for the entire
+       project, shared across signups, invites and resets.
+
+  Neither failure shows an error. The app calls the function,
+  Supabase accepts it, your panel honestly reports "sent",
+  and the email is silently dropped. That is why it looked
+  like the panel was lying.
+
+  Paying for Pro does NOT change this. The limit belongs to
+  the built-in mailer, not the plan.
+
+
+  THE FIX — CONNECT A REAL MAIL SENDER (free)
+
+  I suggest Resend: free tier is 100 emails a day, which is
+  far more than you need, and it is the quickest to set up.
+
+  Step 1 — make the account
+    Go to resend.com and sign up.
+    Add your domain hsbfix.org.
+    It will give you 3 DNS records (SPF, DKIM, DMARC).
+    Add those wherever you manage hsbfix.org DNS.
+    Wait for it to show "Verified" — usually minutes.
+
+    Skipping domain verification is possible for testing,
+    but then your mail lands in spam. Do the DNS records.
+
+  Step 2 — create an API key
+    In Resend: API Keys > Create. Copy it. It starts "re_".
+
+  Step 3 — put it into Supabase
+    Supabase dashboard
+      > Authentication
+      > Emails  (SMTP Settings)
+      > turn ON "Enable Custom SMTP"
+
+    Host        smtp.resend.com
+    Port        465
+    Username    resend
+    Password    <your re_... API key>
+    Sender      no-reply@hsbfix.org
+    Sender name PlantMaster Pro
+
+    Save.
+
+  Step 4 — raise the limit
+    Supabase > Authentication > Rate Limits
+    Custom SMTP starts at 30 emails/hour. Raise it to
+    something sensible like 100.
+
+  After this, resets reach ANY customer, not just you.
+
+
+===============================================================
+  PROBLEM B — LINK OPENS hsbfix.org
+===============================================================
+
+  THE CAUSE
+
+  Supabase will only redirect to addresses on its allow list.
+  Anything not on the list falls back to the project's
+  Site URL — which is set to your marketing site, hsbfix.org.
+  So the link "worked", logged the user in, and dumped them
+  on the wrong website.
+
+  THE FIX
+
+  Supabase dashboard
+    > Authentication
+    > URL Configuration
+
+  Set Site URL to:
+
+      https://app.hsbfix.org
+
+  That is where most users go, so it is the right fallback.
+
+  Then add ALL of these under Redirect URLs:
+
+      https://app.hsbfix.org
+      https://app.hsbfix.org/**
+      https://app.hsbfix.org/index.html
+      https://admin.hsbfix.org
+      https://admin.hsbfix.org/**
+      https://admin.hsbfix.org/index.html
+
+  Save.
+
+  The /** entries matter — without them Supabase rejects any
+  link carrying a token or query string, which is every
+  reset link.
+
+
+===============================================================
+  WHAT I FIXED IN THE CODE
+===============================================================
+
+  These are real bugs I found while checking, and they would
+  have bitten you even after the dashboard work.
+
+  1. CUSTOMER APP — reset links using the hash format were
+     ignored.
+
+     The app only looked for "?type=recovery" or "?code=" in
+     the query string. Supabase also issues links in the form
+
+         #access_token=...&type=recovery
+
+     which is in the HASH, not the query. Those links logged
+     the user straight into the dashboard instead of showing
+     the new-password screen. It now checks both, and also
+     listens for Supabase's PASSWORD_RECOVERY event, which is
+     the most reliable signal of all.
+
+  2. ADMIN PANEL — reset only worked in the same browser.
+
+     It set a flag in sessionStorage when you pressed Forgot
+     password, then looked for that flag when the link opened.
+     On a phone, the email usually opens in a DIFFERENT
+     browser, where that flag does not exist — so the panel
+     ignored the reset and showed the login screen. It now
+     reads the URL as well, in all three formats.
+
+  3. ADMIN PANEL — redirect targets made explicit.
+     Your own reset returns to the admin panel; a reset you
+     send to a customer goes to the customer app's index.html
+     rather than a bare domain.
+
+  4. The "check your email" message now warns that delivery
+     may be blocked by the built-in mailer, so a future you
+     is not misled again.
+
+
+===============================================================
+  ORDER TO DO THIS IN
+===============================================================
+
+  1. Set Site URL + Redirect URLs        (fixes Problem B)
+  2. Set up Resend + custom SMTP         (fixes Problem A)
+  3. Upload the new app.js for both apps (fixes the bugs)
+  4. Test, below.
+
+
+===============================================================
+  HOW TO TEST
+===============================================================
+
+  Customer app:
+    Open app.hsbfix.org, tap Forgot password, enter a real
+    customer address on a domain you control.
+    Expect: email arrives within a minute, and the link opens
+    the app showing "Set a new password" — NOT hsbfix.org,
+    and NOT the dashboard.
+
+  Control Center:
+    Open admin.hsbfix.org, tap Forgot password with your own
+    address. Expect the email, and the link should open the
+    panel's reset screen even if it opens in a different
+    browser from the one you requested it in.
+
+  If mail still does not arrive, check
+  Supabase > Authentication > Logs. It names the real reason,
+  usually "email rate limit exceeded" or an SMTP credential
+  error.
+
+
+===============================================================
+  ONE MORE THING WORTH KNOWING
+===============================================================
+
+  Your project has signups DISABLED (disable_signup = true),
+  which is correct for your model — accounts are created by
+  you, not self-service. That does not affect password
+  resets, so leave it as it is.
+
+  Once custom SMTP is working, your signup-notify edge
+  function and any other mail you send will also become
+  reliable. Right now they are subject to the same silent
+  2-per-hour ceiling.

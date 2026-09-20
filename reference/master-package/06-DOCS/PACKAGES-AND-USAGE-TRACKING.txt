@@ -1,0 +1,184 @@
+===============================================================
+  "IS THE USAGE TRACKING CONNECTED TO THE CONTROL CENTRE?"
+  And getting the new packages onto the website
+  16 September 2026
+===============================================================
+
+  SHORT ANSWER
+
+  Yes, it is connected - and I verified it against your live
+  database, not just the code.
+
+  But I found a real bug while checking. The usage screen
+  shows the PLAN's limits, ignoring anything extra you give
+  an individual company in the control centre.
+
+  One SQL file fixes it. Details below.
+
+
+===============================================================
+  WHAT IS ALREADY WORKING
+===============================================================
+
+  The customer app has a "Plan" screen (menu, then Plan on
+  the bottom bar). It shows live meters for:
+
+      Storage used      /  storage allowed
+      Monthly bandwidth /  bandwidth allowed
+      Gemini AI requests this month / allowed
+      AI input tokens this month    / allowed
+      Files             /  files allowed
+      Workers           /  workers allowed
+      Plants            /  plants allowed
+
+  Plus the plan name, subscription status, period end date,
+  the feature list, and any open service incidents.
+
+  It reads all of this through one database function called
+  organization_plan_summary. I called that function on your
+  live project today and it responded correctly.
+
+  So: the numbers a customer sees are real, they are live,
+  and they come from the same database your control centre
+  writes to. When you change a package, the customer's
+  screen follows. That part genuinely works.
+
+  I also confirmed these are live and working:
+      effective_company_limit   -> returned 10
+      company_feature_allowed   -> returned true
+      organization_effective_features -> exists
+
+
+===============================================================
+  THE BUG I FOUND
+===============================================================
+
+  Your system has two different ideas of a limit.
+
+    THE PLAN LIMIT      what the package says, e.g. 10 workers
+    THE EFFECTIVE LIMIT the plan, plus anything extra you
+                        granted that one company, minus
+                        anything you blocked
+
+  The ENFORCEMENT side already uses the effective limit. The
+  triggers that stop someone adding an 11th worker call
+  effective_company_limit correctly. So if you granted a
+  company 8 extra workers, they really can add them.
+
+  The DISPLAY side does not. organization_plan_summary reads
+  the raw plan row, so the customer's screen still shows the
+  old package number.
+
+  WHAT THE CUSTOMER SEES
+
+  You grant Pakistan Synthetic 8 extra workers as a goodwill
+  gesture. They add them - it works. Then they open Plan and
+  see:
+
+      Workers    18 / 10
+
+  Over their limit, in red, according to their own screen.
+  They message you thinking the app is broken. It is not -
+  the display is just reading the wrong number.
+
+  Same for features. A module you switch on for one company
+  will not appear in their feature list, because the list is
+  built from the plan's raw features and ignores per-company
+  grants.
+
+  THE FIX
+
+      05-DATABASE/02-repairs-and-features/
+          11-USAGE-SHOWS-REAL-LIMITS.sql
+
+  Run it in the Supabase SQL editor. It rewrites that one
+  function so every limit and every feature shown is the
+  effective value - exactly what is enforced.
+
+  It also fixes a second, quieter problem. The old version
+  used an inner join to the subscription table, so a company
+  with no subscription row got an error screen instead of a
+  page. Now it uses a left join and the screen still loads.
+
+  Safe to run. Read-only reporting function, changes no data,
+  safe to run more than once.
+
+  TO CHECK IT WORKED
+    1. Give a company a storage bonus in the control centre.
+    2. Sign in to the app as that company.
+    3. Menu, then Plan.
+    4. The storage bar should show the RAISED number.
+
+
+===============================================================
+  THE PACKAGES ON THE WEBSITE
+===============================================================
+
+  I could not read your new packages. Your database blocked
+  me, which is correct - subscription_plans is protected by
+  row-level security and I am not logged in. Good.
+
+  That leaves two ways to get them onto hsbfix.org.
+
+
+  OPTION A - AUTOMATIC. Recommended.
+
+  Run this file:
+
+      05-DATABASE/02-repairs-and-features/
+          12-PUBLIC-PRICING-FEED.sql
+
+  It creates one narrow read-only function that returns only
+  the public marketing fields of your active plans: code,
+  name, description, monthly and yearly price, users, plants,
+  storage in GB, and the feature list.
+
+  It deliberately does NOT expose your internal controls - no
+  AI rate limits, no per-minute ceilings, no retention
+  settings, no company data. The table itself stays locked;
+  only this one function is readable.
+
+  I have already updated pricing.html to use it. On page load
+  it fetches your live packages and corrects the prices, the
+  user counts, the storage figures and the per-user maths.
+
+  If the fetch fails - offline, or you have not run the SQL -
+  the page silently keeps the written prices. It cannot break.
+
+  After that, changing a price in the control centre changes
+  the website. One place to edit, permanently.
+
+  HIDING A PLAN FROM THE WEBSITE
+  Set it inactive, or put "internal", "test" or "demo" in its
+  code, or add "internal": true to its features. Any of those
+  keeps it working for existing customers while keeping it
+  off the public page.
+
+
+  OPTION B - MANUAL
+
+  If you would rather not run the SQL, send me the new
+  packages - name, price, users, plants, storage, and which
+  features each includes - and I will rewrite the pricing
+  page by hand.
+
+  Slower, and it goes stale the next time you change
+  anything. I would do Option A.
+
+
+===============================================================
+  WHAT TO UPLOAD
+===============================================================
+
+  SQL - run in the Supabase SQL editor, in this order:
+
+    1. 11-USAGE-SHOWS-REAL-LIMITS.sql    fixes the bug
+    2. 12-PUBLIC-PRICING-FEED.sql        optional, for the
+                                         automatic website
+
+  WEBSITE - upload to the hsbfix.org repository:
+
+    pricing.html    (only needed if you ran file 12)
+
+  Nothing else changed. The app and control centre need no
+  new upload for this.

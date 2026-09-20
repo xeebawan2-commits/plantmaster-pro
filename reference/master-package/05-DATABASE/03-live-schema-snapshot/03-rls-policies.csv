@@ -1,0 +1,182 @@
+schemaname,tablename,policyname,cmd,qual,with_check
+public,action_attachments,action_attachments_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,admin_action_logs,platform insert admin logs,INSERT,null,is_platform_admin()
+public,admin_action_logs,platform read admin logs,SELECT,platform_has_permission('audit.view'::text),null
+public,admin_action_logs,super admin inserts audit,INSERT,null,is_super_platform_admin()
+public,admin_action_logs,super admin read access admin_action_logs,SELECT,is_super_platform_admin(),null
+public,ai_usage,ai_usage_member,SELECT,is_org_member(organization_id),null
+public,ai_usage,super admin read access ai_usage,SELECT,is_super_platform_admin(),null
+public,api_keys,api_keys_read,SELECT,pm_is_org_owner(organization_id),null
+public,api_keys,api_keys_write,ALL,pm_is_org_owner(organization_id),pm_is_org_owner(organization_id)
+public,asset_status_history,status_insert,INSERT,null,is_org_member(organization_id)
+public,asset_status_history,status_read,SELECT,is_org_member(organization_id),null
+public,assets,assets read,SELECT,is_org_member(organization_id),null
+public,assets,assets write,ALL,"(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text, 'engineer'::text, 'supervisor'::text, 'technician'::text])))","(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text, 'engineer'::text, 'supervisor'::text, 'technician'::text])))"
+public,attendance,attendance_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,audit_logs,audit insert,INSERT,null,is_org_member(organization_id)
+public,audit_logs,audit read,SELECT,is_org_member(organization_id),null
+public,backup_jobs,platform backup access,ALL,platform_has_permission('backups.manage'::text),platform_has_permission('backups.manage'::text)
+public,backup_jobs,super admin full access backup_jobs,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,checklist_items,checklist_items_member,ALL,"(EXISTS ( SELECT 1
+   FROM checklist_templates t
+  WHERE ((t.id = checklist_items.template_id) AND is_org_member(t.organization_id))))","(EXISTS ( SELECT 1
+   FROM checklist_templates t
+  WHERE ((t.id = checklist_items.template_id) AND is_org_member(t.organization_id))))"
+public,checklist_runs,checklist_runs_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,checklist_templates,checklist_templates_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,checklist_values,checklist_values_member,ALL,"(EXISTS ( SELECT 1
+   FROM checklist_runs r
+  WHERE ((r.id = checklist_values.run_id) AND is_org_member(r.organization_id))))","(EXISTS ( SELECT 1
+   FROM checklist_runs r
+  WHERE ((r.id = checklist_values.run_id) AND is_org_member(r.organization_id))))"
+public,code_registry,code registry member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,company_feature_blocks,platform feature block access,ALL,platform_has_permission('companies.manage'::text),platform_has_permission('companies.manage'::text)
+public,company_feature_blocks,super admin full access company_feature_blocks,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,complimentary_access,platform manage complimentary,ALL,platform_has_permission('companies.manage'::text),platform_has_permission('companies.manage'::text)
+public,complimentary_access,super admin full access complimentary_access,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,condition_alarms,condition alarms member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,condition_entity_links,condition links member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,condition_recordings,condition recordings member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,daily_logs,daily_logs_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,data_retention_policies,owner manages retention,ALL,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),((org_role(organization_id) = 'owner'::text) OR is_platform_admin())
+public,data_retention_policies,super admin full access data_retention_policies,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,deletion_requests,owner manages deletion requests,ALL,((org_role(organization_id) = 'owner'::text) OR (requested_by = auth.uid()) OR is_platform_admin()),((org_role(organization_id) = 'owner'::text) OR (requested_by = auth.uid()) OR is_platform_admin())
+public,deletion_requests,super admin full access deletion_requests,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,document_chunks,chunks_member,SELECT,"(EXISTS ( SELECT 1
+   FROM manuals m
+  WHERE ((m.id = document_chunks.manual_id) AND is_org_member(m.organization_id))))",null
+public,file_metadata,files read,SELECT,is_org_member(organization_id),null
+public,file_metadata,files write,INSERT,null,is_org_member(organization_id)
+public,inventory_transactions,inventory_transactions_member,ALL,"(EXISTS ( SELECT 1
+   FROM spares s
+  WHERE ((s.id = inventory_transactions.spare_id) AND is_org_member(s.organization_id))))","(EXISTS ( SELECT 1
+   FROM spares s
+  WHERE ((s.id = inventory_transactions.spare_id) AND is_org_member(s.organization_id))))"
+public,invitations,invites_manage,ALL,"(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text])))","(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text])))"
+public,legal_acceptances,super admin full access legal_acceptances,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,legal_acceptances,user manages own acceptance,ALL,(user_id = auth.uid()),((user_id = auth.uid()) AND ((organization_id IS NULL) OR is_org_member(organization_id)))
+public,legal_documents,authenticated read active legal docs,SELECT,(active OR is_platform_admin()),null
+public,legal_documents,platform manages legal documents,ALL,platform_has_permission('legal.manage'::text),platform_has_permission('legal.manage'::text)
+public,legal_documents,super admin full access legal_documents,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,loto_procedures,loto access,ALL,"(EXISTS ( SELECT 1
+   FROM plants p
+  WHERE ((p.id = loto_procedures.plant_id) AND is_org_member(p.organization_id))))",null
+public,maintenance_completions,maintenance_completions_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,maintenance_plans,maintenance_plans_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,manuals,manuals_member,ALL,"(EXISTS ( SELECT 1
+   FROM organization_members om
+  WHERE ((om.organization_id = manuals.organization_id) AND (om.user_id = auth.uid()) AND om.active AND ((om.role = ANY (ARRAY['owner'::text, 'manager'::text])) OR COALESCE(((om.permissions ->> 'manuals.view'::text))::boolean, true)))))","(EXISTS ( SELECT 1
+   FROM organization_members om
+  WHERE ((om.organization_id = manuals.organization_id) AND (om.user_id = auth.uid()) AND om.active AND ((om.role = ANY (ARRAY['owner'::text, 'manager'::text])) OR COALESCE(((om.permissions ->> 'manuals.view'::text))::boolean, true)))))"
+public,material_requests,mat_req access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,measurement_points,condition points member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,notifications,notifications_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,organization_entitlements,owner reads entitlements,SELECT,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,organization_members,members read,SELECT,is_org_member(organization_id),null
+public,organization_members,owner manages members,UPDATE,(org_role(organization_id) = 'owner'::text),(org_role(organization_id) = 'owner'::text)
+public,organization_settings,settings_read,SELECT,is_org_member(organization_id),null
+public,organization_settings,settings_write,ALL,"(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text])))","(is_org_member(organization_id) AND (org_role(organization_id) = ANY (ARRAY['owner'::text, 'manager'::text])))"
+public,organization_subscriptions,owner reads subscription,SELECT,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,organization_subscriptions,super admin read access organization_subscriptions,SELECT,is_super_platform_admin(),null
+public,organizations,org members read,SELECT,is_org_member(id),null
+public,permits,permits access,ALL,"(EXISTS ( SELECT 1
+   FROM plants p
+  WHERE ((p.id = permits.plant_id) AND is_org_member(p.organization_id))))",null
+public,plantmaster_sync,plantmaster insert,INSERT,null,true
+public,plantmaster_sync,plantmaster read,SELECT,true,null
+public,plantmaster_sync,plantmaster update,UPDATE,true,true
+public,plants,plants read,SELECT,is_org_member(organization_id),null
+public,platform_admins,platform admin updates self,UPDATE,(user_id = auth.uid()),(user_id = auth.uid())
+public,platform_admins,platform admins read self,SELECT,(user_id = auth.uid()),null
+public,platform_admins,super admin full access platform_admins,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,platform_admins,super admin manages administrators,ALL,platform_has_permission('admins.manage'::text),platform_has_permission('admins.manage'::text)
+public,platform_notifications,platform notification access,ALL,is_platform_admin(),is_platform_admin()
+public,platform_notifications,super admin full access platform_notifications,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,platform_support_messages,owner creates public ticket messages,INSERT,null,"((NOT internal) AND (user_id = auth.uid()) AND (EXISTS ( SELECT 1
+   FROM platform_support_tickets t
+  WHERE ((t.id = platform_support_messages.ticket_id) AND (org_role(t.organization_id) = 'owner'::text)))))"
+public,platform_support_messages,owner reads public ticket messages,SELECT,"((NOT internal) AND (EXISTS ( SELECT 1
+   FROM platform_support_tickets t
+  WHERE ((t.id = platform_support_messages.ticket_id) AND (org_role(t.organization_id) = 'owner'::text)))))",null
+public,platform_support_messages,platform manages ticket messages,ALL,platform_has_permission('support.manage'::text),platform_has_permission('support.manage'::text)
+public,platform_support_messages,super admin full access platform_support_messages,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,platform_support_tickets,owner creates tickets,INSERT,null,((organization_id IS NOT NULL) AND (org_role(organization_id) = 'owner'::text) AND (opened_by = auth.uid()))
+public,platform_support_tickets,owner reads tickets,SELECT,((organization_id IS NOT NULL) AND (org_role(organization_id) = 'owner'::text)),null
+public,platform_support_tickets,platform manages tickets,ALL,platform_has_permission('support.manage'::text),platform_has_permission('support.manage'::text)
+public,platform_support_tickets,super admin full access platform_support_tickets,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,problem_cases,cases_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,profiles,members read coworker profiles,SELECT,"(EXISTS ( SELECT 1
+   FROM organization_members target
+  WHERE ((target.user_id = profiles.id) AND is_org_member(target.organization_id))))",null
+public,profiles,owner updates coworker profiles,UPDATE,"(EXISTS ( SELECT 1
+   FROM organization_members target
+  WHERE ((target.user_id = profiles.id) AND (org_role(target.organization_id) = 'owner'::text))))","(EXISTS ( SELECT 1
+   FROM organization_members target
+  WHERE ((target.user_id = profiles.id) AND (org_role(target.organization_id) = 'owner'::text))))"
+public,profiles,profile self,ALL,(id = auth.uid()),(id = auth.uid())
+public,purchase_order_lines,pol_read,SELECT,"(EXISTS ( SELECT 1
+   FROM purchase_orders po
+  WHERE ((po.id = purchase_order_lines.purchase_order_id) AND pm_is_org_member(po.organization_id))))",null
+public,purchase_order_lines,pol_write,ALL,"(EXISTS ( SELECT 1
+   FROM purchase_orders po
+  WHERE ((po.id = purchase_order_lines.purchase_order_id) AND pm_is_org_leader(po.organization_id))))","(EXISTS ( SELECT 1
+   FROM purchase_orders po
+  WHERE ((po.id = purchase_order_lines.purchase_order_id) AND pm_is_org_leader(po.organization_id))))"
+public,purchase_orders,po_read,SELECT,pm_is_org_member(organization_id),null
+public,purchase_orders,po_write,ALL,pm_is_org_leader(organization_id),pm_is_org_leader(organization_id)
+public,qa_environments,active platform admin qa environments,ALL,is_platform_admin(),is_platform_admin()
+public,qa_environments,platform qa environment access,ALL,platform_has_permission('qa.manage'::text),platform_has_permission('qa.manage'::text)
+public,qa_environments,super admin full access qa_environments,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,qa_manual_checks,active platform admin qa manual checks,ALL,is_platform_admin(),is_platform_admin()
+public,qa_manual_checks,platform qa manual access,ALL,platform_has_permission('qa.manage'::text),platform_has_permission('qa.manage'::text)
+public,qa_manual_checks,super admin full access qa_manual_checks,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,qa_test_results,active platform admin qa results,ALL,is_platform_admin(),is_platform_admin()
+public,qa_test_results,platform qa result access,ALL,platform_has_permission('qa.manage'::text),platform_has_permission('qa.manage'::text)
+public,qa_test_results,super admin full access qa_test_results,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,qa_test_runs,active platform admin qa runs,ALL,is_platform_admin(),is_platform_admin()
+public,qa_test_runs,platform qa run access,ALL,platform_has_permission('qa.manage'::text),platform_has_permission('qa.manage'::text)
+public,qa_test_runs,super admin full access qa_test_runs,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,quota_overrides,platform manage quota,ALL,platform_has_permission('usage.manage'::text),platform_has_permission('usage.manage'::text)
+public,quota_overrides,super admin full access quota_overrides,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,report_dispatches,reports_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,restore_drills,platform restore access,ALL,platform_has_permission('backups.manage'::text),platform_has_permission('backups.manage'::text)
+public,restore_drills,super admin full access restore_drills,ALL,is_super_platform_admin(),is_super_platform_admin()
+public,scan_entity_links,scan links member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,scan_pages,scanner page member access,ALL,"(EXISTS ( SELECT 1
+   FROM scan_sessions s
+  WHERE ((s.id = scan_pages.session_id) AND is_org_member(s.organization_id))))","(EXISTS ( SELECT 1
+   FROM scan_sessions s
+  WHERE ((s.id = scan_pages.session_id) AND is_org_member(s.organization_id))))"
+public,scan_sessions,scanner member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,sensor_devices,condition sensors member access,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,shift_assignments,shift_assignments_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,shift_handovers,shift_handovers_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,spares,spares_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,storage_reservations,user reads own storage reservations,SELECT,((user_id = auth.uid()) OR (org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,storage_usage_events,owner reads storage usage,SELECT,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,storage_usage_events,super admin read access storage_usage_events,SELECT,is_super_platform_admin(),null
+public,subscription_plans,authenticated read active plans,SELECT,(active OR is_platform_admin()),null
+public,subscription_plans,super admin read access subscription_plans,SELECT,is_super_platform_admin(),null
+public,suppliers,suppliers_read,SELECT,pm_is_org_member(organization_id),null
+public,suppliers,suppliers_write,ALL,pm_is_org_leader(organization_id),pm_is_org_leader(organization_id)
+public,support_messages,support_messages_member,ALL,"(EXISTS ( SELECT 1
+   FROM support_threads t
+  WHERE ((t.id = support_messages.thread_id) AND is_org_member(t.organization_id))))","(EXISTS ( SELECT 1
+   FROM support_threads t
+  WHERE ((t.id = support_messages.thread_id) AND is_org_member(t.organization_id))))"
+public,support_threads,support_threads_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,system_incidents,members read own incidents,SELECT,(((organization_id IS NOT NULL) AND is_org_member(organization_id)) OR is_platform_admin()),null
+public,system_incidents,super admin read access system_incidents,SELECT,is_super_platform_admin(),null
+public,technical_experiences,experiences_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,tool_transactions,tool_transactions_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,tools,tools_member,ALL,is_org_member(organization_id),is_org_member(organization_id)
+public,usage_adjustments,platform create adjustment,SELECT,platform_has_permission('usage.view'::text),null
+public,usage_adjustments,platform insert adjustment,INSERT,null,platform_has_permission('usage.manage'::text)
+public,usage_adjustments,super admin inserts usage adjustments,INSERT,null,is_super_platform_admin()
+public,usage_adjustments,super admin read access usage_adjustments,SELECT,is_super_platform_admin(),null
+public,usage_counters,owner reads usage counters,SELECT,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,usage_counters,super admin read access usage_counters,SELECT,is_super_platform_admin(),null
+public,usage_events,owner reads usage events,SELECT,((org_role(organization_id) = 'owner'::text) OR is_platform_admin()),null
+public,usage_events,super admin read access usage_events,SELECT,is_super_platform_admin(),null
+public,work_orders,work read,SELECT,is_org_member(organization_id),null
+public,work_orders,work write,ALL,(is_org_member(organization_id) AND (org_role(organization_id) <> 'viewer'::text)),(is_org_member(organization_id) AND (org_role(organization_id) <> 'viewer'::text))

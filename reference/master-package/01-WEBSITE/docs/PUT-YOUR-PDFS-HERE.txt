@@ -1,0 +1,9 @@
+Put your two PDFs in THIS folder, with these EXACT names:
+
+    PlantMaster-Pro-Overview.pdf
+    PlantMaster-Pro-Subscription-Agreement.pdf
+
+resources.html links to those filenames. If the names differ
+by even one character the download button will 404.
+
+Then delete this note file.

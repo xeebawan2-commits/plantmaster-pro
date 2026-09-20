@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- dark rounded tile so the mark has presence on any background -->
+  <rect x="0" y="0" width="300" height="300" rx="66" fill="#0D1117"/>
+
+  <!-- hexagonal shield, centred and scaled to fill the tile -->
+  <g transform="translate(150,150) scale(2.02) translate(-60,-62)">
+    <polygon points="60,5 110,33 110,91 60,119 10,91 10,33"
+             fill="url(#shieldGrad)" stroke="#3B82F6" stroke-width="2"/>
+
+    <!-- plant / factory roofline -->
+    <path d="M 30,85 L 30,58 L 48,46 L 48,58 L 66,46 L 66,58 L 84,46 L 84,85 Z" fill="#334155"/>
+    <rect x="74" y="32" width="6" height="18" fill="#475569"/>
+
+    <!-- wrench -->
+    <path d="M 40,82 L 72,50 C 76,46 82,46 86,50 C 90,54 90,60 86,64 L 54,96 C 50,100 44,100 40,96 Z"
+          fill="url(#amberGrad)"/>
+    <circle cx="80" cy="56" r="4" fill="#0F172A"/>
+
+    <!-- uptime pulse -->
+    <circle cx="30" cy="35" r="4" fill="#10B981"/>
+  </g>
+</svg>

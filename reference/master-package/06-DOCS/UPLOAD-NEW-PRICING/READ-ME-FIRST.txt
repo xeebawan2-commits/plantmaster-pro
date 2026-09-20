@@ -1,0 +1,72 @@
+UPLOAD THESE 4 FILES to the hsbfix.org repository
+(top level, overwrite the existing ones)
+
+    pricing.html    rebuilt: 4 real packages
+    index.html      price data for Google updated
+    signup.html     "unlimited" removed
+    styles.css      layout for 4 columns instead of 3
+
+
+WHY THE PRICE DID NOT CHANGE BEFORE
+
+  You ran the SQL - I checked, the pricing feed is live and
+  returning your packages correctly.
+
+  But pricing.html was never uploaded. The old page was still
+  sitting on the server, and the old page knows nothing about
+  the feed. Upload these and it will work.
+
+
+WHAT CHANGED
+
+  1. FOUR PACKAGES, taken from your live database:
+
+       Basic         Rs 7,500    5 users,  1 plant,   5 GB
+       Essential     Rs 12,000  10 users,  1 plant,  10 GB
+       Professional  Rs 24,000  25 users,  1 plant,  30 GB
+       Enterprise    Rs 40,000 100 users,  2 plants, 100 GB
+
+     The old page showed three plans and Enterprise as
+     "Quoted". Enterprise now shows its real price.
+
+  2. THE WORD "UNLIMITED" IS GONE. It appeared 8 times
+     across pricing.html and signup.html. Every one is now a
+     real number:
+
+       "Unlimited assets and work orders"
+            -> file counts are stated per plan instead
+       "Unlimited users" (Enterprise)     -> 100 users
+       "Unlimited manual uploads"         -> Manual uploads
+       "Unlimited" in the compare table   -> real figures
+
+     I also added a Files row to the comparison table, since
+     that is a real limit customers will hit.
+
+  3. FEATURES NOW MATCH THE DATABASE EXACTLY. Every tick and
+     cross is read from your actual plan settings. For
+     example Basic genuinely has no AI, no uploads and no
+     support desk; Essential has AI but no condition
+     monitoring; only Enterprise has company branding.
+
+  4. GOOGLE PRICE DATA updated on both pages, so search
+     results show the correct four prices.
+
+  5. FAQ ANSWERS rewritten - they referenced "three plans"
+     and "blocks of five users", neither of which is true now.
+
+
+AFTER THIS, PRICES UPDATE THEMSELVES
+
+  The page reads your live packages on load. Change a price
+  in the control centre and the website follows within
+  seconds. No more editing HTML.
+
+  If the feed is ever unreachable the page falls back to the
+  figures written into it, so it cannot break.
+
+
+CHECK IT WORKED
+
+  Open https://hsbfix.org/pricing.html?x=1 and confirm you
+  see four cards with Basic at Rs 7,500 and Enterprise at
+  Rs 40,000.

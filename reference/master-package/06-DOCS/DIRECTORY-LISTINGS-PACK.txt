@@ -1,0 +1,280 @@
+================================================================
+ DIRECTORY LISTINGS — COPY AND PASTE PACK
+ PlantMaster Pro / HSB Fix Services
+ Prepared 16 September 2026
+================================================================
+
+Everything below is ready to paste. You do not need to write
+anything yourself. Do them in the order given.
+
+Budget: Rs 0. Every listing here is free. Ignore any sales call
+that follows - you do not need paid placement to start.
+
+
+----------------------------------------------------------------
+ BEFORE YOU START - the one thing that was blocking you
+----------------------------------------------------------------
+
+Capterra and G2 both refuse listings where the only call to
+action is "contact us" or "join a waitlist". They require a
+publicly available trial or demo.
+
+You now have both:
+
+    https://hsbfix.org/demo.html     - no login required
+    https://hsbfix.org/signup.html   - 7 day free trial
+
+Use the demo URL wherever a form asks for a demo link. It is
+the strongest asset you have, because a reviewer can click it
+and immediately see a working product.
+
+
+----------------------------------------------------------------
+ ASSETS - ALREADY MADE, NOTHING TO PREPARE
+----------------------------------------------------------------
+
+All of this is done and sitting in the LISTING-ASSETS folder.
+Every screenshot is from the demo account, so there is no real
+customer data in any of them. Just upload the files.
+
+  Logo         logo-300x300.png   transparent PNG
+
+  Screenshots  upload SIX, in exactly this order. The first
+               image is shown largest and most visitors never
+               scroll past the third.
+
+                 1. 02-diagnostic-answer.png
+                 2. 04-dashboard.png
+                 3. 01-ai-problem-solver.png
+                 4. 05-work-orders.png
+                 5. 08-condition-monitoring.png
+                 6. 07-analytics-kpis.png
+
+               Lead with the diagnostic answer: it shows the
+               confidence score and the manual page citation
+               together, which no competitor can show. The
+               dashboard second proves it is a full CMMS.
+
+               Five spares are in the folder if a site wants
+               more: 03, 06, 09, 10, 11.
+
+  Video        Optional. Skip it for now - it doubles profile
+               strength but it is not required, and waiting on
+               it is the main reason listings never get filed.
+               Add it later from your own screen recording.
+
+  Website      https://hsbfix.org
+  Demo         https://hsbfix.org/demo.html
+  Pricing      https://hsbfix.org/pricing.html
+
+
+----------------------------------------------------------------
+ 1. GARTNER DIGITAL MARKETS  (Capterra + GetApp + Software Advice)
+----------------------------------------------------------------
+
+ONE form gets you onto all three sites. Do not submit three
+times.
+
+  Go to:  https://www.capterra.com/vendors/sign-up
+  Time:   about 30 minutes
+  Approval: 1 to 3 business days
+  Cost:   free. Listing, review collection, responding to
+          reviews and displaying badges are all free. Only
+          pay-per-click advertising costs money - decline it.
+
+CATEGORY
+  Primary:    CMMS Software
+  Secondary:  Maintenance Management, Preventive Maintenance,
+              Facility Management, Fixed Asset Management
+
+PRODUCT NAME
+  PlantMaster Pro
+
+  (Not "PlantMaster Pro - AI CMMS". Platform rules require the
+  name to match the product name on your own website, with no
+  marketing words attached.)
+
+COMPANY NAME
+  HSB Fix Services
+
+  (No "Pvt Ltd" or other suffix - their rules forbid it.)
+
+DESCRIPTION - paste exactly as written
+--------------------------------------
+Written in third person, no superlatives, no calls to action,
+no phone numbers or URLs inside the text. All four of those
+get a listing rejected or edited.
+
+    PlantMaster Pro is maintenance management software for
+    industrial plants, built for textile mills, food
+    processing units, and manufacturing sites in South Asia.
+    It covers work orders, preventive maintenance schedules,
+    asset registers with QR code scanning, spare parts
+    inventory, purchase orders, and technician attendance.
+
+    The system includes an AI troubleshooting assistant that
+    reads the equipment manuals a plant uploads and answers
+    fault questions from those documents, citing the page
+    number the answer came from. Where a manual does not
+    cover the question, the assistant reports that rather
+    than generating an untraceable answer.
+
+    A condition monitoring module uses a standard smartphone
+    microphone to record a thirty second sample from running
+    equipment and compares it against a baseline recorded
+    when the machine was healthy, highlighting the frequency
+    bands that have changed. No additional sensors or wiring
+    are required.
+
+    Voice input accepts both Urdu and English, allowing shop
+    floor staff to raise jobs by speaking rather than typing.
+    A daily summary email reports open work, overdue tasks,
+    and equipment flagged for attention.
+
+    Pricing is charged per plant rather than per user, with
+    four tiers covering small workshops through to multi
+    site operations. The software runs in a web browser on
+    any phone, tablet or desktop without installation.
+
+    (Word count: 214. The guideline is 200-300.)
+
+KEY FEATURES - tick these on their checklist
+  Work order management        Preventive maintenance
+  Asset tracking               Inventory management
+  Purchase orders              Mobile access
+  Barcode / QR scanning        Predictive maintenance
+  Scheduling                   Technician management
+  Reporting and analytics      Document management
+  Audit trail                  Multi-location
+  Alerts and notifications     Calibration management
+  Service history              Vendor management
+
+PRICING - enter transparent figures, it outperforms "contact us"
+  Free trial:     Yes, 7 days
+  Free version:   No
+  Starting price: PKR 7,500 per month (about USD 27)
+  Pricing model:  Flat rate per plant, per month
+
+  Basic          PKR  7,500/mo    5 users,  1 plant
+  Essential      PKR 12,000/mo   10 users,  1 plant
+  Professional   PKR 24,000/mo   25 users,  1 plant
+  Enterprise     PKR 40,000/mo  100 users,  2 plants
+
+DEPLOYMENT      Cloud / SaaS / Web-based
+                Mobile - Android (web app)
+                Mobile - iPhone / iPad (web app)
+SUPPORT         Email, WhatsApp, Phone, Knowledge base
+TRAINING        Live online, Documentation, In person
+LANGUAGES       English, Urdu
+COUNTRIES       Pakistan, United Arab Emirates, Bangladesh,
+                India, Saudi Arabia
+COMPANY SIZE    Small business, Mid-market
+FOUNDED         2025
+INTEGRATIONS    Leave blank. Do not invent any.
+
+
+----------------------------------------------------------------
+ 2. G2
+----------------------------------------------------------------
+
+Separate company, separate track. Reviews do NOT sync with
+Capterra.
+
+  Go to:  https://www.g2.com/products/new
+  Note:   you must sign in with a business email or LinkedIn
+          before that page will load. Use your hsbfix.org
+          address, not Gmail.
+  Time:   about 20 minutes
+  Approval: 1 to 3 business days, then claim the profile
+
+  G2 rejects: B2C products, alpha or beta products, plug-ins,
+  and duplicates. PlantMaster Pro is none of those, so it
+  should pass.
+
+  Category: CMMS Software
+  Use the same description, features and pricing as above.
+  Do not reword it - consistency across directories is good.
+
+  After approval: hover "Unclaimed" on your profile and click
+  "Claim this profile". Claiming is free. Responding to
+  reviews on G2 requires a paid plan, so do not promise
+  anyone a public reply there.
+
+  Free badge worth aiming at: "Users Love Us" - needs 20
+  reviews at 4.0 or above. Every other G2 badge is paid.
+
+
+----------------------------------------------------------------
+ 3. SOFTWARESUGGEST + THE SOUTH ASIA SITES
+----------------------------------------------------------------
+
+These matter more for you than G2 does, because the buyers
+are regional and the listings rank in Google for searches
+like "CMMS software Pakistan".
+
+  SoftwareSuggest   https://www.softwaresuggest.com/vendors
+                    Free listing. Expect a sales call from a
+                    Pune number. Be polite, decline the paid
+                    plan, keep the free listing.
+
+  GoodFirms         https://www.goodfirms.co/software/add-software
+                    Free. Good domain authority.
+
+  SourceForge       https://sourceforge.net/software/vendors/
+                    Free. Surprisingly strong in search.
+
+  Crozdesk          https://crozdesk.com/vendors
+                    Free.
+
+  AlternativeTo     https://alternativeto.net
+                    Free. List PlantMaster Pro as an
+                    alternative to MaintainX, UpKeep, Limble,
+                    Fiix. People search exactly this way.
+
+  Software Advice   Already covered by the Gartner form.
+                    Do not submit separately.
+
+
+----------------------------------------------------------------
+ 4. THINGS THAT WILL GET YOU BANNED - read this
+----------------------------------------------------------------
+
+  Do not write your own review, or have staff or family write
+  one. Both platforms detect this through IP address, device
+  fingerprint and writing style. The penalty is removal of
+  the listing, and it is permanent.
+
+  Do not offer payment for a positive review. Offering a
+  small thank-you gift for an HONEST review is allowed on
+  Capterra, but it must be offered to everyone regardless of
+  what they write, and it must be disclosed.
+
+  Do not copy competitor descriptions.
+
+  Do not use "best", "fastest", "leading", "number one".
+  Listings get edited or rejected for superlatives.
+
+  Do not put a phone number, email or URL inside the
+  description text. There are separate fields for those.
+
+  Do not claim integrations you do not have.
+
+
+----------------------------------------------------------------
+ 5. WHAT TO EXPECT, HONESTLY
+----------------------------------------------------------------
+
+  A listing with zero reviews gets very little traffic. That
+  is not a reason to skip it - it is a reason to get the
+  listing up NOW so that the clock starts, and so the profile
+  is ready when your first customers can be asked.
+
+  Realistic: 0 to 3 enquiries a month at first. Meaningful
+  traffic starts around 10 reviews. The Capterra Shortlist
+  badge needs roughly 20 reviews at 4.0 or higher.
+
+  The single biggest win is not traffic. It is that when a
+  prospect in Karachi googles "PlantMaster Pro" to check
+  whether you are a real company, they find you listed on
+  Capterra and G2 next to MaintainX and UpKeep. That is
+  credibility you cannot buy, and it closes deals.

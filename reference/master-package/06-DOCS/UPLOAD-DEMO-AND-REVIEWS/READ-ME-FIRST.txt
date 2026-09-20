@@ -1,0 +1,55 @@
+UPLOAD THESE 7 FILES to the hsbfix.org repository
+(top level, overwrite the existing ones)
+
+    demo.html      NEW - the live demo page
+    index.html     hero button now opens the demo
+    pricing.html   Demo added to menu and footer
+    signup.html    Demo added to menu
+    guide.html     Demo added to menu and footer
+    privacy.html   Demo added to menu and footer
+    terms.html     Demo added to menu and footer
+
+styles.css did NOT change this time. The demo page carries
+its own styling inside the file.
+
+
+WHAT THE DEMO IS
+
+  https://hsbfix.org/demo.html
+
+  A working click-through of the app, loaded with one week of
+  sample data from a fictional Karachi spinning mill. Six
+  tabs: Dashboard, Work Orders, Assets, AI Problem Solver,
+  Condition Monitoring, Manuals.
+
+  Everything runs inside the page. It never touches your
+  database, never touches Supabase, and cannot be broken by a
+  visitor. There is nothing to log into.
+
+  Things a visitor can actually do:
+    - click through all six screens
+    - ask the AI solver three sample questions, including one
+      in Urdu, and watch it answer with a manual page number
+    - press "Record 30 seconds" on condition monitoring and
+      watch the frequency comparison appear
+
+  An orange strip across the top says it is demo data from a
+  fictional mill, so nobody can accuse you of inventing
+  customers.
+
+
+WHY IT MATTERS MORE THAN IT LOOKS
+
+  Capterra and G2 both REFUSE to list software whose only
+  call to action is "contact us". They require a publicly
+  available demo or trial. This page unblocks both listings.
+
+  It also works at 2am when you are asleep and a plant
+  manager is comparing options.
+
+
+CHECK IT WORKED
+
+  Open https://hsbfix.org/demo.html and click the
+  "AI Problem Solver" tab, then click the Urdu question.
+  You should see an answer appear with a page citation.

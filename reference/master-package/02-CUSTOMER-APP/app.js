@@ -1,0 +1,772 @@
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';import{SUPABASE_URL,SUPABASE_ANON_KEY,FILE_BUCKET}from'./config.js?v=4.3.1';import{enqueue,flushQueue,allQueued}from'./offline.js?v=4.11.1';import{createOperations}from'./operations.js?v=4.33.1';import{createScanner}from'./scanner.js?v=4.11.1';import{createConditionMonitor}from'./condition.js?v=4.11.1';import{createUnifiedSolver}from'./solver.js?v=4.11.1';import{createAnalytics}from'./analytics.js';import{createProcurement}from'./procurement.js?v=1.1.0';import{createCsvImport}from'./csv-import.js?v=1.0.2';
+const sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));let session,userId=null,org,plant,allPlants=[],role,profile={},view='dashboard',records=[],channel,formHandler,viewHistory=[],handlingPop=false,lastHomeBack=0,onlineUsers=1,realtimeTimer,searchTimer,platformAdmin=false,appStarted=false,procurement,csvImport;
+function pmFriendlyError(t){const s=String(t??'');
+if(/violates row-level security|row-level security policy|permission denied|42501|insufficient_privilege/i.test(s)){
+  return role==='viewer'?'Read-only demo — changes are not saved.':'You do not have permission for this action.';
+}
+if(/JWT|token is expired|invalid claim/i.test(s))return'Session expired. Please sign in again.';
+if(/Failed to fetch|NetworkError|network request failed/i.test(s))return'No connection. Your changes will queue.';
+return s}
+function toast(t){const x=$('#toast');x.textContent=pmFriendlyError(t);x.classList.add('show');clearTimeout(x.t);x.t=setTimeout(()=>x.classList.remove('show'),2500)}
+function setSync(){const x=$('#sync'),online=navigator.onLine;x.textContent=online?`● Online${onlineUsers>1?` • ${onlineUsers}`:''}`:'● Offline';x.title=online?`${onlineUsers} active PlantMaster user${onlineUsers===1?'':'s'} in this plant`:'Changes will queue until connection returns';x.style.color=online?'#32d39a':'#fbbf24'}
+const operations=createOperations({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''})});procurement=createProcurement({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),audit:operations.audit,enhanceVoice:operations.enhanceVoice});csvImport=createCsvImport({sb,$,esc,toast,state:()=>({org,plant,userId,role}),audit:(...a)=>operations.audit(...a)});window.PMCsv=csvImport;
+const scanner=createScanner({sb,$,esc,toast,FILE_BUCKET,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),enhanceVoice:operations.enhanceVoice,audit:operations.audit});
+const conditionMonitor=createConditionMonitor({sb,$,esc,toast,FILE_BUCKET,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),enhanceVoice:operations.enhanceVoice,audit:operations.audit});
+const unifiedSolver=createUnifiedSolver({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||''}),audit:operations.audit});
+const analyticsView=createAnalytics({sb,$,esc,toast,state:()=>({session,userId,org,plant,role,profile,email:session?.user?.email||""})});
+function ensureCoreToolbar(){
+  const bar=$('#toolbar');
+  if(!bar)return;
+  if(!$('#search')||!$('#add'))bar.innerHTML='<input id="search" placeholder="Search current module…"><button id="add">＋ Add</button>';
+  $('#search').oninput=()=>{clearTimeout(searchTimer);if(view==='dashboard')searchTimer=setTimeout(()=>globalSearch($('#search').value),350);else if(procurement&&procurement.handles(view))procurement.setSearch($('#search').value);else renderList()};
+  $('#add').onclick=dispatchAdd;
+}
+function dispatchAdd(){
+  if(['assets','work','files'].includes(view))return openRecordForm();
+  if(view==='support')return openSupportForm();
+  if(view==='solver')return phase3Form('problem_cases',[['title','Problem title'],['symptoms','Symptoms'],['alarm_code','Alarm code']]);
+  if(view==='manuals')return createManualInput();
+  if(view==='checklists')return phase2Form('checklist_templates',[['name','Checklist name'],['schedule','Schedule'],['shift_name','Shift'],['instructions','Instructions']]);
+  if(view==='maintenance')return phase2Form('maintenance_plans',[['title','Title'],['frequency','Frequency'],['priority','Priority'],['next_due','Due date','date'],['description','Description']]);
+  if(view==='inventory')return inventoryChoice();
+}
+
+const PM_DEMO_EMAIL='demo@hsbfix.org';
+function pmWantsDemo(){try{const q=new URLSearchParams(location.search);return q.get('demo')==='1'||q.has('demo')&&q.get('demo')!=='0'}catch(_){return false}}
+function pmStripDemoParam(){try{const u=new URL(location.href);u.searchParams.delete('demo');history.replaceState({},'',u.pathname+u.search+u.hash)}catch(_){}}
+function pmShowDemoSwitch(currentEmail){
+  $('#boot').hidden=true;$('#auth').hidden=true;$('#app').hidden=true;
+  document.body.classList.add('pm-auth','pm-gate-open');
+  let g=document.getElementById('pmDemoGate');
+  if(!g){g=document.createElement('section');g.id='pmDemoGate';document.body.appendChild(g)}
+  g.innerHTML='<div class="pm-gate-card">'+
+    '<h2>Already signed in</h2>'+
+    '<p>This link opens the <b>read-only demo workspace</b>, but this browser is signed in as:</p>'+
+    '<div class="pm-gate-who">'+esc(currentEmail||'another account')+'</div>'+
+    '<p>Opening the demo will sign this account out of this browser. Your data is not affected and you can sign back in at any time.</p>'+
+    '<div class="pm-gate-btns">'+
+      '<button class="pm-gate-go" id="pmGateGo">Sign out and open the demo</button>'+
+      '<button class="pm-gate-stay" id="pmGateStay">Stay in my account</button>'+
+    '</div></div>';
+  document.getElementById('pmGateGo').onclick=async()=>{
+    const b=document.getElementById('pmGateGo');b.disabled=true;b.textContent='Signing out…';
+    try{sessionStorage.removeItem('pmView')}catch(_){}
+    await sb.auth.signOut();
+    g.remove();document.body.classList.remove('pm-gate-open');
+    showAuth();
+    const em=$('#email');if(em){em.value=PM_DEMO_EMAIL;em.dispatchEvent(new Event('input',{bubbles:true}))}
+    const am=$('#authMsg');if(am)am.textContent='Signed out. Enter the demo password shown on the website to continue.';
+    const pw=$('#password');if(pw)pw.focus();
+  };
+  document.getElementById('pmGateStay').onclick=async()=>{
+    pmStripDemoParam();g.remove();
+    document.body.classList.remove('pm-auth','pm-gate-open');
+    if(session){await loadWorkspace()}else{showAuth()}
+  };
+}
+async function init(){setSync();const{data}=await sb.auth.getSession();session=data.session;$('#boot').hidden=true;if(pmWantsDemo()){const em=session?.user?.email||'';if(session&&em.toLowerCase()!==PM_DEMO_EMAIL){return pmShowDemoSwitch(em)}pmStripDemoParam();if(!session){showAuth();const f=$('#email');if(f)f.value=PM_DEMO_EMAIL;const am=$('#authMsg');if(am)am.textContent='Demo workspace — enter the password shown on the website.';return}}if(!session)return showAuth();await loadWorkspace()}
+function showAuth(){$('#auth').hidden=false;$('#app').hidden=true;const r=$('#resetPw');if(r)r.hidden=true;const o=$('#onboard');if(o)o.hidden=true;document.body.classList.add('pm-auth');document.body.classList.remove('pm-demo-readonly')}
+function authCredentials(){const email=$('#email').value.trim(),password=$('#password').value;if(!email){$('#authMsg').textContent='Enter your work email first.';$('#email').focus();return null}if(!/^\S+@\S+\.\S+$/.test(email)){ $('#authMsg').textContent='Enter a valid email address.';return null}if(password.length<8){$('#authMsg').textContent='Password must contain at least 8 characters.';$('#password').focus();return null}return{email,password}}
+$('#authForm').onsubmit=async e=>{e.preventDefault();const credentials=authCredentials();if(!credentials)return;$('#authMsg').textContent='Signing in…';const{error}=await sb.auth.signInWithPassword(credentials);$('#authMsg').textContent=error?.message||''};
+const _su=$('#signUp');if(_su)_su.onclick=async()=>{const credentials=authCredentials();if(!credentials)return;$('#authMsg').textContent='Creating account…';const{data:result,error}=await sb.auth.signUp({email:credentials.email,password:credentials.password,options:{emailRedirectTo:location.origin+location.pathname}});if(error){$('#authMsg').textContent=error.message;return}$('#authMsg').textContent=result.session?'Account created and signed in.':'Account created. Check your email confirmation link, then return and sign in.'};
+$('#forgotPw').onclick=async()=>{const em=($('#email').value||'').trim();if(!em)return toast('Enter your email first, then tap Forgot password');$('#authMsg').textContent='Sending recovery link…';const{error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});if(error)$('#authMsg').textContent=error.message;else $('#authMsg').textContent='Recovery email sent to '+em+' — open the link in your inbox and set a new password.'};
+/* A recovery link can arrive three ways depending on the flow:
+     ?code=...            (PKCE)
+     ?type=recovery       (older links)
+     #access_token=...&type=recovery   (implicit — NOT in location.search)
+   Missing the hash form was sending people to the dashboard. */
+let pmRecovery=false;try{
+  const q=location.search||'',h=location.hash||'';
+  pmRecovery=q.includes('type=recovery')||q.includes('code=')||
+             (h.includes('type=recovery'))||(h.includes('access_token')&&h.includes('recovery'));
+}catch(_){}
+function showResetPw(){$('#auth').hidden=true;$('#onboard').hidden=true;$('#resetPw').hidden=false;document.body.classList.add('pm-auth')}
+$('#resetPwForm').onsubmit=async e=>{e.preventDefault();const p1=$('#rpw1').value,p2=$('#rpw2').value;if(p1.length<8)return toast('Password must be at least 8 characters');if(p1!==p2)return toast('Passwords do not match');$('#rpwMsg').textContent='Setting…';const{error}=await sb.auth.updateUser({password:p1});if(error){$('#rpwMsg').textContent=error.message;return}$('#rpwMsg').textContent='';
+  /* Sign out and send them to the login screen so they prove the new
+     password works, instead of dropping them straight into the app. */
+  pmRecovery=false;appStarted=false;
+  try{history.replaceState({},'',location.origin+location.pathname)}catch(_){}
+  await sb.auth.signOut();
+  $('#resetPw').hidden=true;showAuth();
+  $('#authMsg').textContent='✓ Password updated. Sign in with your new password.';
+  toast('✓ Password updated — please sign in')};
+sb.auth.onAuthStateChange(async(event,s)=>{session=s;if(event==='PASSWORD_RECOVERY'){pmRecovery=true;showResetPw();return}if(event==='SIGNED_OUT'){appStarted=false;showAuth();return}if(event==='SIGNED_IN'&&!appStarted){if(pmRecovery){showResetPw();return}await loadWorkspace()}});
+let canViewManuals=true;let indexChain=Promise.resolve();const indexingIds=new Set();
+async function loadWorkspace(){let authUser=session?.user;if(!authUser){const result=await sb.auth.getUser();authUser=result.data.user;}const uid=authUser?.id;if(!uid){showAuth();return}userId=uid;await sb.from('profiles').upsert({id:uid,full_name:authUser.user_metadata?.full_name||authUser.email||''},{onConflict:'id',ignoreDuplicates:true});const inviteToken=new URLSearchParams(location.search).get('invite');if(inviteToken){const accepted=await sb.rpc('accept_invitation',{invite_token:inviteToken});if(accepted.error)toast(accepted.error.message);else{toast('Invitation accepted — workspace joined');const clean=new URL(location.href);clean.searchParams.delete('invite');history.replaceState({},'',clean.pathname+clean.search+clean.hash)}}const{data:profileRow}=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();profile=profileRow||{id:uid,full_name:authUser.email||''};const{data:m,error}=await sb.from('organization_members').select('organization_id,role,permissions,organizations(id,name,logo_path)').eq('user_id',uid).eq('active',true).limit(1).maybeSingle();if(error)return toast(error.message);if(!m){$('#auth').hidden=true;$('#onboard').hidden=false;return}org=m.organizations;role=m.role;document.body.classList.toggle('pm-demo-readonly',role==='viewer');canViewManuals=(role==='owner'||role==='manager')||((m.permissions||{})['manuals.view']!==false);const _mb=document.querySelector('[data-view="manuals"]');if(_mb)_mb.hidden=!canViewManuals;const adminCheck=await sb.rpc('is_platform_admin');platformAdmin=!!adminCheck.data;const{data:plantRows}=await sb.from('plants').select('*').eq('organization_id',m.organization_id).order('created_at');allPlants=plantRows||[];let _savedPlant=null;try{_savedPlant=localStorage.getItem('pmPlantId')}catch(_){}plant=allPlants.find(x=>x.id===_savedPlant)||allPlants[0]||null;const settingsResult=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();if(settingsResult.data)await applyBranding(await brandingAllowed(settingsResult.data));startApp()}
+$('#orgForm').onsubmit=async e=>{e.preventDefault();const{data:r,error}=await sb.rpc('create_organization',{org_name:$('#orgName').value,plant_name:$('#plantName').value});if(error)return toast(error.message);await loadWorkspace()};
+function startApp(){document.body.classList.remove('pm-auth');appStarted=true;$('#auth').hidden=$('#onboard').hidden=true;$('#app').hidden=false;$('#brand').textContent=org.name;if(!$('#plantLabel').textContent)$('#plantLabel').textContent=plant?.name||'';history.replaceState({pmView:'dashboard'},'');renderNav();const _pmr=new URLSearchParams(location.search).get('pmroute');let _restore=null;try{_restore=sessionStorage.getItem('pmView')}catch(_){}const _valid=v=>!!v&&v!=='dashboard'&&(['assets','work','files','people','checklists','maintenance','inventory','notifications','support','manuals','solver','reports','profile','invites','email','qr','analytics','condition','commercial','appsupport','recovery','settings','procurement','suppliers'].includes(v));if(_pmr){const _cu=new URL(location.href);_cu.searchParams.delete('pmroute');history.replaceState({pmView:_pmr},_cu.pathname);go(_pmr,true)}else if(_valid(history.state?.pmView)){go(history.state.pmView,true)}else if(_valid(_restore)){go(_restore,true)}else{go('dashboard',true)}subscribe();flush();setTimeout(checkRequiredLegal,500)}
+$('#logout').onclick=()=>{try{sessionStorage.removeItem('pmView')}catch(_){}sb.auth.signOut()};$('#menu').onclick=e=>{e.stopPropagation();$('#drawer').classList.toggle('open');renderNav()};document.addEventListener('pointerdown',e=>{const d=$('#drawer');if(!d||!d.classList.contains('open'))return;if(d.contains(e.target))return;if(e.target.closest('#menu,#mobileMore'))return;d.classList.remove('open');renderNav()},true);document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const d=$('#drawer');if(d&&d.classList.contains('open')){d.classList.remove('open');renderNav()}});$('#search').oninput=()=>{clearTimeout(searchTimer);if(view==='dashboard')searchTimer=setTimeout(()=>globalSearch($('#search').value),350);else renderList()};$('#add').onclick=()=>openRecordForm();$('#cancelRecord').onclick=$('#closeRecord').onclick=()=>{const m=$('#modal');if(typeof m.close==='function'&&m.open){m.close();m.style.removeProperty('display')}else{m.removeAttribute('open');m.style.display='none'}};
+function renderNav(){$$('#drawer [data-view],.mobile-bottom [data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));$('#mobileMore')?.classList.toggle('active',$('#drawer')?.classList.contains('open'))}
+async function go(v,replace=false){if(!v)return;if(view!==v){viewHistory.push(view);if(!handlingPop){if(replace)history.replaceState({pmView:v},'');else history.pushState({pmView:v},'')}}view=v;try{sessionStorage.setItem('pmView',v)}catch(_){}$('#drawer').classList.remove('open');const currentSearch=$('#search')||$('#opsSearch');if(currentSearch)currentSearch.value='';renderNav();$('#content').innerHTML=`<div class="card"><h3>Opening ${v==='work'?'Work Orders':v[0].toUpperCase()+v.slice(1)}…</h3></div>`;try{await loadView()}catch(error){console.error(error);$('#content').innerHTML=`<div class="card"><h3>Navigation error</h3><p>${esc(error.message||error)}</p></div>`}}window.go=go;window.openPeopleSection=async section=>{await go('people');await window.PMOps?.openPeopleTab(section)};
+async function loadView(){if(view!=='qr')scanner.stop();if(view!=='condition')conditionMonitor.stop();if(view!=='solver')unifiedSolver.stop();if(view!=='analytics')analyticsView.stop();if(view==='qr')return scanner.render();if(view==='condition')return conditionMonitor.render();if(view==='solver')return unifiedSolver.render();if(view==='analytics')return analyticsView.render();if(operations.handles(view))return operations.render(view);if(procurement.handles(view)){ensureCoreToolbar();return procurement.render(view);}ensureCoreToolbar();if(view==='audit')return renderAudit();if(view==='dashboard')return dashboard();if(view==='commercial')return loadCommercialView();if(view==='platform')return loadPlatformView();if(view==='appsupport')return loadAppSupport();if(['people','checklists','maintenance','inventory','notifications'].includes(view))return loadPhase2View();if(['support','manuals','solver','reports'].includes(view))return loadPhase3View();if(['profile','invites','email','qr'].includes(view))return loadPhase4View();if(!['assets','work','files'].includes(view))return settings();$('#toolbar').hidden=false;$('#add').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view==='assets'?'assets':view==='work'?'work orders':'files'}…</h3></div>`;try{let result;if(view==='assets')result=await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else if(view==='work')result=await sb.from('work_orders').select('*,assets(name),loto_procedures(*),permits(*)').eq('plant_id',plant.id).is('removed_at',null).order('updated_at',{ascending:false}).limit(100);else result=await sb.from('file_metadata').select('*').eq('organization_id',org.id).is('removed_at',null).order('created_at',{ascending:false}).limit(100);if(result.error)throw result.error;records=result.data||[];renderList();toast(`${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'} opened${records.length?'':'. Tap + Add to create the first record.'}`)}catch(error){console.error('Module load failed',error);records=[];$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1><div class="card"><h3>Could not load this module</h3><p>${esc(error.message||error)}</p><button onclick="retryCurrentView()">Retry</button></div>`;toast('Module load error — details are shown on screen')}}
+window.retryCurrentView=()=>loadView();
+let pushSaveFailed=false;
+function notifBar(sub){if(!('Notification'in window))return'';const p=Notification.permission;
+ if(p==='denied')return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;border-color:#7f1d1d;background:#2b0d0d">🔕 <span><b style="color:#f87171">Notifications are blocked</b> for this site in your browser — allow them (Phone Settings → Chrome → Site settings → Notifications) to receive plant alerts.</span></div>';
+ if(p==='granted'&&sub===true&&!pushSaveFailed)return '';
+ const label=sub===false?'Finish setup':(pushSaveFailed?'Retry server save':'Enable alerts');
+ return '<div class="card" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;border-color:#78520f;background:#2a2108">🔔 <span style="flex:1;min-width:200px"><b style="color:#fbbf24">Push alerts are not fully on yet.</b> <span style="color:var(--pro-muted);font-size:13px">Turn them on to get work orders and alarms even when the app is closed.</span></span><button class="primary" style="padding:9px 16px;font-size:13.5px" onclick="window.enablePushAlerts()">'+label+'</button></div>'}
+async function renderNotifBar(){const wrap=$('#notifBarWrap');if(!wrap)return;let sub=null;try{if(window.PMPush&&window.PMPush.status)sub=(await window.PMPush.status())==='subscribed'}catch(_){sub=null}wrap.innerHTML=notifBar(sub)}
+window.enablePushAlerts=async()=>{if(!('Notification'in window))return toast('This browser does not support notifications');const p=await Notification.requestPermission();if(p!=='granted'){renderNotifBar();return toast('Permission was not granted — alerts stay off')}if(window.PMPush&&window.PMPush.enable){let tok=session?.access_token;try{const rs=await sb.auth.refreshSession();if(rs.data?.session?.access_token)tok=rs.data.session.access_token}catch(_){}const ok=await window.PMPush.enable(tok);pushSaveFailed=!ok;toast(ok?'✓ Alerts enabled on this phone':'Could not enable alerts — '+(window.__pmPushErr||'unknown error')+'. Try again.')}else{pushSaveFailed=true;toast('Alert module is still loading — try again in a moment')}renderNotifBar()};
+
+// ---------- audit trail viewer (v4.39.0) ----------
+// audit_logs was write-only: operations.js inserted, nothing ever read it back.
+// Reuses the report exporters (CSV / Excel / Word / PDF) by loading rows into
+// reportRows + reportTable, so all four formats work with no new export code.
+let auditRows=[],auditActions=[];
+async function renderAudit(){
+  $('#toolbar').hidden=true; $('#add').hidden=true;
+  const today=new Date().toISOString().slice(0,10);
+  const monthAgo=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+  $('#content').innerHTML=`
+    <section class="module-head">
+      <div><h1>Audit Trail</h1><p>Every change made in this plant — who, what and when.</p></div>
+      <button class="secondary" onclick="window.go('dashboard')">Dashboard</button>
+    </section>
+    <div class="report-controls card">
+      <label>From date<input id="auditFrom" type="date" value="${monthAgo}"></label>
+      <label>To date<input id="auditTo" type="date" value="${today}"></label>
+      <label>Action<select id="auditAction"><option value="">All actions</option></select></label>
+      <label>Search<input id="auditSearch" type="search" placeholder="Person, record or ID"></label>
+      <button class="primary" onclick="loadAudit()">Show activity</button>
+    </div>
+    <div class="format-grid">
+      ${['csv','excel','word','pdf'].map(t=>`<article class="format-card">
+        <div><b>${t.toUpperCase()}</b><small>${t==='csv'?'Data table':t==='excel'?'Spreadsheet':t==='word'?'Document':'Print-ready report'}</small></div>
+        <button onclick="viewAudit('${t}')">View</button>
+        <button class="primary" onclick="exportAudit('${t}')">Download</button>
+      </article>`).join('')}
+    </div>
+    <div id="auditPreview">${emptyReport('Choose a date range and tap Show activity.')}</div>`;
+  loadAudit();
+}
+
+async function refreshAuditActions(){
+  const sel=$('#auditAction'); if(!sel) return;
+  const keep=sel.value;
+  const r=await sb.from('audit_logs').select('action')
+    .eq('organization_id',org.id).eq('plant_id',plant.id)
+    .order('created_at',{ascending:false}).limit(1000);
+  auditActions=[...new Set((r.data||[]).map(x=>x.action).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All actions</option>'+
+    auditActions.map(a=>`<option value="${esc(a)}"${a===keep?' selected':''}>${esc(a.replaceAll('_',' '))}</option>`).join('');
+  sel.value=keep;
+}
+
+window.loadAudit=async()=>{
+  const from=$('#auditFrom')?.value, to=$('#auditTo')?.value;
+  const act=$('#auditAction')?.value||'', term=($('#auditSearch')?.value||'').trim().toLowerCase();
+  $('#auditPreview').innerHTML='<div class="card loading-card"><span class="spinner"></span><div><h3>Loading activity</h3><p>Reading the audit trail…</p></div></div>';
+  try{
+    let q=sb.from('audit_logs').select('*')
+      .eq('organization_id',org.id).eq('plant_id',plant.id)
+      .order('created_at',{ascending:false}).limit(1000);
+    if(from) q=q.gte('created_at',from+'T00:00:00');
+    if(to)   q=q.lte('created_at',to+'T23:59:59');
+    if(act)  q=q.eq('action',act);
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(Error('Request timed out. Check the connection and retry.')),15000));
+    const r=await Promise.race([q,timeout]);
+    if(r.error) throw r.error;
+    let rows=r.data||[];
+    if(term) rows=rows.filter(x=>JSON.stringify(x).toLowerCase().includes(term));
+    auditRows=rows;
+    // Populate the action filter from a dedicated unfiltered query, not from the
+    // current result. Building it from filtered rows meant a new action could
+    // never appear, and picking one collapsed the list to that single action.
+    await refreshAuditActions();
+    paintAudit();
+    toast(`${rows.length} ${rows.length===1?'entry':'entries'}`);
+  }catch(x){
+    $('#auditPreview').innerHTML=`<div class="empty-state">${esc(x.message||String(x))}</div>`;
+    toast(x.message||String(x));
+  }
+};
+
+function auditWho(r){ return r.details?.worker_name || r.details?.email || 'Unknown user'; }
+function auditWhat(r){
+  const a=(r.action||'').replaceAll('_',' ');
+  const d=r.details||{};
+  const label=d.name||d.title||d.subject||d.po_number||d.part_number||d.asset_code||r.entity_id||'';
+  return label ? `${a} — ${label}` : a;
+}
+
+function paintAudit(){
+  if(!auditRows.length){
+    $('#auditPreview').innerHTML=emptyReport('No activity in this range.');
+    return;
+  }
+  $('#auditPreview').innerHTML=`
+    <div class="card">
+      <h3 style="margin-bottom:10px">${auditRows.length} entr${auditRows.length===1?'y':'ies'}</h3>
+      <div class="audit-list">
+        ${auditRows.slice(0,300).map(r=>`
+          <div class="audit-row">
+            <div class="ar-when">
+              <b>${new Date(r.created_at).toLocaleDateString()}</b>
+              <small>${new Date(r.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</small>
+            </div>
+            <div class="ar-main">
+              <b>${esc(auditWhat(r))}</b>
+              <small>${esc(auditWho(r))}${r.details?.designation?' · '+esc(r.details.designation):''}</small>
+            </div>
+            <span class="ar-type">${esc((r.entity_type||'').replaceAll('_',' '))}</span>
+          </div>`).join('')}
+      </div>
+      ${auditRows.length>300?`<p class="muted" style="margin-top:10px">Showing the newest 300 on screen. Downloads include all ${auditRows.length}.</p>`:''}
+    </div>`;
+}
+
+// flatten for export: one clean row per entry, no raw jsonb blobs
+function auditExportRows(){
+  return auditRows.map(r=>({
+    date:new Date(r.created_at).toLocaleDateString(),
+    time:new Date(r.created_at).toLocaleTimeString(),
+    person:auditWho(r),
+    designation:r.details?.designation||'',
+    action:(r.action||'').replaceAll('_',' '),
+    record_type:(r.entity_type||'').replaceAll('_',' '),
+    record:r.details?.name||r.details?.title||r.details?.subject||r.details?.po_number||'',
+    record_id:r.entity_id||'',
+    shift:r.details?.shift_name||''
+  }));
+}
+
+// borrow the report exporters by swapping the globals they read
+function withAuditRows(fn){
+  const keepRows=reportRows, keepTable=reportTable;
+  reportRows=auditExportRows(); reportTable='audit_trail';
+  try{ return fn(); } finally { reportRows=keepRows; reportTable=keepTable; }
+}
+window.exportAudit=type=>{
+  if(!auditRows.length) return toast('Show the activity first');
+  withAuditRows(()=>window.exportReport(type));
+};
+window.viewAudit=type=>{
+  if(!auditRows.length) return toast('Show the activity first');
+  withAuditRows(()=>window.viewReport(type));
+};
+
+async function dashboard() {
+  ensureCoreToolbar();
+  
+  // We still need the notification count for the top right bell
+  const n = await sb.from('notifications').select('id',{count:'exact'}).eq('organization_id',org.id).is('read_at',null);
+  
+  $('#toolbar').hidden=false; $('#add').hidden=true; $('#search').placeholder='Search assets, work, manuals, people…';
+  
+  const tile=(label,icon,target)=>`<button type="button" class="kpi kpi-link" onclick="window.${target.includes('(') ? target : `go('${target}')`}"><span>${label}</span><strong style="font-size:36px;margin:8px 0">${icon}</strong><small>Open module →</small></button>`;
+  
+  $('#content').innerHTML=`
+    <section class="module-head dashboard-head">
+      <div><h1>Dashboard</h1><p>${esc(org.name)} • ${esc(plant.name)} • ${esc(role)}</p></div>
+      <button class="secondary" onclick="window.go('notifications')">🔔 ${(n.data ? n.count : 0)} Alerts</button>
+    </section>
+    <div id="notifBarWrap">${notifBar()}</div>
+    
+    <div class="kpis" style="margin-bottom: 20px;">
+      ${tile('Analytics & KPIs', '📈', 'analytics')}
+      ${tile('Scanner', '📷', 'qr')}
+      ${tile('Daily Logs', '📋', "openPeopleSection('logs')")}
+      ${tile('Condition Monitoring', '∿', 'condition')}
+      ${tile('Problem Solver', '🧠', 'solver')}
+      ${tile('Reports', '📊', 'reports')}
+    </div>
+    
+    <div class="grid dashboard-grid">
+      <button type="button" class="card dashboard-link" onclick="window.go('assets')"><h3>🏭 Assets</h3><p>Equipment register, state and QR records</p><span>Open Assets →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('work')"><h3>🧰 Work Orders</h3><p>Assigned corrective work and completion</p><span>Open Work Orders →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('checklists')"><h3>✅ Checklists</h3><p>Templates and completed runs</p><span>Open Checklists →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('maintenance')"><h3>🛠 Maintenance</h3><p>Weekly, monthly and yearly plans</p><span>Open Maintenance →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('inventory')"><h3>📦 Spares & Tools</h3><p>Stock, custody and calibration</p><span>Open Inventory →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('procurement')"><h3>🧾 Purchase Orders</h3><p>Requests, approvals and goods receipt</p><span>Open Purchase Orders →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('suppliers')"><h3>🏷 Suppliers</h3><p>Vendors, NTN/STRN and payment terms</p><span>Open Suppliers →</span></button>
+    </div>
+  `;
+  renderNotifBar();
+}
+
+function formatBytesCommercial(n=0){const units=['B','KB','MB','GB','TB'];let i=0,v=Number(n)||0;while(v>=1024&&i<units.length-1){v/=1024;i++}return`${v<10&&i? v.toFixed(1):Math.round(v)} ${units[i]}`}
+function usageMeter(label,used,limit,display=v=>v){const pct=limit>0?Math.min(100,Math.round(used/limit*100)):0;return`<article class="usage-meter"><div><b>${esc(label)}</b><span>${esc(display(used))} / ${esc(display(limit))}</span></div><div class="meter"><i style="width:${pct}%"></i></div><small>${pct}% used • ${esc(display(Math.max(0,limit-used)))} remaining</small></article>`}
+async function loadCommercialView(){$('#toolbar').hidden=true;$('#content').innerHTML='<div class="card loading-card"><span class="spinner"></span><div><h3>Loading plan and usage</h3><p>Reading company entitlements…</p></div></div>';try{const summaryResult=await sb.rpc('organization_plan_summary',{p_organization_id:org.id});if(summaryResult.error)throw summaryResult.error;const x=summaryResult.data,plan=x.plan||{},[retentionResult,incidentsResult,legalResult]=await Promise.all([sb.from('data_retention_policies').select('*').eq('organization_id',org.id).maybeSingle(),sb.from('system_incidents').select('*').eq('organization_id',org.id).neq('status','resolved').order('last_seen_at',{ascending:false}).limit(20),sb.from('legal_documents').select('*').eq('active',true).order('effective_at',{ascending:false})]);const retention=retentionResult.data||{},incidents=incidentsResult.data||[],legal=legalResult.data||[];$('#content').innerHTML=`<section class="module-head"><div><h1>Plan & Usage</h1><p>Company subscription, limits, retention and service health</p></div><span class="lifecycle ${esc(x.organization_status)}">${esc(x.organization_status)}</span></section><div class="commercial-summary"><article class="card plan-card"><small>Current plan</small><h2>${esc(plan.name||'Unassigned')}</h2><p>${esc(plan.description||'')}</p><dl><div><dt>Subscription</dt><dd>${esc(x.subscription_status||'—')}</dd></div><div><dt>Period end</dt><dd>${x.period_end?new Date(x.period_end).toLocaleDateString():'—'}</dd></div><div><dt>Workers</dt><dd>${x.workers||0} / ${plan.max_workers||0}</dd></div><div><dt>Plants</dt><dd>${x.plants||0} / ${plan.max_plants||0}</dd></div></dl></article><div class="usage-stack">${usageMeter('Storage',Number(x.storage_bytes||0),Number(plan.max_storage_bytes||0),formatBytesCommercial)}${usageMeter('Monthly bandwidth',Number(x.bandwidth_bytes_month||0),Number(plan.max_bandwidth_bytes_month||0),formatBytesCommercial)}${usageMeter('Monthly Gemini requests',Number(x.ai_requests_month||0),Number(plan.ai_requests_month||0))}${usageMeter('Monthly AI input tokens',Number(x.ai_input_tokens_month||0),Number(plan.ai_input_tokens_month||0))}${usageMeter('Files',Number(x.files||0),Number(plan.max_files||0))}</div></div><div class="commercial-grid"><article class="card"><h3>Features</h3><div class="feature-list">${Object.entries(plan.features||{}).map(([k,v])=>`<span class="${v?'enabled':'disabled'}">${v?'✓':'—'} ${esc(k.replaceAll('_',' '))}</span>`).join('')||'<p>No feature list.</p>'}</div><p class="muted-text">AI metering becomes authoritative after deploying the secured commercial Gemini function.</p></article><article class="card"><h3>Service health</h3>${incidents.length?incidents.map(i=>`<div class="incident ${esc(i.severity)}"><b>${esc(i.component)} — ${esc(i.event_type)}</b><p>${esc(i.message)}</p><small>${new Date(i.last_seen_at).toLocaleString()}</small></div>`).join(''):'<div class="healthy">✓ No open company incidents</div>'}</article></div>${role==='owner'?`<div class="commercial-grid"><article class="card"><h3>Data retention</h3><label>Operational records (days)<input id="retOperational" type="number" min="30" value="${retention.operational_days||1095}"></label><label>Audit records (days)<input id="retAudit" type="number" min="365" value="${retention.audit_days||2190}"></label><label>AI prompt retention (days; 0 means do not retain)<input id="retAI" type="number" min="0" value="${retention.ai_prompt_days||0}"></label><label>Soft-delete grace period<input id="retGrace" type="number" min="7" value="${retention.soft_delete_grace_days||30}"></label><button class="primary" onclick="saveRetentionPolicy()">Save retention policy</button></article><article class="card"><h3>Privacy & company data</h3><p>Request an export before deletion. A deletion request creates a reviewed, delayed workflow and does not immediately erase records or backups.</p><button onclick="requestCompanyData('export_and_delete')">Request export and deletion review</button><button class="danger" onclick="requestCompanyData('organization')">Request company deletion review</button></article></div>`:''}<article class="card"><h3>Legal documents</h3>${legal.map(d=>`<div class="legal-row"><div><b>${esc(d.title)}</b><small>${esc(d.document_type)} • version ${esc(d.version)}</small></div><button onclick="viewLegalDocument('${d.id}')">View</button></div>`).join('')||'<p class="muted-text">No active legal documents have been published yet.</p>'}</article>`}catch(error){$('#content').innerHTML=`<div class="error-state"><h2>Plan & Usage is not ready</h2><p>${esc(error.message)}</p><p>Run schema-phase7-commercial.sql in Supabase, then retry.</p><button onclick="loadCommercialView()">Retry</button></div>`}}
+window.saveRetentionPolicy=async()=>{const payload={organization_id:org.id,operational_days:Number($('#retOperational').value),audit_days:Number($('#retAudit').value),ai_prompt_days:Number($('#retAI').value),soft_delete_grace_days:Number($('#retGrace').value),updated_at:new Date().toISOString(),updated_by:userId};const r=await sb.from('data_retention_policies').upsert(payload);if(r.error)return toast(r.error.message);await operations.audit('retention_policy_updated','organization',org.id,payload);toast('Retention policy saved');loadCommercialView()};
+window.requestCompanyData=async type=>{if(role!=='owner')return toast('Owner access required');const phrase=type==='organization'?'DELETE COMPANY':'EXPORT AND DELETE';if(prompt(`This creates a reviewed request, not an immediate deletion. Type ${phrase} to continue:`)!==phrase)return;const r=await sb.from('deletion_requests').insert({organization_id:org.id,requested_by:userId,request_type:type,status:'requested',reason:'Owner request from Plan & Usage'});if(r.error)return toast(r.error.message);await operations.audit('data_request_created','organization',org.id,{request_type:type});toast('Request recorded for platform review')};
+window.viewLegalDocument=async id=>{const r=await sb.from('legal_documents').select('*').eq('id',id).single();if(r.error)return toast(r.error.message);const d=r.data,w=open('','_blank');if(!w)return toast('Allow pop-ups to view the document');w.document.write(`<!doctype html><meta name="viewport" content="width=device-width"><title>${esc(d.title)}</title><style>body{max-width:850px;margin:30px auto;padding:20px;font:15px/1.7 Arial;color:#17212b}pre{white-space:pre-wrap;font:inherit}</style><h1>${esc(d.title)}</h1><p>Version ${esc(d.version)} • Effective ${new Date(d.effective_at).toLocaleDateString()}</p><pre>${esc(d.content)}</pre>`);w.document.close()};
+async function checkRequiredLegal(){if(!org?.id)return;const r=await sb.rpc('pending_legal_documents',{p_organization_id:org.id});if(r.error||!r.data?.length)return;const d=r.data[0];document.querySelector('#legalGate')?.remove();const gate=document.createElement('dialog');gate.id='legalGate';gate.innerHTML=`<div class="legal-gate"><small>Required legal document</small><h2>${esc(d.title)}</h2><p>Version ${esc(d.version)} • Effective ${new Date(d.effective_at).toLocaleDateString()}</p><div class="legal-content">${esc(d.content).replaceAll('\n','<br>')}</div><label><input id="legalConfirm" type="checkbox"> I have read and agree to this document.</label><button id="acceptLegal" class="primary" disabled>Accept and Continue</button></div>`;document.body.append(gate);gate.oncancel=e=>e.preventDefault();gate.querySelector('#legalConfirm').onchange=e=>gate.querySelector('#acceptLegal').disabled=!e.target.checked;gate.querySelector('#acceptLegal').onclick=async()=>{const raw=new TextEncoder().encode(navigator.userAgent),hash=await crypto.subtle.digest('SHA-256',raw),userAgentHash=[...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');const a=await sb.rpc('accept_legal_document',{p_document_id:d.id,p_organization_id:org.id,p_locale:navigator.language||null,p_user_agent_hash:userAgentHash});if(a.error)return toast(a.error.message);gate.close();gate.remove();checkRequiredLegal()};gate.showModal()}
+async function loadPlatformView(){if(!platformAdmin){$('#toolbar').hidden=true;$('#content').innerHTML='<div class="error-state"><h2>Platform administrator required</h2><p>This area is reserved for the PlantMaster service operator.</p></div>';return}$('#toolbar').hidden=true;$('#content').innerHTML='<div class="card loading-card"><span class="spinner"></span><div><h3>Loading tenant control center</h3><p>Reading commercial status and aggregate usage…</p></div></div>';try{const[tenants,plans]=await Promise.all([sb.rpc('platform_tenant_overview'),sb.from('subscription_plans').select('code,name').eq('active',true).order('price_monthly')]);if(tenants.error)throw tenants.error;if(plans.error)throw plans.error;const planOptions=(selected)=>plans.data.map(p=>`<option value="${esc(p.code)}" ${p.code===selected?'selected':''}>${esc(p.name)}</option>`).join('');$('#content').innerHTML=`<section class="module-head"><div><h1>Platform Administration</h1><p>Activate, suspend and assign plans without opening customer operational content</p></div><span class="lifecycle active">${tenants.data.length} companies</span></section><div class="platform-toolbar"><input id="tenantSearch" type="search" placeholder="Search company, plan or status…"><button onclick="loadPlatformView()">Refresh</button></div><div id="tenantGrid" class="record-grid">${tenants.data.map(t=>`<article class="record-card tenant-card" data-search="${esc(`${t.organization_name} ${t.plan_name} ${t.commercial_status}`.toLowerCase())}"><div class="record-title"><div><h3>${esc(t.organization_name)}</h3><p>Created ${new Date(t.created_at).toLocaleDateString()}</p></div><span class="lifecycle ${esc(t.commercial_status)}">${esc(t.commercial_status)}</span></div><dl><div><dt>Workers</dt><dd>${t.workers}</dd></div><div><dt>Plants</dt><dd>${t.plants}</dd></div><div><dt>Files</dt><dd>${t.files}</dd></div><div><dt>Storage</dt><dd>${formatBytesCommercial(t.storage_bytes)}</dd></div><div><dt>AI this month</dt><dd>${t.ai_requests_month}</dd></div><div><dt>Open incidents</dt><dd>${t.open_incidents}</dd></div></dl><label>Plan<select id="plan-${t.organization_id}">${planOptions(t.plan_code)}</select></label><label>Status<select id="status-${t.organization_id}">${['trial','active','past_due','suspended','cancelled','deletion_pending'].map(v=>`<option ${v===t.commercial_status?'selected':''}>${v}</option>`).join('')}</select></label><label>Reason<input id="reason-${t.organization_id}" value="${esc(t.status_reason||'')}" placeholder="Reason / internal note"></label><button class="primary" onclick="platformApply('${t.organization_id}')">Apply commercial changes</button></article>`).join('')||'<div class="empty-state">No organizations.</div>'}</div>`;$('#tenantSearch').oninput=e=>{const q=e.target.value.toLowerCase();$$('.tenant-card').forEach(c=>c.hidden=!c.dataset.search.includes(q))}}catch(error){$('#content').innerHTML=`<div class="error-state"><h2>Platform administration failed</h2><p>${esc(error.message)}</p><button onclick="loadPlatformView()">Retry</button></div>`}}
+window.platformApply=async id=>{if(!platformAdmin)return;const status=$(`#status-${id}`).value,plan=$(`#plan-${id}`).value,reason=$(`#reason-${id}`).value;if(['suspended','cancelled','deletion_pending'].includes(status)&&prompt(`Type ${status.toUpperCase()} to confirm:`)!==status.toUpperCase())return;const r=await sb.rpc('platform_set_company',{p_organization_id:id,p_status:status,p_plan_code:plan,p_reason:reason||null});if(r.error)return toast(r.error.message);toast('Company commercial settings updated');loadPlatformView()};
+async function loadAppSupport(){$('#toolbar').hidden=true;if(role!=='owner'){ $('#content').innerHTML='<div class="error-state"><h2>Owner-only section</h2><p>Complaints to the PlantMaster platform are raised by the company owner, so billing and account questions come from one verified person.</p><p>Your role on this account is <b>'+esc(role||'member')+'</b>. To report a problem with a machine instead, open <b>Work Orders</b> and add a work order, or use <b>Support</b> for in-company help.</p><p style="margin-top:14px"><button class="primary" onclick="window.go(\'work\')">Go to Work Orders</button> <button onclick="window.go(\'support\')">Go to Support</button></p></div>';return}const r=await sb.rpc('owner_app_complaints',{p_organization_id:org.id});if(r.error){$('#content').innerHTML=`<div class="error-state"><h2>App Support is not ready</h2><p>${esc(r.error.message)}</p><p>Platform Control Center Phase 11 must be installed.</p></div>`;return}records=r.data||[];$('#content').innerHTML=`<section class="module-head"><div><h1>App Complaints & Support</h1><p>Send application, account, billing, Storage, AI or data complaints directly to the PlantMaster platform administrator.</p></div><button class="primary" onclick="newAppComplaint()">＋ New Complaint</button></section><div class="record-grid">${records.map(t=>`<article class="record-card"><div class="record-title"><div><h3>#${t.ticket_number} ${esc(t.subject)}</h3><p>${esc(t.category)} • ${new Date(t.updated_at).toLocaleString()}</p></div><span class="state ${esc(t.status)}">${esc(t.status)}</span></div><p>${esc(t.description.slice(0,260))}</p><button onclick="openAppComplaint('${t.id}')">Open Conversation</button></article>`).join('')||'<div class="empty-state"><b>No complaints</b><p>Create a complaint if you need platform-level help.</p></div>'}</div>`}
+window.newAppComplaint=()=>{ensureCoreToolbar();$('#modalTitle').textContent='New App Complaint';$('#fields').innerHTML=`<label class="form-field"><span>Category</span><select name="category"><option>application</option><option>account</option><option>billing</option><option>storage</option><option>ai</option><option>data</option><option>privacy</option><option>other</option></select></label><label class="form-field"><span>Priority</span><select name="priority"><option>low</option><option selected>medium</option><option>high</option><option>critical</option></select></label>${field("subject","Subject")}<label class="form-field span-2"><span>Description</span><textarea name="description" required placeholder="Describe the problem, what you expected, and the steps to reproduce it."></textarea></label>`;formHandler=async values=>{const r=await sb.rpc('submit_app_complaint',{p_organization_id:org.id,p_category:values.category,p_priority:values.priority,p_subject:values.subject,p_description:values.description,p_app_version:'4.10.1',p_device_info:{user_agent:navigator.userAgent,platform:navigator.platform}});if(r.error)throw r.error;await operations.audit('platform_complaint_created','organization',org.id,{subject:values.subject,priority:values.priority});toast('Complaint sent to Platform Admin');loadAppSupport()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m)};
+window.openAppComplaint=async id=>{const ticket=records.find(x=>x.id===id),r=await sb.rpc('owner_app_complaint_messages',{p_ticket_id:id});if(r.error)return toast(r.error.message);$('#modalTitle').textContent=`#${ticket.ticket_number} ${ticket.subject}`;$('#fields').innerHTML=`<div class="span-2 conversation"><div class="message"><b>Complaint</b><br>${esc(ticket.description)}<small>${new Date(ticket.created_at).toLocaleString()}</small></div>${(r.data||[]).map(x=>`<div class="message ${x.user_id===userId?'mine':''}">${esc(x.message)}<small>${new Date(x.created_at).toLocaleString()}</small></div>`).join('')}</div><label class="form-field span-2"><span>Reply</span><textarea name="message" required></textarea></label>`;formHandler=async values=>{const q=await sb.rpc('reply_app_complaint',{p_ticket_id:id,p_message:values.message});if(q.error)throw q.error;toast('Reply sent');setTimeout(()=>openAppComplaint(id),150)};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m)};
+function settings(){$('#toolbar').hidden=true;$('#content').innerHTML=`<h1>Settings</h1><div class="card"><h3>Workspace</h3><p>Organization: ${esc(org.name)}<br>Plant: ${esc(plant.name)}<br>Role: ${esc(role)}<br>User: ${esc(session?.user?.email||'Signed-in user')}</p><button onclick="location.reload()">Refresh</button></div>`}
+function renderList(){if(!['assets','work','files'].includes(view))return;$('#toolbar').hidden=false;$('#add').textContent=view==='files'?'＋ Upload':'＋ Add';const q=$('#search').value.toLowerCase(),list=records.filter(r=>JSON.stringify(r).toLowerCase().includes(q));$('#content').innerHTML=`<h1>${view==='assets'?'Assets':view==='work'?'Work Orders':'Files'}</h1>${view==='assets'&&['owner','manager'].includes(role)?`<div class="actions" style="margin-bottom:12px"><button class="secondary" onclick="window.PMCsv.openImport('assets')">⬆ Import CSV</button></div>`:''}<div class="grid">${list.map(card).join('')||'<div class="card">No records.</div>'}</div>`}
+function card(r){if(view==='assets'){
+  const meter = r.meter_unit ? `<br><b>Meter:</b> ${r.current_meter_value||0} / ${r.pm_trigger_meter_value||'∞'} ${esc(r.meter_unit)}` : '';
+  return`<article class="card"><h3>${esc(r.name)}</h3><p>${esc(r.asset_code)} • ${esc(r.asset_type)}<br>${esc(r.location)}${meter}</p><div class="state ${esc(r.running_state)}">● ${esc(r.running_state)}</div><div class="state ${esc(r.status)}">${esc(r.status)}</div><div class="actions">${r.meter_unit ? `<button class="secondary" onclick="logMeter('${r.id}')">⏱ Log</button>` : ''}<button onclick="editRecord('${r.id}')">Edit</button>${role==='owner'?`<button class="danger" onclick="removeRecord('${r.id}')">Remove</button>`:''}</div></article>`;
+}if(view==='work'){
+  let timerBtn = '';
+  const isRunning = !!r.started_at;
+  if(r.status!=='completed'){
+    timerBtn = isRunning ? `<button class="danger" onclick="toggleTimer('${r.id}', true)">⏸ Pause Work</button>` : `<button onclick="toggleTimer('${r.id}', false)">▶ Start Work</button>`;
+  }
+  const timeLog = r.labor_minutes ? `<br><b>Time Logged:</b> ${r.labor_minutes} mins` : '';
+  const costLog = r.total_cost && r.total_cost > 0 ? ` • <b>Cost:</b> $${r.total_cost}` : '';
+  
+  const activeLoto = (r.loto_procedures || []).find(x => !x.removed_at);
+  const activePermit = (r.permits || []).find(x => x.status !== 'closed');
+  const safetyBadges = [];
+  if(activeLoto) safetyBadges.push(`<span class="state critical" style="margin-top:6px;border-color:#ef4444;color:#ef4444">🔒 LOTO ACTIVE</span>`);
+  if(activePermit) safetyBadges.push(`<span class="state warning" style="margin-top:6px;border-color:#f59e0b;color:#f59e0b">📝 PERMIT ${activePermit.status.toUpperCase()}</span>`);
+  const safetyHtml = safetyBadges.length ? `<div style="margin-bottom:8px">${safetyBadges.join(' ')}</div>` : '';
+
+  return `<article class="card"><h3>${esc(r.title)}</h3><p>${esc(r.assets?.name||'General')} • ${esc(r.priority)} • ${esc(r.status)}<br>${esc(r.description)}${timeLog}${costLog}</p>${safetyHtml}${r.work_done?`<p><b>Work done:</b> ${esc(r.work_done)}<br>${esc(r.designation||'')} • ${esc(r.shift_name||'')} • ${r.completed_at?new Date(r.completed_at).toLocaleString():''}</p>`:''}<div class="actions">${timerBtn}${r.status==='completed'?`<button onclick="reopenWork('${r.id}')">Reopen</button>`:`<button class="primary" onclick="completeWork('${r.id}')">✓ Work Done</button>`}<button class="secondary" onclick="manageSafety('${r.id}')">🦺 Safety</button><button onclick="editRecord('${r.id}')">Edit</button>${role==='owner'?`<button class="danger" onclick="removeRecord('${r.id}')">Remove</button>`:''}</div></article>`;
+}return`<article class="card"><h3>${esc(r.file_name)}</h3><p>${esc(r.category)} • ${Math.ceil((r.size_bytes||0)/1024)} KB</p><button onclick="downloadFile('${r.object_path}')">Open</button></article>`}
+window.editRecord=id=>openRecordForm(records.find(r=>r.id===id));window.removeRecord=async id=>{if(role!=='owner')return toast('Only the owner can remove records');if(!confirm('Move this record to Recovery?'))return;const table=view==='assets'?'assets':'work_orders',record={id,removed_at:new Date().toISOString(),removed_by:userId};if(navigator.onLine){const{error}=await sb.from(table).update(record).eq('id',id);if(error)return toast(error.message)}else await enqueue({table,action:'upsert',record});await operations.audit('record_removed',table,id);toast('Moved to Recovery');loadView()};
+function field(name,label,value='',type='text',req=true,extra=''){return`<label class=\"form-field\"><span>${label}</span><input name=\"${name}\" type=\"${type}\" value=\"${esc(value)}\" ${req?'required':''} ${extra}></label>`}
+function openRecordForm(r={}){if(view==='files')return $('#fileInput')?.click()||createFileInput();$('#modalTitle').textContent=r.id?'Edit record':`Add ${view==='assets'?'asset':'work order'}`;if(view==='assets')$('#fields').innerHTML=field('asset_code','Asset code',r.asset_code)+field('name','Name',r.name)+field('asset_type','Type',r.asset_type)+field('location','Location',r.location)+field('manufacturer','Manufacturer',r.manufacturer)+field('model','Model',r.model)+field('serial_number','Serial number',r.serial_number)+field('rating','Rating / capacity',r.rating)+field('status','Status',r.status||'operational')+field('running_state','Running state',r.running_state||'shutdown')+field('meter_unit','Meter Unit (e.g. hours)',r.meter_unit||'','text',false)+field('current_meter_value','Current Meter',r.current_meter_value||'0','number',false,'step=\"any\"')+field('pm_trigger_meter_value','PM Trigger Threshold',r.pm_trigger_meter_value||'','number',false,'step=\"any\"');else $('#fields').innerHTML=field('title','Title',r.title)+`<label class="form-field"><span>Description</span><textarea name="description" required>${esc(r.description)}</textarea></label>`+field('priority','Priority',r.priority||'medium')+field('status','Status',r.status||'open')+field('due_at','Due date',r.due_at?.slice(0,16)||'','datetime-local');formHandler=async values=>{const table=view==='assets'?'assets':'work_orders',base={...r};delete base.assets;const record={...base,...values,id:r.id||crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,created_by:r.created_by||userId,updated_at:new Date().toISOString()};if(navigator.onLine){const{error}=await sb.from(table).upsert(record);if(error)throw error}else await enqueue({table,action:'upsert',record});await operations.audit(r.id?'record_updated':'record_created',table,record.id,{name:record.name||record.title});records=[record,...records.filter(item=>item.id!==record.id)];renderList();toast('Saved successfully');setTimeout(()=>loadView(),250)};const modal=$('#modal');modal.style.removeProperty('display');if(typeof modal.showModal==='function')modal.showModal();else{modal.setAttribute('open','');modal.style.display='block'}}
+$('#recordForm').onsubmit=async e=>{e.preventDefault();try{if(!userId){const result=await sb.auth.getUser();userId=result.data.user?.id;if(!userId)throw Error('Your session expired. Please sign in again.')}await formHandler(Object.fromEntries(new FormData(e.target)));if(typeof $('#modal').close==='function')$('#modal').close();else{$('#modal').removeAttribute('open');$('#modal').style.display='none'}}catch(x){console.error('Save failed',x);let box=$('#recordForm .form-error-inline');if(!box){box=document.createElement('div');box.className='form-error-inline';box.style.cssText='grid-column:1/-1;color:#fda4af;padding:9px;border:1px solid #9f1239;border-radius:9px;background:#3b0a19';$('#fields').prepend(box)}box.textContent=x.message||String(x);toast(x.message||String(x))}};
+window.completeWork=async id=>{
+  const r=records.find(x=>x.id===id);if(!r)return;
+  
+  let currentMins = r.labor_minutes || 0;
+  if (r.started_at) {
+     const start = new Date(r.started_at).getTime();
+     const now = new Date().getTime();
+     currentMins += Math.floor((now - start) / 60000);
+  }
+
+  $('#modalTitle').textContent=`Work Done — ${r.title}`;
+  $('#fields').innerHTML=`<label class="form-field"><span>Work done</span><textarea name="work_done" required></textarea></label>${field('shift_name','Shift',profile.default_shift||'General Shift')}${field('designation','Designation',profile.designation||role)}<label class="form-field"><span>Tools used</span><textarea name="tools_used"></textarea></label><label class="form-field"><span>Parts used</span><textarea name="parts_used"></textarea></label><label class="form-field"><span>Measurements / readings</span><textarea name="measurements_text"></textarea></label><label class="form-field"><span>Root cause</span><textarea name="root_cause"></textarea></label><label class="form-field"><span>Corrective action</span><textarea name="corrective_action"></textarea></label>${field('downtime_minutes','Downtime minutes','0','number')}${field('labor_minutes','Total Labor (minutes)',currentMins,'number')}`;
+  
+  formHandler=async values=>{
+    const completed_at=new Date().toISOString(),measurements={text:values.measurements_text||''};
+    delete values.measurements_text;
+    
+    const finalMins = Number(values.labor_minutes) || 0;
+    const rate = profile.labor_rate_hourly || 0;
+    const totalCost = Number(((finalMins / 60) * rate).toFixed(2));
+
+    const update={...values, measurements, downtime_minutes:Number(values.downtime_minutes)||0, labor_minutes: finalMins, total_cost: totalCost, started_at: null, status:'completed', completed_by:userId, completed_at, updated_at:completed_at};
+    
+    const q=await sb.from('work_orders').update(update).eq('id',id);
+    if(q.error)throw q.error;
+    
+    await operations.audit('work_order_completed','work_order',id,{title:r.title,shift_name:update.shift_name,designation:update.designation,downtime_minutes:update.downtime_minutes,labor_minutes:update.labor_minutes,total_cost:update.total_cost});
+    toast('Work completion recorded. Cost calculated.');
+    loadView();
+  };
+  const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m);
+};
+window.reopenWork=async id=>{if(!['owner','manager','supervisor'].includes(role))return toast('Supervisor permission required to reopen work');if(!confirm('Reopen this completed work order?'))return;const q=await sb.from('work_orders').update({status:'open',updated_at:new Date().toISOString()}).eq('id',id);if(q.error)return toast(q.error.message);await operations.audit('work_order_reopened','work_order',id);toast('Work order reopened');loadView()};
+function createFileInput(){const i=document.createElement('input');i.type='file';i.id='fileInput';i.multiple=true;i.hidden=true;i.onchange=()=>uploadFiles(i.files);document.body.append(i);i.click()}
+async function uploadFiles(files){for(const file of files){const reserve=await sb.rpc('reserve_storage_upload',{p_organization_id:org.id,p_bytes:file.size,p_file_name:file.name,p_mime_type:file.type||'application/octet-stream'});if(reserve.error){toast(`${file.name}: ${reserve.error.message}`);continue}const reservationId=reserve.data,id=crypto.randomUUID(),path=`${org.id}/${plant.id}/${id}-${file.name.replace(/[^\w.-]/g,'_')}`;const upload=await sb.storage.from(FILE_BUCKET).upload(path,file);if(upload.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});toast(upload.error.message);continue}const meta=await sb.from('file_metadata').insert({id,organization_id:org.id,plant_id:plant.id,bucket:FILE_BUCKET,object_path:path,file_name:file.name,mime_type:file.type,size_bytes:file.size,category:'manual',uploaded_by:userId}).select('id').single();if(meta.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});toast(meta.error.message);continue}const finish=await sb.rpc('finalize_storage_upload',{p_reservation_id:reservationId,p_object_path:path,p_file_metadata_id:id});if(finish.error)toast(`Uploaded; usage recording warning: ${finish.error.message}`)}toast('Upload complete');loadView()}
+window.downloadFile=async path=>{let size=records.find(x=>x.object_path===path)?.size_bytes;if(size==null){const q=await sb.from('file_metadata').select('size_bytes').eq('organization_id',org.id).eq('object_path',path).maybeSingle();size=q.data?.size_bytes||0}const usage=await sb.rpc('record_storage_download',{p_organization_id:org.id,p_object_path:path,p_bytes:Number(size)||0});if(usage.error)return toast(usage.error.message);const{data:d,error}=await sb.storage.from(FILE_BUCKET).createSignedUrl(path,120);if(error)return toast(error.message);open(d.signedUrl,'_blank')};
+function realtimeRefresh(table){const modules={assets:'assets',work_orders:'work',notifications:'notifications',checklist_templates:'checklists',checklist_runs:'checklists',maintenance_plans:'maintenance',maintenance_completions:'maintenance',spares:'inventory',tools:'inventory',inventory_transactions:'inventory',tool_transactions:'inventory',support_threads:'support',support_messages:'support',manuals:'manuals',problem_cases:'solver',shift_assignments:'people',attendance:'people',shift_handovers:'people',daily_logs:'people',condition_recordings:'condition',condition_alarms:'condition'};if(view!=='dashboard'&&modules[table]!==view)return;clearTimeout(realtimeTimer);realtimeTimer=setTimeout(()=>loadView(),350)}
+function subscribe(){
+  channel?.unsubscribe();
+  const tables=['assets','work_orders','notifications','checklist_runs','maintenance_plans','spares','tools','support_threads','support_messages','attendance','daily_logs','condition_recordings','condition_alarms'];
+  channel=sb.channel(`plant-${plant.id}`,{config:{presence:{key:userId}}});
+  tables.forEach(table=>channel.on('postgres_changes',{event:'*',schema:'public',table},()=>realtimeRefresh(table)));
+  channel.on('presence',{event:'sync'},()=>{const state=channel.presenceState();onlineUsers=Math.max(1,Object.values(state).reduce((n,list)=>n+list.length,0));setSync()});
+  channel.subscribe(status=>{if(status==='SUBSCRIBED')channel.track({user_id:userId,name:profile.full_name||session?.user?.email,plant_id:plant.id,online_at:new Date().toISOString()});if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setSync()})
+}
+async function flush(){setSync();const n=await flushQueue(sb);if(n)toast(`${n} offline action(s) synchronized`)}window.addEventListener('online',flush);window.addEventListener('offline',setSync);window.addEventListener('popstate',async e=>{const target=e.state?.pmView;if(!target)return;handlingPop=true;try{view=target;renderNav();await loadView()}finally{handlingPop=false}});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});init();
+
+/* Phase 2 modules */
+async function loadPhase2View(){
+  $('#toolbar').hidden=false;$('#add').hidden=view==='people'||view==='notifications';$('#add').textContent='＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view}…</h3></div>`;
+  try{
+    if(view==='people'){const r=await sb.from('organization_members').select('user_id,role,active').eq('organization_id',org.id);if(r.error)throw r.error;const ids=(r.data||[]).map(x=>x.user_id),p=ids.length?await sb.from('profiles').select('id,full_name').in('id',ids):{data:[]};records=(r.data||[]).map(x=>({...x,profile:(p.data||[]).find(y=>y.id===x.user_id)}));return renderPeople()}
+    if(view==='checklists'){const r=await sb.from('checklist_templates').select('*,assets(name),checklist_items(count)').eq('plant_id',plant.id).order('updated_at',{ascending:false});if(r.error)throw r.error;records=r.data||[]}
+    if(view==='maintenance'){const r=await sb.from('maintenance_plans').select('*,assets(name)').eq('plant_id',plant.id).order('updated_at',{ascending:false});if(r.error)throw r.error;records=r.data||[]}
+    if(view==='inventory'){const[a,b]=await Promise.all([sb.from('spares').select('*').eq('plant_id',plant.id),sb.from('tools').select('*').eq('plant_id',plant.id)]);if(a.error)throw a.error;if(b.error)throw b.error;records=[...(a.data||[]).map(x=>({...x,_kind:'spare'})),...(b.data||[]).map(x=>({...x,_kind:'tool'}))]}
+    if(view==='notifications'){const r=await sb.from('notifications').select('*').eq('organization_id',org.id).order('created_at',{ascending:false}).limit(100);if(r.error)throw r.error;records=r.data||[];return renderNotifications()}
+    renderPhase2List();
+  }catch(e){$('#content').innerHTML=`<h1>${view}</h1><div class="card"><h3>Could not load module</h3><p>${esc(e.message)}</p></div>`}
+}
+function renderPeople(){$('#content').innerHTML=`<h1>Roster & Attendance</h1><div class="grid">${records.map(x=>`<div class="card"><h3>${esc(x.profile?.full_name||x.user_id)}</h3><p>${esc(x.role)} • ${x.active?'Active':'Inactive'}</p></div>`).join('')||'<div class="card">No members.</div>'}</div>`}
+function renderNotifications(){$('#content').innerHTML=`<section class="module-head"><div><h1>Alarms & Notifications</h1><p>Checklist failures, maintenance alerts and operational messages</p></div>${records.some(x=>!x.read_at)?'<button onclick="markAllNotificationsRead()">✓ Mark all read</button>':''}</section><div class="grid">${records.map(x=>`<article class="card ${x.read_at?'muted':''}"><div class="record-title"><div><h3>${x.read_at?'':'🔔 '}${esc(x.title)}</h3><p>${new Date(x.created_at).toLocaleString()}</p></div><span class="state ${x.read_at?'read':'alarm'}">${x.read_at?'Read':'Unread'}</span></div><p>${esc(x.body)}</p>${x.read_at?'':`<button onclick="markNotificationRead('${x.id}')">Mark read</button>`}</article>`).join('')||'<div class="empty-state"><b>No alarms</b><p>New operational alerts will appear here.</p></div>'}</div>`}
+window.markNotificationRead=async id=>{const r=await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('id',id);if(r.error)return toast(r.error.message);toast('Notification marked read');loadView()};
+window.markAllNotificationsRead=async()=>{const r=await sb.from('notifications').update({read_at:new Date().toISOString()}).eq('organization_id',org.id).is('read_at',null);if(r.error)return toast(r.error.message);toast('All notifications marked read');loadView()};
+function renderPhase2List(){const names={checklists:'Checklists',maintenance:'Maintenance',inventory:'Spares & Tools'};$('#content').innerHTML=`<h1>${names[view]}</h1><div class="grid">${records.map(phase2Card).join('')||'<div class="card">No records. Tap + Add.</div>'}</div>`}
+function phase2Card(x){if(view==='checklists')return`<div class="card"><h3>${esc(x.name)}</h3><p>${esc(x.assets?.name||'General')} • ${esc(x.schedule)} • ${esc(x.shift_name)}</p></div>`;if(view==='maintenance')return`<div class="card"><h3>${esc(x.title)}</h3><p>${esc(x.frequency)} • ${esc(x.priority)} • Due ${esc(x.next_due)} • ${esc(x.status)}</p><p>${esc(x.description)}</p></div>`;return x._kind==='spare'?`<div class="card"><h3>${esc(x.description)}</h3><p>${esc(x.part_number)} • Stock ${x.stock} • Min ${x.min_stock} • ${esc(x.bin_location)}</p></div>`:`<div class="card"><h3>${esc(x.name)}</h3><p>${esc(x.tool_code)} • ${esc(x.status)} • Calibration ${esc(x.calibration_due)}</p></div>`}
+const addPhase1Handler=$('#add').onclick;$('#add').onclick=()=>{if(['assets','work','files'].includes(view))return openRecordForm();if(view==='checklists')return phase2Form('checklist_templates',[['name','Checklist name'],['schedule','Schedule'],['shift_name','Shift'],['instructions','Instructions']]);if(view==='maintenance')return phase2Form('maintenance_plans',[['title','Title'],['frequency','Frequency'],['priority','Priority'],['next_due','Due date','date'],['description','Description']]);if(view==='inventory')return inventoryChoice()};
+function phase2Form(table,fields){$('#modalTitle').textContent='Add '+view;$('#fields').innerHTML=fields.map(f=>field(f[0],f[1],'',f[2]||'text')).join('');formHandler=async values=>{const record={...values,id:crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,created_by:userId,updated_at:new Date().toISOString()};if(['spares','tools'].includes(table))delete record.created_by;if(table==='maintenance_plans')record.status='pending';const r=await sb.from(table).insert(record);if(r.error)throw r.error;toast('Saved');loadPhase2View()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','')}
+function inventoryChoice(){const type=confirm('OK = Add Spare, Cancel = Add Tool')?'spares':'tools';const fs=type==='spares'?[['part_number','Part number'],['description','Description'],['stock','Stock','number'],['min_stock','Minimum','number'],['bin_location','Bin location']]:[['tool_code','Tool code'],['name','Name'],['specification','Specification'],['condition','Condition'],['calibration_due','Calibration due','date']];phase2Form(type,fs)}
+
+
+/* Phase 3 */
+async function loadPhase3View(){
+ $('#toolbar').hidden=false;$('#add').hidden=view==='reports';$('#add').textContent=view==='manuals'?'＋ Upload':view==='solver'?'＋ New Case':'＋ Add';$('#content').innerHTML=`<div class="card"><h3>Loading ${view}…</h3></div>`;
+ try{if(view==='support'){const r=await sb.from('support_threads').select('*,assets(name)').eq('plant_id',plant.id).order('updated_at',{ascending:false});if(r.error)throw r.error;records=r.data||[];renderSupport()}
+ else if(view==='manuals'){if(!canViewManuals){toast('Your account cannot view manuals — the owner can grant access in People → Edit & Permissions');window.go('dashboard');return}await sb.from('manuals').update({status:'index failed — tap to retry'}).eq('organization_id',org.id).like('status','indexing%').then(_=>{});const r=await sb.from('manuals').select('*,assets(name)').eq('organization_id',org.id).order('created_at',{ascending:false});if(r.error)throw r.error;records=r.data||[];renderManuals();if(role==='owner'||role==='manager'){records.filter(x=>(!x.status||x.status==='uploaded')&&x.mime_type==='application/pdf'&&(x.size_bytes||0)<=20*1024*1024).forEach(x=>window.indexManual(x.id,false))}}
+ else if(view==='solver'){const r=await sb.from('problem_cases').select('*,assets(name)').eq('plant_id',plant.id).order('created_at',{ascending:false});if(r.error)throw r.error;records=r.data||[];renderSolver()}
+ else return renderReports()}catch(e){$('#content').innerHTML=`<h1>${view}</h1><div class="card"><h3>Could not load</h3><p>${esc(e.message)}</p></div>`}}
+function renderSupport(){
+  $('#content').innerHTML=`<section class="module-head"><div><h1>Technical Support</h1><p>Open plant issues, discuss troubleshooting and preserve the complete conversation.</p></div><button class="primary" onclick="openSupportForm()">＋ New Support Issue</button></section><div class="source-box"><b>How it works:</b> Create an issue, add the first technical message, then workers can open the conversation and reply with voice or text.</div><div class="record-grid support-layout">${records.map(x=>`<article class="record-card"><div class="record-title"><div><h3>${esc(x.subject)}</h3><p>${esc(x.assets?.name||'General plant issue')} • ${new Date(x.updated_at||x.created_at).toLocaleString()}</p></div><span class="state ${esc(x.status)}">${esc(x.status)}</span></div><p>Priority: ${esc(x.priority)}</p><div class="actions"><button class="primary" onclick="openSupport('${x.id}')">Open Conversation</button><button onclick="setSupportStatus('${x.id}','${x.status==='closed'?'open':'closed'}')">${x.status==='closed'?'Reopen':'Close'}</button></div></article>`).join('')||`<div class="empty-state"><b>No support conversations</b><p>Create the first issue and record the symptoms, readings or alarm details.</p><button class="primary" onclick="openSupportForm()">＋ Create Support Issue</button></div>`}</div>`
+}
+window.openSupportForm=()=>{ensureCoreToolbar();$('#modalTitle').textContent='New Technical Support Issue';$('#fields').innerHTML=field('subject','Issue subject')+`<label class="form-field"><span>Priority</span><select name="priority"><option>low</option><option selected>medium</option><option>high</option><option>critical</option></select></label><label class="form-field span-2"><span>First message</span><textarea name="message" placeholder="Describe symptoms, alarms, readings and checks already completed" required></textarea></label>`;formHandler=async values=>{const id=crypto.randomUUID(),stamp=new Date().toISOString();let r=await sb.from('support_threads').insert({id,organization_id:org.id,plant_id:plant.id,subject:values.subject,priority:values.priority,status:'open',created_by:userId,created_at:stamp,updated_at:stamp});if(r.error)throw r.error;r=await sb.from('support_messages').insert({id:crypto.randomUUID(),thread_id:id,user_id:userId,message:values.message,created_at:stamp});if(r.error)throw r.error;await operations.audit('support_issue_created','support_thread',id,{subject:values.subject,priority:values.priority});toast('Support issue created');loadPhase3View()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m)};
+window.openSupport=async id=>{const thread=records.find(x=>x.id===id),r=await sb.from('support_messages').select('*').eq('thread_id',id).order('created_at');if(r.error)return toast(r.error.message);const userIds=[...new Set((r.data||[]).map(x=>x.user_id))],profiles=userIds.length?(await sb.from('profiles').select('id,full_name,designation').in('id',userIds)).data||[]:[];$('#modalTitle').textContent=thread?.subject||'Support conversation';$('#fields').innerHTML=`<div class="span-2 conversation">${(r.data||[]).map(x=>{const p=profiles.find(y=>y.id===x.user_id);return`<div class="message ${x.user_id===userId?'mine':''}">${esc(x.message)}<small>${esc(p?.full_name||'Worker')} • ${esc(p?.designation||'')} • ${new Date(x.created_at).toLocaleString()}</small></div>`}).join('')||'<p>No messages.</p>'}</div><label class="span-2">Reply<textarea name="message" placeholder="Write or dictate a technical reply" required></textarea></label>`;formHandler=async values=>{const stamp=new Date().toISOString(),q=await sb.from('support_messages').insert({id:crypto.randomUUID(),thread_id:id,user_id:userId,message:values.message,created_at:stamp});if(q.error)throw q.error;await sb.from('support_threads').update({updated_at:stamp,status:'open'}).eq('id',id);await operations.audit('support_reply_added','support_thread',id);toast('Reply sent');setTimeout(()=>window.openSupport(id),200)};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m);setTimeout(()=>{const c=m.querySelector('.conversation');if(c)c.scrollTop=c.scrollHeight},0)};
+window.setSupportStatus=async(id,status)=>{const r=await sb.from('support_threads').update({status,updated_at:new Date().toISOString()}).eq('id',id);if(r.error)return toast(r.error.message);await operations.audit(`support_${status}`,'support_thread',id);toast(`Support issue ${status}`);loadPhase3View()};
+function renderManuals(){$('#content').innerHTML=`<h1>Manuals & Drawings</h1><div class="grid">${records.map(x=>`<div class="card"><h3>${esc(x.title)}</h3><p>${esc(x.manufacturer)} ${esc(x.model)}<br>${esc(x.assets?.name||'General')} • ${Math.ceil((x.size_bytes||0)/1024)} KB • ${esc(x.status||'uploaded')}</p><button onclick="openManual('${x.storage_path}')">Open</button><button onclick="indexManual('${x.id}',true)">🤖 Index for AI</button>${role==='owner'||role==='manager'?`<button class="danger" onclick="deleteManual('${x.id}')">🗑 Delete</button>`:''}</div>`).join('')||'<div class="card">No manuals uploaded.</div>'}</div>`}
+window.indexManual=(id,force)=>{indexChain=indexChain.then(()=>runIndexJob(id,force)).catch(()=>{})};
+async function runIndexJob(id,force){const m=records.find(x=>x.id===id);if(!m)return;if(indexingIds.has(id))return;const st0=m.status||'';if(st0.indexOf('indexing')===0)return;if(st0==='indexed'&&!confirm('This manual is already indexed.\nRe-indexing from scratch uses AI credits again. Continue?'))return;indexingIds.add(id);const setStatus=st=>{sb.from('manuals').update({status:st}).eq('id',id).eq('organization_id',org.id).then(_=>{});const i=records.findIndex(x=>x.id===id);if(i>=0)records[i]={...records[i],status:st};loadPhase3View();};const call=async()=>{const r=await sb.functions.invoke('ingest-manual',{body:{organization_id:org.id,manual_id:id,force:!!force}});if(r.error){let d='';try{d=(await r.error.context?.json())?.error||''}catch(_){}const msg=d||r.error.message||String(r.error);if(/still processing|retrying automatically/i.test(msg))return{retry:true,message:msg};throw Error(msg)}if(r.data&&r.data.error){const msg=String(r.data.error);if(/still processing|retrying automatically/i.test(msg))return{retry:true,message:msg};throw Error(msg)}return r.data||{}};await sb.from('manuals').update({status:'indexing…'}).eq('id',id).eq('organization_id',org.id);{const i0=records.findIndex(x=>x.id===id);if(i0>=0)records[i0]={...records[i0],status:'indexing…'}};toast(force?'Re-indexing manual for AI — this can take a few minutes…':'Indexing manual for AI in the background — this can take a few minutes…');try{let data=await call();let tries=0;while(data&&data.retry){tries++;if(tries>8)throw Error(data.message||'Gemini is taking too long — tap Index for AI again later');setStatus('indexing… (retry '+tries+')');await new Promise(res=>setTimeout(res,40000));data=await call();}setStatus('indexed');toast(`Done — ${data.chunks||0} text chunks ready. The AI can now read this manual.`)}catch(e){setStatus('index failed — tap to retry');toast('Indexing failed: '+(e.message||e))}finally{indexingIds.delete(id)}};
+window.deleteManual=async id=>{const m=records.find(x=>x.id===id);if(!m)return;if(!confirm('Delete "'+m.title+'"?\nThis removes the file, its AI index and all records. This cannot be undone.'))return;try{const r=await sb.functions.invoke('delete-manual',{body:{organization_id:org.id,manual_id:id}});if(r.error){let d='';try{d=(await r.error.context?.json())?.error||''}catch(_){}throw Error(d||r.error.message)}if(r.data&&r.data.error)throw Error(r.data.error);records=records.filter(x=>x.id!==id);loadPhase3View();toast('Manual deleted')}catch(e){toast('Delete failed: '+(e.message||e))}};
+window.openManual=async path=>{let size=records.find(x=>x.storage_path===path)?.size_bytes;if(size==null){const q=await sb.from('manuals').select('size_bytes').eq('organization_id',org.id).eq('storage_path',path).maybeSingle();size=q.data?.size_bytes||0}const usage=await sb.rpc('record_storage_download',{p_organization_id:org.id,p_object_path:path,p_bytes:Number(size)||0});if(usage.error)return toast(usage.error.message);const r=await sb.storage.from(FILE_BUCKET).createSignedUrl(path,120);if(r.error)return toast(r.error.message);open(r.data.signedUrl,'_blank')};
+let solverMode='manual';
+function renderSolver(){
+  $('#content').innerHTML=`<section class="module-head"><div><h1>Problem Solver</h1><p>Search plant manuals and experience, ask Gemini securely, or continue with Google.</p></div><button class="secondary" onclick="solverHistory()">Case History (${records.length})</button></section><div class="card"><div class="solver-modes"><button class="${solverMode==='manual'?'active':''}" onclick="setSolverMode('manual')">📚 Manual</button><button class="${solverMode==='gemini'?'active':''}" onclick="setSolverMode('gemini')">✦ Gemini</button><button class="${solverMode==='gemini_manual'?'active':''}" onclick="setSolverMode('gemini_manual')">✦＋📚 Gemini + Manual</button><button class="${solverMode==='google'?'active':''}" onclick="setSolverMode('google')">G Google</button></div><div class="solver-search"><input id="solverQuestion" type="search" placeholder="Describe the fault, alarm code, symptoms or readings…"><button class="primary" onclick="runProblemSearch()">Search / Diagnose</button></div><p id="solverModeHelp" class="muted-text">${solverHelp()}</p></div><div id="solverResult" class="solver-result">${records.length?`<div class="card"><b>Recent case:</b> ${esc(records[0].title)} — ${esc(records[0].status)}</div>`:'<div class="empty-state"><b>Ready to troubleshoot</b><p>Select a mode, enter the problem, or use the microphone.</p></div>'}</div>`;operations.enhanceVoice($('#content'));$('#solverQuestion').onkeydown=e=>{if(e.key==='Enter')window.runProblemSearch()}
+}
+function solverHelp(){return{manual:'Search only uploaded manual text, approved technical experience and verified plant cases.',gemini:'Ask Gemini for a fast safety-focused technical diagnosis. The private key remains in Supabase.',gemini_manual:'Give Gemini the matching plant manuals and approved experience as its allowed source context.',google:'Open a Google technical search in a new browser tab.'}[solverMode]}
+window.setSolverMode=mode=>{solverMode=mode;renderSolver();setTimeout(()=>$('#solverQuestion')?.focus(),0)};
+async function collectPlantSources(question){const term=question.trim().replace(/[,%()]/g,' ').slice(0,100),[chunks,experiences,cases,manualFiles]=await Promise.all([sb.from('document_chunks').select('content,page_number,manuals(title)').ilike('content',`%${term}%`).limit(8),sb.from('technical_experiences').select('problem,symptoms,root_cause,solution,tools,parts').eq('organization_id',org.id).eq('approved',true).or(`problem.ilike.%${term}%,symptoms.ilike.%${term}%`).limit(8),sb.from('problem_cases').select('title,symptoms,actual_cause,verified_solution').eq('organization_id',org.id).not('verified_solution','is',null).or(`title.ilike.%${term}%,symptoms.ilike.%${term}%`).limit(8),sb.from('manuals').select('title,manufacturer,model,storage_path,status').eq('organization_id',org.id).or(`title.ilike.%${term}%,manufacturer.ilike.%${term}%,model.ilike.%${term}%`).limit(12)]);return{manuals:chunks.data||[],manual_files:manualFiles.data||[],experiences:experiences.data||[],verified_cases:cases.data||[]}}
+window.runProblemSearch=async()=>{const question=$('#solverQuestion').value.trim();if(!question)return toast('Describe the problem first');if(solverMode==='google'){open(`https://www.google.com/search?q=${encodeURIComponent(question+' industrial maintenance troubleshooting')}`,'_blank');$('#solverResult').innerHTML=`<div class="card"><h3>Google search opened</h3><p>${esc(question)}</p><p>Check manufacturer and safety sources before acting.</p></div>`;return}const out=$('#solverResult');out.innerHTML='<div class="card"><h3>Searching safely…</h3><p>Checking plant sources and selected diagnostic mode.</p></div>';try{const sources=solverMode==='gemini'?{manuals:[],manual_files:[],experiences:[],verified_cases:[]}:await collectPlantSources(question);if(solverMode==='manual'){const manualFiles=sources.manual_files.map(x=>`<div class="source-item"><b>📄 ${esc(x.title)}</b><p>${esc(x.manufacturer||'')} ${esc(x.model||'')} • ${esc(x.status||'uploaded')}</p><button onclick="openManual('${x.storage_path}')">Open Manual</button></div>`).join(''),manual=sources.manuals.map(x=>`<div class="source-item"><b>${esc(x.manuals?.title||'Manual')} — page ${esc(x.page_number||'—')}</b><p>${esc(x.content.slice(0,900))}</p></div>`).join(''),exp=sources.experiences.map(x=>`<div class="source-item"><b>Approved experience: ${esc(x.problem)}</b><p><b>Cause:</b> ${esc(x.root_cause)}<br><b>Solution:</b> ${esc(x.solution)}</p></div>`).join(''),cases=sources.verified_cases.map(x=>`<div class="source-item"><b>Verified case: ${esc(x.title)}</b><p><b>Cause:</b> ${esc(x.actual_cause||'')}<br><b>Solution:</b> ${esc(x.verified_solution)}</p></div>`).join('');out.innerHTML=`<div class="card"><h2>Plant-source results</h2><p class="safety-note">⚠ Follow LOTO, isolation, guarding and qualified-person requirements.</p><div class="source-list">${manualFiles+manual+exp+cases||'<p>No extracted manual text or approved matching experience was found. Upload/extract a manual or try Gemini.</p>'}</div></div>`;return}
+  const mode=solverMode==='gemini_manual'?'manual':'quick',functionBody={mode,question,organization_id:org.id,plant_id:plant.id,manuals:sources.manuals,approved_experiences:sources.experiences,verified_cases:sources.verified_cases};const invoke=await sb.functions.invoke('smart-responder',{body:functionBody});if(invoke.error){let detail='';try{const payload=await invoke.error.context?.json();detail=payload?.error||payload?.message||''}catch{}throw Error(detail||invoke.error.message)}const answer=invoke.data||{};if(answer.error)throw Error(answer.error);out.innerHTML=`<div class="card"><div class="record-title"><div><h2>Gemini diagnosis</h2><p>${solverMode==='gemini_manual'?'Gemini + plant manuals':'Gemini fast answer'}</p></div><span class="state">${esc(answer.confidence||'Unverified')}</span></div><div class="source-box"><b>Safety</b><p>${esc(answer.safety||'Follow plant safety procedures, isolation and qualified-person requirements.')}</p></div><div class="answer-text">${esc(answer.answer||'No answer returned').replaceAll('\n','<br>')}</div><h3>Sources</h3><ul>${(answer.sources||[]).map(x=>`<li>${esc(x)}</li>`).join('')||'<li>No source list returned — verify before action.</li>'}</ul><button onclick="saveSolverCase()">Save as Problem Case</button></div>`;window.lastSolverAnswer={question,mode:solverMode,answer}}catch(e){out.innerHTML=`<div class="error-state"><h2>Diagnosis unavailable</h2><p>${esc(e.message)}</p><button onclick="runProblemSearch()">Retry</button></div>`}}
+window.saveSolverCase=async()=>{const x=window.lastSolverAnswer;if(!x)return;const r=await sb.from('problem_cases').insert({id:crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,title:x.question.slice(0,120),symptoms:x.question,mode:x.mode,ai_answer:x.answer,status:'open',created_by:userId,created_at:new Date().toISOString()});if(r.error)return toast(r.error.message);await operations.audit('problem_case_saved','problem_case',r.data?.id||'new',{mode:x.mode});toast('Problem case saved');loadPhase3View()};
+window.solverHistory=()=>{$('#solverResult').innerHTML=`<div class="record-grid">${records.map(x=>`<article class="record-card"><h3>${esc(x.title)}</h3><p>${esc(x.symptoms)}<br>${esc(x.mode)} • ${esc(x.status)}</p>${x.verified_solution?`<div class="source-box"><b>Verified solution</b><p>${esc(x.verified_solution)}</p></div>`:''}</article>`).join('')||'<div class="empty-state">No saved cases.</div>'}</div>`};
+let reportRows=[],reportTable='work_orders';
+const reportTables=['assets','work_orders','checklist_runs','maintenance_plans','spares','tools','support_threads','manuals','problem_cases','attendance','daily_logs','shift_handovers'];
+async function renderReports(){
+  $('#toolbar').hidden=true;
+  $('#content').innerHTML=`<section class="module-head"><div><h1>Reports & Analytics</h1><p>Generate once, then view or download the selected report format.</p></div><button class="secondary" onclick="window.go('dashboard')">Dashboard</button></section><div class="report-controls card"><label>Report module<select id="reportModule">${reportTables.map(t=>`<option value="${t}" ${t===reportTable?'selected':''}>${t.replaceAll('_',' ')}</option>`).join('')}</select></label><label>From date<input id="reportFrom" type="date"></label><label>To date<input id="reportToDate" type="date"></label><button class="primary" onclick="loadReportPreview()">Generate Report</button></div><div class="format-grid">${['csv','excel','word','pdf'].map(t=>`<article class="format-card"><div><b>${t.toUpperCase()}</b><small>${t==='csv'?'Data table':t==='excel'?'Spreadsheet':t==='word'?'Document':'Print-ready report'}</small></div><button onclick="viewReport('${t}')">View</button><button class="primary" onclick="exportReport('${t}')">Download</button></article>`).join('')}</div><div id="reportPreview">${emptyReport('Select a module and tap Generate Report. Reports now load only the selected module.')}</div>`;
+}
+function emptyReport(message){return `<div class="empty-state"><b>Report preview</b><p>${esc(message)}</p></div>`}
+window.loadReportPreview=async()=>{
+  reportTable=$('#reportModule').value;const from=$('#reportFrom').value,to=$('#reportToDate').value;
+  $('#reportPreview').innerHTML='<div class="card loading-card"><span class="spinner"></span><div><h3>Generating report</h3><p>Loading the selected module…</p></div></div>';
+  try{const request=sb.from(reportTable).select('*').eq('organization_id',org.id).limit(1000),timeout=new Promise((_,reject)=>setTimeout(()=>reject(Error('Report request timed out. Check the connection and retry.')),15000)),r=await Promise.race([request,timeout]);if(r.error)throw r.error;
+  reportRows=(r.data||[]).filter(row=>{const raw=row.created_at||row.updated_at||row.performed_at||row.completed_at||row.work_date||row.log_date||row.next_due;if(!raw||(!from&&!to))return true;const d=String(raw).slice(0,10);return(!from||d>=from)&&(!to||d<=to)});paintReportPreview();toast(`Report generated: ${reportRows.length} record(s)`)}catch(error){reportRows=[];$('#reportPreview').innerHTML=`<div class="error-state"><h2>Report could not load</h2><p>${esc(error.message)}</p><button onclick="loadReportPreview()">Retry</button></div>`}
+};
+function paintReportPreview(){if(!reportRows.length){$('#reportPreview').innerHTML=emptyReport('No records match the selected module and dates.');return}const keys=reportKeys();$('#reportPreview').innerHTML=`<div class="report-summary"><b>${reportRows.length} record(s)</b><span>${esc(reportTable.replaceAll('_',' '))}</span></div><div class="table-wrap"><table><thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead><tbody>${reportRows.slice(0,100).map(row=>`<tr>${keys.map(k=>`<td>${esc(reportValue(row[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${reportRows.length>100?'<p class="muted-text">Preview shows 100 rows; downloads contain all rows.</p>':''}`}
+function reportKeys(){const preferred=['created_at','updated_at','work_date','log_date','title','name','asset_code','status','priority','shift_name','worker_name','designation','description','work_done'];const all=[...new Set(reportRows.flatMap(r=>Object.keys(r)))].filter(k=>!['organization_id','plant_id','signature_data'].includes(k));return[...preferred.filter(k=>all.includes(k)),...all.filter(k=>!preferred.includes(k))].slice(0,18)}
+function reportValue(v){if(v==null)return'';if(typeof v==='object')return JSON.stringify(v);return String(v)}
+function reportCSV(){const keys=reportKeys();return[keys.join(','),...reportRows.map(r=>keys.map(k=>`"${reportValue(r[k]).replaceAll('"','""')}"`).join(','))].join('\r\n')}
+function reportHTML(format='report'){const keys=reportKeys(),title=`${org.name} — ${plant.name} — ${reportTable.replaceAll('_',' ')}`;return`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${esc(title)}</title><style>body{font:12px Arial;margin:28px;color:#111}h1{font-size:21px}.meta{margin-bottom:16px;color:#555}.badge{padding:4px 8px;background:#e8f1fa;border-radius:6px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #8594a3;padding:6px;text-align:left;vertical-align:top}th{background:#dfeaf5}@media print{button{display:none}}</style></head><body><h1>${esc(title)}</h1><div class="meta">Generated ${new Date().toLocaleString()} • ${reportRows.length} record(s) • <span class="badge">${format.toUpperCase()} view</span></div><table><thead><tr>${keys.map(k=>`<th>${esc(k.replaceAll('_',' '))}</th>`).join('')}</tr></thead><tbody>${reportRows.map(r=>`<tr>${keys.map(k=>`<td>${esc(reportValue(r[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`}
+function saveReportBlob(data,type,extension){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=`PlantMaster-${reportTable}-${new Date().toISOString().slice(0,10)}.${extension}`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+window.viewReport=type=>{if(!reportRows.length)return toast('Generate the report first');if(type==='csv'){$('#reportPreview').innerHTML=`<div class="report-summary"><b>CSV view</b><button onclick="paintReportPreview()">Table view</button></div><pre class="csv-view">${esc(reportCSV())}</pre>`;return}const w=open('','_blank');if(!w)return toast('Allow pop-ups to view this format');w.document.write(reportHTML(type));if(type==='pdf')w.document.write('<p><button onclick="print()">Print / Save PDF</button></p>');w.document.close()};
+window.exportReport=type=>{if(!reportRows.length)return toast('Generate the report first');if(type==='csv')saveReportBlob('\ufeff'+reportCSV(),'text/csv;charset=utf-8','csv');if(type==='excel')saveReportBlob('\ufeff'+reportHTML('excel'),'application/vnd.ms-excel','xls');if(type==='word')saveReportBlob(reportHTML('word'),'application/msword','doc');if(type==='pdf'){const w=open('','_blank');if(!w)return toast('Allow pop-ups to save PDF');w.document.write(reportHTML('pdf'));w.document.close();setTimeout(()=>w.print(),350)}toast(type==='pdf'?'Print dialog opened — choose Save as PDF':`${type.toUpperCase()} downloaded`)};
+
+const addPhase2Click=$('#add').onclick;$('#add').onclick=()=>{if(view==='support')return phase3Form('support_threads',[['subject','Subject'],['priority','Priority']]);if(view==='solver')return phase3Form('problem_cases',[['title','Problem title'],['symptoms','Symptoms'],['alarm_code','Alarm code']]);if(view==='manuals')return createManualInput();return ['assets','work','files'].includes(view)?openRecordForm():view==='checklists'?phase2Form('checklist_templates',[['name','Checklist name'],['schedule','Schedule'],['shift_name','Shift'],['instructions','Instructions']]):view==='maintenance'?phase2Form('maintenance_plans',[['title','Title'],['frequency','Frequency'],['priority','Priority'],['next_due','Due date','date'],['description','Description']]):view==='inventory'?inventoryChoice():null};
+function phase3Form(table,fields){$('#modalTitle').textContent='Add '+view;$('#fields').innerHTML=fields.map(f=>field(f[0],f[1],'',f[2]||'text')).join('');formHandler=async values=>{const r={...values,id:crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,created_by:userId,updated_at:new Date().toISOString()};if(table==='support_threads')r.status='open';if(table==='problem_cases'){r.status='open';r.mode='offline'}const q=await sb.from(table).insert(r);if(q.error)throw q.error;toast('Saved');loadPhase3View()};const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','')}
+function createManualInput(){const i=document.createElement('input');i.type='file';i.accept='.pdf,.doc,.docx,image/*';i.onchange=()=>uploadManual(i.files[0]);i.click()}
+async function uploadManual(file){if(!file)return;const reserve=await sb.rpc('reserve_storage_upload',{p_organization_id:org.id,p_bytes:file.size,p_file_name:file.name,p_mime_type:file.type||'application/octet-stream'});if(reserve.error)return toast(reserve.error.message);const reservationId=reserve.data,id=crypto.randomUUID(),path=`${org.id}/${plant.id}/manuals/${id}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(path,file);if(u.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(u.error.message)}const r=await sb.from('manuals').insert({id,organization_id:org.id,plant_id:plant.id,title:file.name,storage_path:path,mime_type:file.type,size_bytes:file.size,uploaded_by:userId});if(r.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(r.error.message)}await operations.audit('manual_uploaded','manual',id,{title:file.name});const meta=await sb.from('file_metadata').insert({organization_id:org.id,plant_id:plant.id,bucket:FILE_BUCKET,object_path:path,file_name:file.name,mime_type:file.type,size_bytes:file.size,category:'manual',uploaded_by:userId}).select('id').single();if(meta.error){await sb.rpc('cancel_storage_reservation',{p_reservation_id:reservationId});return toast(meta.error.message)}await sb.rpc('finalize_storage_upload',{p_reservation_id:reservationId,p_object_path:path,p_file_metadata_id:meta.data.id});loadPhase3View();if(file.type==='application/pdf'&&file.size<=20*1024*1024){toast('Manual saved — starting AI indexing automatically…');indexManual(id)}else toast(file.type==='application/pdf'?'Manual uploaded (over 20 MB — split it into parts, then use Index for AI)':'Manual uploaded')}
+
+
+
+/* Branding a company has ALREADY SAVED is left alone — taking
+   away a logo they are using would be punishing them for a
+   change on our side. The gate only stops them setting NEW
+   branding. If you ever need to strip branding on downgrade,
+   set STRIP_BRANDING_ON_DOWNGRADE to true. */
+const STRIP_BRANDING_ON_DOWNGRADE=false;
+async function brandingAllowed(x={}){
+  if(!STRIP_BRANDING_ON_DOWNGRADE)return x;
+  if(await canUseBranding())return x;
+  const{app_name,primary_color,secondary_color,theme,pattern,logo_path,...rest}=x;
+  return rest;
+}
+async function applyBranding(x={}){
+  const palettes={industrial:['#0ea5e9','#22d3ee'],corporate:['#2563eb','#7c3aed'],green:['#059669','#84cc16'],steel:['#64748b','#38bdf8'],light:['#2563eb','#0891b2']};
+  const fallback=palettes[x.theme]||palettes.industrial,primary=x.primary_color||fallback[0],secondary=x.secondary_color||fallback[1];
+  document.documentElement.style.setProperty('--brand-primary',primary);document.documentElement.style.setProperty('--brand-secondary',secondary);
+  document.body.dataset.theme=x.theme||'industrial';document.body.dataset.pattern=x.pattern||'grid';
+  document.title=x.app_name||'PlantMaster Pro';if($('#plantLabel'))$('#plantLabel').textContent=x.plant_display_name||plant?.name||'';
+  if(x.logo_path&&$('#brandLogo')){const r=await sb.storage.from(FILE_BUCKET).createSignedUrl(x.logo_path,3600);if(!r.error){$('#brandLogo').src=r.data.signedUrl;$('#brandLogo').hidden=false}}
+}
+/* Does this company's package include paid branding?
+   Fails CLOSED: if the plan cannot be read we lock the fields
+   rather than give branding away by accident. */
+let _featCache=null;
+async function effectiveFeatures(){
+  if(_featCache)return _featCache;
+  /* Preferred: package + per-company extras - per-company blocks. */
+  try{
+    const r=await sb.rpc('organization_effective_features',{p_organization_id:org.id});
+    if(!r.error&&r.data&&typeof r.data==='object'){_featCache=r.data;return _featCache}
+  }catch(_){}
+  /* Fallback for before 10-COMPANY-FEATURES.sql is run. */
+  try{
+    const r=await sb.rpc('organization_plan_summary',{p_organization_id:org.id});
+    if(!r.error){_featCache=r.data?.plan?.features||{};return _featCache}
+  }catch(_){}
+  return (_featCache={});
+}
+async function canUseBranding(){
+  const f=await effectiveFeatures();
+  return !!f.white_label;
+}
+
+async function renderCompanyProfile(){
+  const r=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();if(r.error)return $('#content').innerHTML=`<div class="error-state"><h2>Profile could not load</h2><p>${esc(r.error.message)}</p></div>`;const x=r.data||{};
+  let logo='';if(x.logo_path){const u=await sb.storage.from(FILE_BUCKET).createSignedUrl(x.logo_path,900);logo=u.data?.signedUrl||''}
+  const opts=(list,current)=>list.map(v=>`<option value="${v}" ${v===(current||'')?'selected':''}>${v[0].toUpperCase()+v.slice(1)}</option>`).join('');
+  /* Paid branding gate. Locked fields stay visible so the
+     customer can see what the upgrade buys them. */
+  const brandOK=await canUseBranding();
+  const lock=brandOK?'':' disabled';
+  const upsell=brandOK?'':`<div class="span-2 card" style="border-color:#1e3a5f;background:#0d1b2e;display:flex;gap:12px;align-items:flex-start;padding:14px">
+      <span style="font-size:20px;line-height:1">🎨</span>
+      <div><b style="color:#7aa2f7">Company profile & branding is a paid feature</b>
+      <p style="margin:6px 0 10px;font-size:13.5px;opacity:.85">Make the app your own: your logo, your application name, your colours, and your company address, contact number and footer printed on every report, work order and document you export. The settings below are locked on your current plan.</p>
+      <a href="https://wa.me/923162364074?text=${encodeURIComponent('Hello HSB Fix Services — I would like to enable Company Branding for '+(org?.name||'my company')+'.')}" target="_blank" rel="noopener" style="display:inline-block;background:#25d366;color:#04210f;font-weight:700;padding:9px 16px;border-radius:8px;text-decoration:none;font-size:13.5px">Enable branding on WhatsApp</a>
+      </div></div>`;
+  $('#content').innerHTML=`<section class="module-head"><div><h1>Company Profile & Theme</h1><p>Changes apply immediately to this company workspace and document branding.</p></div><button class="secondary" onclick="window.go('dashboard')">Dashboard</button></section><div class="card profile-shell"><div class="logo-panel"><div id="companyLogoPreview" class="logo-preview">${logo?`<img src="${logo}" alt="Company logo">`:'<span>No logo uploaded</span>'}</div><label class="form-field"><span>Company logo</span><input id="setLogo" type="file" accept="image/png,image/jpeg,image/webp"${lock}></label></div><form id="companyProfileForm" class="profile-form">${upsell}<label class="form-field"><span>Application name</span><input id="setApp" value="${esc(x.app_name||'PlantMaster Pro')}" required${lock}></label><label class="form-field"><span>Plant display name</span><input id="setPlant" value="${esc(x.plant_display_name||plant.name)}" required${lock}></label><label class="form-field color-field"><span>Primary colour</span><input id="setPrimary" type="color" value="${esc(x.primary_color||'#0ea5e9')}"${lock}></label><label class="form-field color-field"><span>Secondary colour</span><input id="setSecondary" type="color" value="${esc(x.secondary_color||'#22d3ee')}"${lock}></label><label class="form-field"><span>Theme</span><select id="setTheme"${lock}>${opts(['industrial','corporate','green','steel','light'],x.theme||'industrial')}</select></label><label class="form-field"><span>Pattern</span><select id="setPattern"${lock}>${opts(['grid','dots','diagonal','circuit','none'],x.pattern||'grid')}</select></label><label class="form-field span-2"><span>Company address</span><textarea id="setAddress"${lock}>${esc(x.address||'')}</textarea></label><label class="form-field"><span>Contact number</span><input id="setContact" value="${esc(x.contact||'')}"${lock}></label><label class="form-field"><span>Company email</span><input id="setEmail" type="email" value="${esc(x.email||'')}"${lock}></label><label class="form-field"><span>Daily report time</span><input id="setReportTime" type="time" value="${esc(String(x.report_time||'11:00').slice(0,5))}"${lock}></label><label class="form-field"><span>Document footer</span><input id="setFooter" value="${esc(x.footer_text||'')}"${lock}></label><div class="theme-preview"><b>Live theme preview</b><p>Buttons, highlights, patterns and documents use your selected company colours.</p></div><div class="span-2 actions"><button type="submit" class="primary">Save & Apply Profile</button></div></form></div>`;
+  if(brandOK){
+    $('#setLogo').onchange=e=>{const f=e.target.files[0];if(f)$('#companyLogoPreview').innerHTML=`<img src="${URL.createObjectURL(f)}" alt="Logo preview">`};
+    const live=()=>applyBranding({primary_color:$('#setPrimary').value,secondary_color:$('#setSecondary').value,pattern:$('#setPattern').value,theme:$('#setTheme').value,plant_display_name:$('#setPlant').value,app_name:$('#setApp').value});['setPrimary','setSecondary','setPattern'].forEach(id=>$('#'+id).oninput=live);$('#setTheme').onchange=()=>{const palettes={industrial:['#0ea5e9','#22d3ee'],corporate:['#2563eb','#7c3aed'],green:['#059669','#84cc16'],steel:['#64748b','#38bdf8'],light:['#2563eb','#0891b2']},p=palettes[$('#setTheme').value];$('#setPrimary').value=p[0];$('#setSecondary').value=p[1];live()};
+  }
+  $('#companyProfileForm').onsubmit=saveCompanyProfile;
+  operations.enhanceVoice($('#content'));
+}
+async function saveCompanyProfile(e){
+  e.preventDefault();const button=e.submitter;button.disabled=true;button.textContent='Saving…';try{
+  /* Re-check entitlement at save time. A disabled input can be
+     re-enabled in browser devtools, so never trust the form. */
+  const brandOK=await canUseBranding();
+  let logo_path;const file=brandOK?$('#setLogo').files[0]:null;if(file){if(file.size>5*1024*1024)throw Error('Logo must be smaller than 5 MB');logo_path=`${org.id}/branding/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(logo_path,file);if(u.error)throw u.error}
+  const payload={organization_id:org.id,app_name:$('#setApp').value.trim(),plant_display_name:$('#setPlant').value.trim(),primary_color:$('#setPrimary').value,secondary_color:$('#setSecondary').value,theme:$('#setTheme').value,pattern:$('#setPattern').value,address:$('#setAddress').value.trim(),contact:$('#setContact').value.trim(),email:$('#setEmail').value.trim(),report_time:$('#setReportTime').value||'11:00',footer_text:$('#setFooter').value.trim(),updated_at:new Date().toISOString()};if(logo_path)payload.logo_path=logo_path;if(!brandOK){['app_name','primary_color','secondary_color','theme','pattern','logo_path','plant_display_name','address','contact','email','report_time','footer_text'].forEach(k=>delete payload[k])}
+  const r=await sb.from('organization_settings').upsert(payload);if(r.error)throw r.error;
+  /* Re-read the saved row so branding the customer already owns
+     (logo, colours) is re-applied, not wiped by a partial payload. */
+  const after=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();
+  await applyBranding(after.data||payload);await operations.audit('company_profile_updated','organization',org.id,{theme:payload.theme,pattern:payload.pattern,branding:brandOK});toast('Company profile saved and applied');await renderCompanyProfile()}catch(error){toast(error.message)}finally{button.disabled=false;button.textContent='Save & Apply Profile'}}
+
+/* Phase 4 */
+async function loadPhase4View(){
+ $('#toolbar').hidden=true;if(view==='profile')return renderCompanyProfile();try{
+ if(view==='profile'){const r=await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle();const x=r.data||{};$('#content').innerHTML=`<h1>Company Profile & Theme</h1><div class="card"><label>Company logo</label><input id="setLogo" type="file" accept="image/*"><label>App name</label><input id="setApp" value="${esc(x.app_name||'PlantMaster Pro')}"><label>Plant display name</label><input id="setPlant" value="${esc(x.plant_display_name||plant.name)}"><label>Primary colour</label><input id="setPrimary" type="color" value="${esc(x.primary_color||'#3b82f6')}"><label>Secondary colour</label><input id="setSecondary" type="color" value="${esc(x.secondary_color||'#06b6d4')}"><label>Theme</label><select id="setTheme"><option>industrial</option><option>corporate</option><option>green</option><option>steel</option><option>light</option></select><label>Pattern</label><select id="setPattern"><option>grid</option><option>dots</option><option>diagonal</option><option>circuit</option><option>none</option></select><label>Address</label><input id="setAddress" value="${esc(x.address||'')}"><label>Contact</label><input id="setContact" value="${esc(x.contact||'')}"><label>Email</label><input id="setEmail" value="${esc(x.email||'')}"><button onclick="saveOrgSettings()">Save Profile</button></div>`}
+ if(view==='invites'){const r=await sb.from('invitations').select('*').eq('organization_id',org.id).order('created_at',{ascending:false});records=r.data||[];$('#content').innerHTML=`<h1>Invitations</h1><button onclick="createInvite()">＋ Invite User</button><div class="grid">${records.map(i=>`<div class="card"><h3>${esc(i.email||'QR Invite')}</h3><p>${esc(i.role)} • Expires ${i.expires_at}</p><div class="invite-actions"><button class="email-btn" onclick="emailInvitation('${i.id}')">✉ Email</button><button class="whatsapp-btn" onclick="whatsappInvitation('${i.id}')">◉ WhatsApp</button><button onclick="shareInvite('${i.token}')">Copy / Share</button></div></div>`).join('')}</div>`}
+ if(view==='qr'){$('#content').innerHTML=`<h1>QR Scanner & Generator</h1><div class="grid"><div class="card"><h3>Scan QR</h3><div id="qrReader"></div><button onclick="startQRScanner()">Start Camera</button></div><div class="card"><h3>Generate QR</h3><input id="qrText" placeholder="Asset ID, URL or text"><button onclick="generateQR()">Generate</button><div id="qrOutput"></div></div></div>`}
+ if(view==='email'){const cfg=(await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle()).data||{};$('#content').innerHTML=`<h1>Daily Plant Report</h1><div class="card" style="max-width:780px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--pro-surface-2);margin-bottom:14px"><div><small style="color:var(--pro-accent);letter-spacing:1px;font-size:10.5px;font-weight:700">AUTO-GENERATED FROM TODAY'S PLANT DATA</small><b id="drSubject" style="display:block;font-size:14.5px">Preparing your report…</b></div><span id="drDate" style="color:var(--pro-muted);font-size:12.5px"></span></div><div id="drChips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px"></div><label style="display:block;font-size:13px;color:var(--pro-muted);margin:0 0 5px">Recipient</label><input id="reportTo" type="email" placeholder="manager@company.com" value="${esc(cfg.email||'')}" style="width:100%;margin:0 0 12px"><label style="display:block;font-size:13px;color:var(--pro-muted);margin:0 0 5px">Email — auto-filled. You are the engineer reviewer: read it, edit if needed, then send.</label><textarea id="reportSummary" spellcheck="false" style="width:100%;min-height:300px;margin:0 0 14px;font:12.5px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap"></textarea><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="primary" onclick="sendDailyReport()">✓ Reviewed — Send from Email App</button><button class="secondary" onclick="buildDailyReport()">↻ Regenerate</button></div><p style="color:var(--pro-muted);font-size:12.5px;margin-top:12px">Nothing is sent until you tap send yourself. The report is regenerated from today's live data every time you open this page.</p></div>`;buildDailyReport()}
+ }catch(e){$('#content').innerHTML=`<div class="card"><h3>Error</h3><p>${esc(e.message)}</p></div>`}}
+window.saveOrgSettings=async()=>{let logo_path;const file=$('#setLogo').files[0];if(file){logo_path=`${org.id}/branding/${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g,'_')}`;const u=await sb.storage.from(FILE_BUCKET).upload(logo_path,file);if(u.error)return toast(u.error.message)}const payload={organization_id:org.id,app_name:$('#setApp').value,plant_display_name:$('#setPlant').value,primary_color:$('#setPrimary').value,secondary_color:$('#setSecondary').value,theme:$('#setTheme').value,pattern:$('#setPattern').value,address:$('#setAddress').value,contact:$('#setContact').value,email:$('#setEmail').value,updated_at:new Date().toISOString()};if(logo_path)payload.logo_path=logo_path;const r=await sb.from('organization_settings').upsert(payload);if(r.error)return toast(r.error.message);toast('Company profile saved')};
+window.createInvite=async()=>{const email=prompt('Invite email (optional for QR):'),role=prompt('Role: operator, technician, engineer, supervisor, manager, quality_control_officer, power_house_engineer... (type any role from the list)','operator');if(!role)return;const r=await sb.from('invitations').insert({organization_id:org.id,plant_id:plant.id,email,role,created_by:userId}).select().single();if(r.error)return toast(r.error.message);shareInvite(r.data.token);loadPhase4View()};
+window.shareInvite=token=>{const link=`${location.origin}${location.pathname}?invite=${token}`;navigator.share?navigator.share({title:'PlantMaster Invitation',text:`Join ${org.name}`,url:link}):navigator.clipboard.writeText(link).then(()=>toast('Invite link copied'))};
+function invitationMessage(i){const p=i.worker_details||{},link=`${location.origin}${location.pathname}?invite=${i.token}`;return{p,link,text:`PlantMaster worker account\nCompany: ${org.name}\nWorker: ${p.full_name||i.email||''}\nRole: ${i.role}\nOpen this secure link to create/sign in to your account:\n${link}`}}
+window.emailInvitation=id=>{const i=records.find(x=>x.id===id);if(!i?.email)return toast('This invitation has no email address');const m=invitationMessage(i);location.href=`mailto:${encodeURIComponent(i.email)}?subject=${encodeURIComponent(`Join ${org.name} on PlantMaster`)}&body=${encodeURIComponent(m.text)}`};
+window.whatsappInvitation=id=>{const i=records.find(x=>x.id===id);if(!i)return;const m=invitationMessage(i);let phone=String(m.p.contact||'').replace(/\D/g,'');if(!phone)phone=String(prompt('WhatsApp number with country code, for example 923001234567:')||'').replace(/\D/g,'');if(phone)open(`https://wa.me/${phone}?text=${encodeURIComponent(m.text)}`,'_blank')};
+window.buildDailyReport=async()=>{
+ const today=new Date().toLocaleDateString('en-CA');
+ const dateLabel=new Date().toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ const cfg=(await sb.from('organization_settings').select('*').eq('organization_id',org.id).maybeSingle()).data||{};
+ const appName=cfg.app_name||'PlantMaster Pro';
+ const todayRows=r=>r&&String(r).slice(0,10)===today;
+ const sections=[];const chips=[];
+ try{const wo=(await sb.from('work_orders').select('*').eq('plant_id',plant.id).limit(300)).data||[];
+  const isDone=x=>todayRows(x.completed_at)||(/complete|done|closed/i.test(x.status||'')&&todayRows(x.completed_at||x.updated_at));
+  const done=wo.filter(isDone),open=wo.filter(x=>!isDone(x)&&!/cancel|reject|closed/i.test(x.status||'')),over=open.filter(x=>x.due_date&&String(x.due_date).slice(0,10)<today);
+  chips.push([done.length+' work done today','ok'],[open.length+' work open','warn']);
+  if(over.length)chips.push([over.length+' overdue','bad']);
+  sections.push(['WORK ORDERS','Completed today: '+done.length,
+   ...done.slice(0,8).map(x=>'  ✓ '+(x.title||'job')+(x.assets?.name?' ('+x.assets.name+')':'')),
+   'Open: '+open.length,
+   ...open.slice(0,8).map(x=>'  • '+(x.title||'job')+(x.status?' ['+x.status+']':'')+(x.assets?.name?' ('+x.assets.name+')':'')),
+   over.length?('OVERDUE: '+over.map(x=>x.title||'job').join(', ')):null].filter(Boolean).join('\n'));
+ }catch(e){}
+ try{const al=(await sb.from('notifications').select('*').eq('organization_id',org.id).limit(200)).data||[];
+  const t=al.filter(x=>todayRows(x.created_at));
+  chips.push([t.length+' alerts today',t.length?'warn':'ok']);
+  sections.push(['ALARMS & NOTIFICATIONS (today): '+t.length,...t.slice(0,6).map(x=>'  • '+(x.title||'alert')),'  (see Alerts section for details)'].join('\n'));
+ }catch(e){}
+ try{const cr=(await sb.from('checklist_runs').select('*').eq('organization_id',org.id).eq('plant_id',plant.id).limit(200)).data||[];
+  const t=cr.filter(x=>[x.completed_at,x.created_at,x.run_date,x.work_date].some(todayRows));
+  const fail=t.filter(x=>/fail|miss|overdue|alarm/i.test(x.status||''));
+  chips.push([t.length+' checklist runs','ok']);
+  sections.push(['CHECKLISTS (today): '+t.length+' run'+(t.length!==1?'s':'')+(fail.length?', '+fail.length+' FAILED':' — all passed'),...fail.map(x=>'  ✗ '+(x.title||x.template_name||'checklist'))].join('\n'));
+ }catch(e){}
+ try{let attQ=await sb.from('attendance').select('*').eq('work_date',today).eq('organization_id',org.id).limit(300);let att=attQ.data;
+  if(attQ.error||!att){const q2=await sb.from('attendance').select('*').limit(300);att=(q2.data||[]).filter(x=>[x.work_date,x.date,x.created_at].some(todayRows))}
+  chips.push([(att||[]).length+' attendance marked','ok']);
+  sections.push('ATTENDANCE (today): '+(att||[]).length+' entries');
+ }catch(e){}
+ try{let dlQ=await sb.from('daily_logs').select('*').eq('work_date',today).eq('organization_id',org.id).limit(100);let dl=dlQ.data;
+  if(dlQ.error||!dl){const q2=await sb.from('daily_logs').select('*').limit(200);dl=(q2.data||[]).filter(x=>[x.work_date,x.log_date,x.created_at].some(todayRows))}
+  sections.push(['DAILY LOGS (today): '+(dl||[]).length+' entr'+((dl||[]).length===1?'y':'ies'),...(dl||[]).slice(0,5).map(x=>'  • '+(x.category?x.category+': ':'')+(x.notes||x.summary||'log entry'))].join('\n'));
+ }catch(e){}
+ try{const as=(await sb.from('assets').select('*').eq('plant_id',plant.id).is('removed_at',null).limit(300)).data||[];
+  const run=as.filter(x=>/run/i.test(x.state||x.status||'')).length,down=as.filter(x=>/down|fault|stop|broken|alarm/i.test(x.state||x.status||'')).length;
+  chips.push([as.length+' machines registered','ok']);
+  sections.push(['MACHINES','Registered: '+as.length,'Running: '+run,down?'Down / fault / stopped: '+down:null].filter(Boolean).join('\n'));
+ }catch(e){}
+ const by=(profile?.full_name||'Engineer');
+ const body=[appName.toUpperCase()+' — DAILY PLANT REPORT','========================================',
+  'Company: '+org.name,'Plant: '+(cfg.plant_display_name||plant.name),'Date: '+dateLabel,'Prepared by: '+by,'',
+  sections.join('\n\n'),'',
+  '========================================','Generated by '+appName+'. Decision support only — verify in the field.'].join('\n');
+ const subject=appName+' — Daily Plant Report — '+org.name+' ('+(cfg.plant_display_name||plant.name)+') — '+dateLabel;
+ const subj=$('#drSubject'),summ=$('#reportSummary'),dt=$('#drDate'),ch=$('#drChips');
+ if(subj)subj.textContent=subject;if(dt)dt.textContent=dateLabel;
+ if(ch)ch.innerHTML=chips.map(([t,k])=>`<span style="font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:1px solid ${k==='ok'?'#14532d':k==='warn'?'#78520f':'#7f1d1d'};background:${k==='ok'?'#0d2b1e':k==='warn'?'#2a2108':'#2b0d0d'};color:${k==='ok'?'#4ade80':k==='warn'?'#fbbf24':'#f87171'}">${t}</span>`).join('');
+ if(summ)summ.value=body;
+ toast('Daily report generated — review it, then tap send');
+};
+window.sendDailyReport=()=>{const to=($('#reportTo')?.value||'').trim();const body=$('#reportSummary')?.value||'';const subject=$('#drSubject')?.textContent||'Daily Plant Report';if(!body)return toast('Report is still generating — try again in a moment');if(!to)return toast('Add the recipient email first');let out=body;if(out.length>1900)out=out.slice(0,1897)+'…';location.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(out);toast('Opening your email app — tap Send when ready')};
+
+
+async function globalSearch(q){if(!q.trim())return dashboard();const pattern=`%${q.trim()}%`,[a,w,m]=await Promise.all([sb.from('assets').select('id,name,asset_code,asset_type').eq('plant_id',plant.id).or(`name.ilike.${pattern},asset_code.ilike.${pattern},asset_type.ilike.${pattern}`),sb.from('work_orders').select('id,title,description').eq('plant_id',plant.id).or(`title.ilike.${pattern},description.ilike.${pattern}`),sb.from('manuals').select('id,title,manufacturer,model').eq('organization_id',org.id).or(`title.ilike.${pattern},manufacturer.ilike.${pattern},model.ilike.${pattern}`)]);$('#content').innerHTML=`<h1>Search Results</h1><div class="grid">${(a.data||[]).map(x=>`<div class="card"><h3>🏭 ${esc(x.name)}</h3><p>${esc(x.asset_code)} • ${esc(x.asset_type)}</p></div>`).join('')}${(w.data||[]).map(x=>`<div class="card"><h3>🧰 ${esc(x.title)}</h3><p>${esc(x.description)}</p></div>`).join('')}${(m.data||[]).map(x=>`<div class="card"><h3>📚 ${esc(x.title)}</h3><p>${esc(x.manufacturer)} ${esc(x.model)}</p></div>`).join('')||'<div class="card">No results.</div>'}</div>`}
+async function loadQRLib(url,test){if(test())return true;return new Promise(ok=>{const s=document.createElement('script');s.src=url;s.onload=()=>ok(test());s.onerror=()=>ok(false);document.head.append(s)})}
+window.generateQR=async()=>{if(!await loadQRLib('https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js',()=>!!window.QRCode))return toast('QR library unavailable');$('#qrOutput').innerHTML='';new QRCode($('#qrOutput'),{text:$('#qrText').value||location.href,width:220,height:220})};
+window.startQRScanner=async()=>{if(!isSecureContext)return toast('Camera requires HTTPS');if(!await loadQRLib('https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',()=>!!window.Html5Qrcode))return toast('Scanner unavailable');$('#qrReader').innerHTML='';const q=new Html5Qrcode('qrReader');q.start({facingMode:'environment'},{fps:10,qrbox:220},text=>{toast(`Scanned: ${text}`);q.stop()},()=>{}).catch(e=>toast(String(e)))};
+
+window.toggleTimer=async(id, isRunning)=>{
+  const r=records.find(x=>x.id===id); if(!r)return;
+  let update={};
+  if(!isRunning){
+    update={started_at:new Date().toISOString(), status: r.status==='open'?'in_progress':r.status};
+  } else {
+    const start = new Date(r.started_at).getTime();
+    const now = new Date().getTime();
+    const mins = Math.floor((now - start) / 60000);
+    update={started_at:null, labor_minutes: (r.labor_minutes||0) + mins};
+  }
+  const q=await sb.from('work_orders').update(update).eq('id',id);
+  if(q.error)return toast(q.error.message);
+  toast(isRunning ? 'Timer paused. Time logged.' : 'Timer started.');
+  loadView();
+};
+
+window.logMeter=id=>{
+  const r=records.find(x=>x.id===id);if(!r)return;
+  $('#modalTitle').textContent=`Log Meter — ${r.name}`;
+  $('#fields').innerHTML=field('new_value',`New Reading (${esc(r.meter_unit)})`,r.current_meter_value||'0','number',true,'step="any"');
+  formHandler=async values=>{
+    const newVal=Number(values.new_value);
+    if(newVal<Number(r.current_meter_value||0))return toast('New reading must be higher than current');
+    const update={current_meter_value:newVal, updated_at:new Date().toISOString()};
+    const q=await sb.from('assets').update(update).eq('id',id);
+    if(q.error)throw q.error;
+    toast('Meter updated');
+    const trigger=Number(r.pm_trigger_meter_value);
+    if(trigger && newVal>=trigger && Number(r.current_meter_value||0)<trigger){
+      const wo={id:crypto.randomUUID(),organization_id:org.id,plant_id:plant.id,asset_id:r.id,title:`PM Trigger: ${r.name} reached ${trigger} ${r.meter_unit}`,description:`Auto-generated PM. Meter reading logged at ${newVal} ${r.meter_unit}, crossing threshold of ${trigger}.`,priority:'high',status:'open',created_by:userId,updated_at:new Date().toISOString()};
+      await sb.from('work_orders').insert(wo);
+      toast('⚠️ Preventive Maintenance Work Order Auto-Generated!');
+    }
+    loadView();
+  };
+  const m=$('#modal');m.style.removeProperty('display');m.showModal?m.showModal():m.setAttribute('open','');operations.enhanceVoice(m);
+};
+
+
+window.closeCustomModal = () => {
+  const m=$('#modal'); if(typeof m.close==='function') m.close(); else { m.removeAttribute('open'); m.style.display='none'; }
+};
+
+window.manageSafety = id => {
+  const r = records.find(x => x.id === id); if(!r) return;
+  const activeLoto = (r.loto_procedures || []).find(x => !x.removed_at);
+  const activePermit = (r.permits || []).find(x => x.status !== 'closed');
+  
+  let html = `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2)"><h3>🔒 Lockout / Tagout (LOTO)</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Isolate energy sources before beginning maintenance.</p>`;
+  if(activeLoto) {
+    html += `<div style="padding:12px;background:rgba(220,38,38,0.1);border:1px solid #dc2626;border-radius:10px;margin-top:12px"><b style="color:#fca5a5;display:block;margin-bottom:4px">LOTO Applied</b><small style="color:var(--pro-muted)">At ${new Date(activeLoto.applied_at).toLocaleString()}</small><br><button class="danger" style="margin-top:12px" type="button" onclick="removeLoto('${activeLoto.id}')">Remove LOTO</button></div>`;
+  } else {
+    html += `<button class="primary" style="margin-top:10px" type="button" onclick="applyLoto('${id}', '${r.asset_id||''}')">Apply LOTO</button>`;
+  }
+  html += `</div>`;
+  
+  html += `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2);margin-top:15px"><h3>📝 Safety Permits</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Require management approval for high-risk work.</p>`;
+  if(activePermit) {
+    html += `<div style="padding:12px;background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:10px;margin-top:12px"><b style="color:#fcd34d;display:block;margin-bottom:4px">${esc(activePermit.permit_type.replaceAll('_',' ').toUpperCase())}</b> <small style="color:var(--pro-muted)">Status: ${esc(activePermit.status.toUpperCase())}</small><br>`;
+    if(activePermit.status === 'pending') {
+      if(['owner','manager','supervisor'].includes(role)) {
+        html += `<button class="success" style="margin-top:12px" type="button" onclick="approvePermit('${activePermit.id}')">✓ Approve Permit</button> `;
+      } else {
+        html += `<small style="display:block;margin-top:12px;color:var(--pro-muted)">Waiting for supervisor approval...</small>`;
+      }
+    } else if (activePermit.status === 'approved') {
+      html += `<button class="primary" style="margin-top:12px" type="button" onclick="closePermit('${activePermit.id}')">Close Permit</button>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div style="display:flex;gap:10px;margin-top:12px"><select id="newPermitType" style="flex:1;background:var(--pro-bg);border:1px solid var(--pro-line);color:var(--pro-text);border-radius:10px;padding:10px"><option value="hot_work">Hot Work</option><option value="confined_space">Confined Space</option><option value="heights">Working at Heights</option></select><button class="secondary" type="button" onclick="requestPermit('${id}')">Request</button></div>`;
+  }
+  html += `</div>`;
+  
+  $('#modalTitle').textContent = `Safety & Compliance`;
+  $('#fields').innerHTML = html;
+  
+  // Override form submission so pressing enter doesn't trigger the default work order save
+  $('#recordForm').onsubmit = e => { e.preventDefault(); closeCustomModal(); };
+  
+  const m=$('#modal'); m.style.removeProperty('display'); m.showModal ? m.showModal() : m.setAttribute('open','');
+};
+
+
+
+window.closeCustomModal = () => {
+  const m=$('#modal'); if(typeof m.close==='function') m.close(); else { m.removeAttribute('open'); m.style.display='none'; }
+};
+
+window.manageSafety = id => {
+  const r = records.find(x => x.id === id); if(!r) return;
+  const activeLoto = (r.loto_procedures || []).find(x => !x.removed_at);
+  const activePermit = (r.permits || []).find(x => x.status !== 'closed');
+  
+  let html = `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2)"><h3>🔒 Lockout / Tagout (LOTO)</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Isolate energy sources before beginning maintenance.</p>`;
+  if(activeLoto) {
+    html += `<div style="padding:12px;background:rgba(220,38,38,0.1);border:1px solid #dc2626;border-radius:10px;margin-top:12px"><b style="color:#fca5a5;display:block;margin-bottom:4px">LOTO Applied</b><small style="color:var(--pro-muted)">At ${new Date(activeLoto.applied_at).toLocaleString()}</small><br><button class="danger" style="margin-top:12px" type="button" onclick="removeLoto('${activeLoto.id}')">Remove LOTO</button></div>`;
+  } else {
+    html += `<button class="primary" style="margin-top:10px" type="button" onclick="applyLoto('${id}', '${r.asset_id||''}')">Apply LOTO</button>`;
+  }
+  html += `</div>`;
+  
+  html += `<div class="card" style="grid-column:1/-1;background:var(--pro-surface-2);border-color:var(--pro-line-2);margin-top:15px"><h3>📝 Safety Permits</h3><p style="color:var(--pro-muted);font-size:12px;margin:5px 0">Require management approval for high-risk work.</p>`;
+  if(activePermit) {
+    html += `<div style="padding:12px;background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:10px;margin-top:12px"><b style="color:#fcd34d;display:block;margin-bottom:4px">${esc(activePermit.permit_type.replaceAll('_',' ').toUpperCase())}</b> <small style="color:var(--pro-muted)">Status: ${esc(activePermit.status.toUpperCase())}</small><br>`;
+    if(activePermit.status === 'pending') {
+      if(['owner','manager','supervisor'].includes(role)) {
+        html += `<button class="success" style="margin-top:12px" type="button" onclick="approvePermit('${activePermit.id}')">✓ Approve Permit</button> `;
+      } else {
+        html += `<small style="display:block;margin-top:12px;color:var(--pro-muted)">Waiting for supervisor approval...</small>`;
+      }
+    } else if (activePermit.status === 'approved') {
+      html += `<button class="primary" style="margin-top:12px" type="button" onclick="closePermit('${activePermit.id}')">Close Permit</button>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div style="display:flex;gap:10px;margin-top:12px"><select id="newPermitType" style="flex:1;background:var(--pro-bg);border:1px solid var(--pro-line);color:var(--pro-text);border-radius:10px;padding:10px"><option value="hot_work">Hot Work</option><option value="confined_space">Confined Space</option><option value="heights">Working at Heights</option></select><button class="secondary" type="button" onclick="requestPermit('${id}')">Request</button></div>`;
+  }
+  html += `</div>`;
+  
+  $('#modalTitle').textContent = `Safety & Compliance`;
+  $('#fields').innerHTML = html;
+  
+  // Override form submission so pressing enter doesn't trigger the default work order save
+  $('#recordForm').onsubmit = e => { e.preventDefault(); closeCustomModal(); };
+  
+  const m=$('#modal'); m.style.removeProperty('display'); m.showModal ? m.showModal() : m.setAttribute('open','');
+};
+
+window.applyLoto = async (woId, assetId) => {
+  if(!assetId || assetId==='null') return toast('This Work Order has no specific asset assigned.');
+  const r = await sb.from('loto_procedures').insert({plant_id: plant.id, asset_id: assetId, work_order_id: woId, applied_by: userId});
+  if(!r.error) await operations.audit('loto_applied','loto_procedure',woId,{asset_id:assetId,work_order_id:woId});
+  if(r.error) return toast(r.error.message);
+  toast('LOTO Applied'); loadView(); closeCustomModal();
+};
+window.removeLoto = async (lotoId) => {
+  const r = await sb.from('loto_procedures').update({removed_at: new Date().toISOString(), removed_by: userId}).eq('id', lotoId);
+  if(!r.error) await operations.audit('loto_removed','loto_procedure',lotoId,{});
+  if(r.error) return toast(r.error.message);
+  toast('LOTO Removed'); loadView(); closeCustomModal();
+};
+window.requestPermit = async (woId) => {
+  const pType = $('#newPermitType').value;
+  const r = await sb.from('permits').insert({plant_id: plant.id, work_order_id: woId, permit_type: pType, requested_by: userId});
+  if(!r.error) await operations.audit('permit_requested','permit',woId,{permit_type:pType,work_order_id:woId});
+  if(r.error) return toast(r.error.message);
+  toast('Permit Requested'); loadView(); closeCustomModal();
+};
+window.approvePermit = async (permitId) => {
+  const r = await sb.from('permits').update({status: 'approved', approved_by: userId, approved_at: new Date().toISOString()}).eq('id', permitId);
+  if(!r.error) await operations.audit('permit_approved','permit',permitId,{});
+  if(r.error) return toast(r.error.message);
+  toast('Permit Approved'); loadView(); closeCustomModal();
+};
+window.closePermit = async (permitId) => {
+  const r = await sb.from('permits').update({status: 'closed'}).eq('id', permitId);
+  if(!r.error) await operations.audit('permit_closed','permit',permitId,{});
+  if(r.error) return toast(r.error.message);
+  toast('Permit Closed'); loadView(); closeCustomModal();
+};

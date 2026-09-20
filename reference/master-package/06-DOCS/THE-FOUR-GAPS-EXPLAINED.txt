@@ -1,0 +1,389 @@
+===============================================================
+
+   THE FOUR THINGS I SAID YOU WERE MISSING
+   What each one actually means, and what to do
+
+   16 September 2026
+
+===============================================================
+
+  You asked what these actually mean. Fair — I used jargon.
+  Here is each one in plain language, why it matters in
+  money terms, and what to do about it.
+
+  Two of them I have already fixed for you. Two of them
+  only you can fix, and one of those does not matter yet.
+
+    1. Social preview tags   FIXED — upload and done
+    2. Favicon               FIXED — upload and done
+    3. Third-party reviews   you must do this, 20 minutes
+    4. Integrations / SAP    ignore for now, explained below
+
+
+===============================================================
+  1. "SOCIAL PREVIEW TAGS" — what they are
+===============================================================
+
+  WHAT IT MEANS
+
+  When you paste a link into WhatsApp, the app sends a
+  robot to that page a second before you hit send. The
+  robot looks for hidden instructions in the page telling
+  it three things:
+
+      - what picture to show
+      - what headline to show
+      - what one-line description to show
+
+  Those hidden instructions are called OG TAGS. "OG" stands
+  for Open Graph, which was Facebook's name for it. Every
+  chat app now uses the same system — WhatsApp, LinkedIn,
+  Facebook, X, Slack, Telegram, iMessage.
+
+  They are invisible. They sit in the page's code, not on
+  the page. A visitor never sees them. Only the robot does.
+
+  YOUR PAGES HAD NONE OF THEM.
+
+  So the robot found nothing, and WhatsApp had nothing to
+  show. Your link arrived as a bare blue line of text.
+
+  WHY THAT COSTS YOU MONEY
+
+  You sell on WhatsApp. That is your channel. Picture the
+  plant manager's screen:
+
+    WITHOUT the tags — what he saw until today
+      A grey line of text: hsbfix.org
+      No picture. No words. Looks like spam, or a link
+      somebody forwarded without thinking. Nothing about
+      it says "a real company built this."
+
+    WITH the tags — what he sees now
+      A large photograph of a plant floor, your logo,
+      the headline "The maintenance app that reads your
+      manuals and answers back", and a line explaining
+      the AI and the Urdu voice input.
+
+  Same link. Same product. Completely different first
+  impression, and the first impression is the whole game
+  when you are unknown and asking an industrial buyer to
+  trust you.
+
+  This is why I called it the biggest return on the list.
+  It is two hours of work and it upgrades every single
+  message you will ever send.
+
+  WHAT I DID
+
+  Added the full set of tags to all six pages: index,
+  pricing, signup, guide, privacy and terms. Each page has
+  its own headline and description, so sharing your pricing
+  page shows pricing wording rather than generic homepage
+  wording.
+
+  I also built the share image itself — og-image.jpg,
+  1200 x 630 pixels, which is the size every platform
+  expects. It uses your own hero photograph of the plant
+  floor, darkened on the left so white text reads cleanly,
+  with your teal brand colour, the HSB logo, your headline,
+  and three badges: 19 MODULES, 7-DAY FREE TRIAL, NO CARD
+  NEEDED.
+
+  I also added:
+    canonical tags   tells Google which address is the
+                     real one, so hsbfix.org and
+                     www.hsbfix.org are not treated as two
+                     competing copies
+    theme-color      colours the phone browser's top bar
+                     in your near-black instead of grey
+    sitemap.xml      a list of your pages for Google
+    robots.txt       tells search engines to index you
+
+
+===============================================================
+  2. "FAVICON" — what it is
+===============================================================
+
+  WHAT IT MEANS
+
+  The tiny square icon in the browser tab, next to the page
+  title. Also what shows when someone bookmarks you or adds
+  your site to a phone home screen.
+
+  You had none, so every browser showed a blank grey page
+  symbol.
+
+  WHY IT MATTERS
+
+  Small, but it is the kind of small that registers
+  subconsciously. A plant manager with fourteen tabs open
+  sees a blank icon where every real company has a logo.
+  It reads as unfinished — a site somebody is still
+  building, not a business to hand money to.
+
+  It also means that when he bookmarks you to show his
+  boss on Monday, there is nothing to recognise.
+
+  WHAT I DID
+
+  Built your HSB logo as an icon file — near-black rounded
+  square, white "HS", teal "B", matching your site header
+  exactly. Same colours from your stylesheet: #0d1117 and
+  #0f9b8e.
+
+  Four files, because different devices want different
+  things:
+
+    favicon.ico           the main one, with six sizes
+                          baked inside for every browser
+    favicon-32.png        modern browsers
+    favicon-16.png        small tab displays
+    apple-touch-icon.png  180x180, for iPhone home screens
+
+
+===============================================================
+  3. "THIRD-PARTY REVIEWS" — the one you must do
+===============================================================
+
+  WHAT IT MEANS
+
+  Websites where buyers compare software before they buy.
+  The big three are G2, Capterra and Software Advice. There
+  is also SoftwareSuggest, which is strong in South Asia.
+
+  They are directories. Every CMMS is listed with its
+  features, its price, and reviews from real users. When a
+  plant manager searches "best maintenance software", these
+  directories fill the entire first page of Google — above
+  the vendors' own websites.
+
+  MaintainX has 1,540 reviews on G2, rated 4.8.
+  Limble has 685. Fiix has 476.
+
+  You have zero. Not a bad score — no listing at all.
+
+  WHY THAT COSTS YOU MONEY
+
+  Here is the part that matters, and it is worse than
+  simply "not being rated".
+
+  A buyer comparing options never sees you. He is not
+  choosing between MaintainX, Limble and PlantMaster Pro
+  and picking one of the other two. He is choosing between
+  MaintainX and Limble, because as far as his research is
+  concerned, you do not exist.
+
+  You lose those deals without ever knowing they happened.
+  No enquiry, no rejection, no feedback. Silence.
+
+  And remember what the comparison would actually show if
+  you were on it: Rs 24,000 for a whole plant against
+  Rs 450,000 for MaintainX at 25 users. You win that
+  comparison overwhelmingly. You are just not in it.
+
+  WHAT TO DO — about 20 minutes each, all free
+
+  Listing yourself as a vendor costs nothing on all of
+  these. They make money from advertising and from vendors
+  who pay for placement, but a basic listing is free.
+
+    Capterra   capterra.com/vendors
+               Biggest reach. Owned by Gartner, feeds
+               Software Advice and GetApp too — one listing
+               appears on three sites.
+
+    G2         g2.com/products/new
+               Most respected by serious buyers.
+
+    SoftwareSuggest  softwaresuggest.com/vendors
+               Strong in India and Pakistan. Your market.
+
+  For each: company name, logo, screenshots, a description,
+  feature list, and your pricing. You have all of it — pull
+  the description straight off your own homepage, it is
+  better written than most of theirs.
+
+  THEN THE REVIEWS
+
+  A listing with no reviews is only half useful. When your
+  three founding customers are 60 days in and happy, ask
+  each for a review. Not a favour — build it into the
+  founding-customer deal. You already ask for "two honest
+  lines after 90 days" on your pricing page. Ask them to
+  put those two lines on Capterra instead of emailing them
+  to you.
+
+  Three genuine reviews from named Pakistani plants will do
+  more for you than three hundred from anonymous accounts.
+  Buyers read the words, not just the stars.
+
+  WHEN TO DO IT
+
+  Do the listings now, this month — they take 20 minutes
+  and start building search presence immediately. Get the
+  reviews once your founding customers have real experience
+  to describe.
+
+
+===============================================================
+  4. "INTEGRATIONS" AND "SAP" — ignore this for now
+===============================================================
+
+  WHAT IT MEANS
+
+  An integration is an automatic connection between your
+  software and another system the company already runs, so
+  data moves without anyone retyping it.
+
+  SAP is the big one. It is enterprise accounting and
+  resource planning software used by most large
+  manufacturers. Extremely expensive, extremely entrenched.
+  In Pakistan the large textile groups, cement plants and
+  multinationals run it.
+
+  WHY IT MATTERS — AND WHY IT DOES NOT MATTER YET
+
+  If a company runs SAP, their finance department has a
+  rule: every purchase order must exist in SAP. Not in a
+  second system. In SAP.
+
+  Your system creates purchase orders. If it cannot push
+  them into SAP automatically, someone has to type each one
+  twice. Finance will refuse. The deal dies — and it dies
+  regardless of how good your AI is or how cheap you are.
+  That is what I meant by "SAP kills a deal instantly".
+
+  BUT — and this is the important part — that is a problem
+  for companies large enough to run SAP. Those are not your
+  first customers. A 25-person plant in Karachi is not
+  running SAP. They are running registers, WhatsApp and
+  maybe Tally or QuickBooks.
+
+  Your actual market for the next two years does not have
+  this problem at all.
+
+  WHAT TO DO
+
+  Nothing. Genuinely nothing, for now.
+
+  You already have a REST API on the Professional plan,
+  which means a competent developer can connect anything to
+  you if a customer needs it. That is enough of an answer.
+
+  If a prospect asks "does it integrate with SAP?", the
+  honest answer is:
+
+     "Not out of the box. We have a REST API, so it can be
+      connected — but if SAP integration is essential on
+      day one, I would rather tell you now than sell you
+      something that disappoints you."
+
+  That answer wins respect and occasionally wins the deal
+  anyway, because most people asking do not actually need
+  it on day one.
+
+  Build integrations when a paying customer asks and will
+  wait for it. Never build one on speculation — you will
+  guess wrong about which system, and it is weeks of work.
+
+  Same logic applies to IoT sensors. Your phone-based
+  condition monitoring is a feature, not a gap: no hardware
+  to buy is the entire selling point. Add sensor input the
+  day a customer with sensors wants to pay you.
+
+
+===============================================================
+  WHAT TO UPLOAD, AND HOW TO CHECK IT WORKED
+===============================================================
+
+  Everything is ready in this folder:
+
+      06-DOCS/UPLOAD-THESE-TO-WEBSITE/
+
+  Contents — 13 files:
+      index.html      pricing.html    signup.html
+      guide.html      privacy.html    terms.html
+      og-image.jpg    favicon.ico     favicon-16.png
+      favicon-32.png  apple-touch-icon.png
+      sitemap.xml     robots.txt
+
+  UPLOAD
+
+  Go to the GitHub repository for hsbfix.org, upload all 13
+  into the top level, and let them overwrite the six
+  existing HTML pages. Commit.
+
+  Wait two or three minutes for GitHub Pages to rebuild.
+
+  CHECK IT WORKED — do this, it takes one minute
+
+  The catch: WhatsApp REMEMBERS. It caches what a link
+  looked like the first time it saw it, for about a week.
+  So if you send hsbfix.org to yourself now, you may still
+  see the old bare link and think it failed.
+
+  Two ways round it:
+
+    a) Send a slightly different address, which WhatsApp
+       treats as new:
+
+           https://hsbfix.org/?1
+
+       That should show the picture immediately.
+
+    b) Force Facebook and LinkedIn to re-read the real
+       address — this also clears WhatsApp, since they
+       share infrastructure:
+
+       Facebook debugger:
+         developers.facebook.com/tools/debug/
+         Paste https://hsbfix.org and press "Scrape Again"
+
+       LinkedIn inspector:
+         linkedin.com/post-inspector/
+         Paste the same and click Inspect
+
+    Both are free and neither needs an account beyond a
+    normal login. They also show you exactly what each
+    platform sees, which is useful for confirming the
+    image loaded rather than guessing.
+
+  Then check the favicon: open hsbfix.org and look at the
+  browser tab. You want the black square with the teal B.
+  If you still see blank, press Ctrl+Shift+R to force a
+  reload past the cache.
+
+  ONE MORE THING WORTH DOING
+
+  Once uploaded, submit your sitemap to Google so it finds
+  all six pages properly:
+
+      search.google.com/search-console
+      Add property > hsbfix.org > verify via DNS or by
+      uploading the HTML file it gives you > then
+      Sitemaps > enter: sitemap.xml
+
+  Free. Takes ten minutes. It also shows you what people
+  searched before landing on your site, which tells you
+  what wording actually pulls buyers in.
+
+
+===============================================================
+  SUMMARY
+===============================================================
+
+  DONE, just needs uploading:
+    Social preview tags on all 6 pages
+    Share image built from your own plant photograph
+    Favicon in 4 sizes, matching your brand exactly
+    Canonical tags, theme colour, sitemap, robots.txt
+    Structured data so Google can show your prices
+
+  YOU DO, 20 minutes each, free:
+    List on Capterra, G2, SoftwareSuggest
+    Ask founding customers for reviews at 60 days
+
+  IGNORE until a paying customer asks:
+    SAP and other integrations
+    IoT sensor input

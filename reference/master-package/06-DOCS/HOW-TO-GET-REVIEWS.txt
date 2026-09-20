@@ -1,0 +1,214 @@
+================================================================
+ HOW TO GET REVIEWS - the templates and the timing
+ PlantMaster Pro / HSB Fix Services
+================================================================
+
+You told me you have no paying customers yet. So this file is
+for the moment you do. Keep it and come back to it.
+
+Nothing here invents a review. Every word is designed to get a
+REAL customer to write a real one, which is the only kind that
+survives.
+
+
+----------------------------------------------------------------
+ WHEN TO ASK - this matters more than the wording
+----------------------------------------------------------------
+
+Ask right after a win. Not on a random Tuesday.
+
+The four good moments:
+
+  1. The AI solved a breakdown and saved them a callout.
+     Ask the same day, while they are still impressed.
+
+  2. Condition monitoring caught a bearing before it failed.
+     This is your strongest story. Nobody else in the market
+     does it from a phone microphone.
+
+  3. End of the first month, if usage is healthy - meaning
+     they are logging in most days and closing work orders.
+
+  4. They say something nice on WhatsApp. This is the easiest
+     one. When a customer writes "bohot acha kaam kar raha
+     hai", reply and ask right then.
+
+The four times NOT to ask:
+
+  - Right after a bug or an outage.
+  - When an invoice is overdue.
+  - Before they have closed at least twenty work orders.
+     They have nothing to say yet.
+  - In the same message as an upsell.
+
+
+----------------------------------------------------------------
+ WHO TO ASK
+----------------------------------------------------------------
+
+Ask the maintenance manager, not the owner. The manager uses
+it daily and can write specifics. Specific reviews rank higher
+and convince more.
+
+Ask one person per company. Multiple reviews from the same
+company get filtered.
+
+
+----------------------------------------------------------------
+ TEMPLATE 1 - WHATSAPP, ENGLISH
+----------------------------------------------------------------
+
+Short. Nobody reads a long WhatsApp.
+
+    Assalam o Alaikum [Name],
+
+    Glad the compressor issue got sorted quickly.
+
+    Small favour - we are listing PlantMaster Pro on
+    Capterra, where plant managers compare maintenance
+    software. Would you write a few lines about your
+    experience? Takes about three minutes.
+
+    Honest is fine, including anything you did not like -
+    that helps us more than praise does.
+
+    Link: [paste your Capterra review link]
+
+    Shukriya.
+
+
+----------------------------------------------------------------
+ TEMPLATE 2 - WHATSAPP, URDU
+----------------------------------------------------------------
+
+Use this with older plant managers. It lands much better.
+
+    Assalam o Alaikum [Name] sahib,
+
+    Umeed hai compressor ka masla theek ho gaya hoga.
+
+    Aik chhoti si guzarish thi. Hum PlantMaster Pro ko
+    Capterra par list kar rahe hain, jahan plant managers
+    software compare karte hain. Kya aap apna tajurba do
+    teen line mein likh sakte hain? Bas teen minute lagenge.
+
+    Jo bhi sach hai wohi likhiye - agar koi kami hai to woh
+    bhi zaroor batayen, us se humein zyada faida hota hai.
+
+    Link: [paste your Capterra review link]
+
+    Bohot shukriya.
+
+
+----------------------------------------------------------------
+ TEMPLATE 3 - EMAIL
+----------------------------------------------------------------
+
+Subject:  Three minutes, if you can spare them
+
+    Dear [Name],
+
+    You have been running PlantMaster Pro at [Plant] for
+    about [X] weeks now, and I noticed your team has closed
+    [N] work orders in that time.
+
+    We are building out our listings on Capterra and G2,
+    which is where maintenance managers go to compare
+    software before buying. A short review from someone
+    actually running a plant carries far more weight than
+    anything we can say about ourselves.
+
+    Would you be willing to write a few lines? It takes
+    about three minutes and the platform handles it
+    directly - I never see it before it is published.
+
+    Please be honest, including the parts that need work.
+    A review that mentions a genuine limitation is more
+    believable than one that does not, and it tells us
+    what to fix.
+
+    [paste your Capterra review link]
+
+    Thank you either way.
+
+    Regards,
+    [Your name]
+    HSB Fix Services
+
+
+----------------------------------------------------------------
+ TEMPLATE 4 - THE FOLLOW UP
+----------------------------------------------------------------
+
+Send once, a week later. Never twice.
+
+    [Name], just floating this back up in case it got
+    buried. No pressure at all if you would rather not.
+
+    [link]
+
+
+----------------------------------------------------------------
+ IF THEY SAY YES BUT DO NOT KNOW WHAT TO WRITE
+----------------------------------------------------------------
+
+Most people stall here. Do not write it for them - that is
+against the rules and it reads fake. Instead send prompts:
+
+    No need to write an essay. Just answer whichever of
+    these you feel like:
+
+      - What were you using before, and what was annoying
+        about it?
+      - What does your team use it for most?
+      - Has it caught anything you would otherwise have
+        missed?
+      - What should we improve?
+
+That produces a specific, credible review without you putting
+words in their mouth.
+
+
+----------------------------------------------------------------
+ HANDLING A BAD REVIEW
+----------------------------------------------------------------
+
+You will get one eventually. It is not a disaster - a profile
+of nothing but five stars looks purchased, and buyers know it.
+
+  Reply within 48 hours. On Capterra, replying is free.
+  Thank them, do not argue, state what you changed.
+  Never mention their company name or personal details.
+  Fix the thing, then message them privately and tell them.
+  Never ask them to take the review down.
+
+A calm, specific reply to a three star review sells better
+than the review itself costs you.
+
+
+----------------------------------------------------------------
+ THE TARGET
+----------------------------------------------------------------
+
+  First 3 reviews      the profile stops looking abandoned
+  10 reviews           you start appearing in comparisons
+  20 reviews at 4.0+   Capterra Shortlist badge, G2 "Users
+                       Love Us" badge, both free
+
+At one review per happy customer, twenty customers gets you
+there. That is the whole game.
+
+
+----------------------------------------------------------------
+ A NOTE ON THE WEBSITE
+----------------------------------------------------------------
+
+I did not add a testimonials section to hsbfix.org, on
+purpose. You have no customers yet, and made up quotes with
+stock photos are spotted instantly - they do more damage than
+an empty space.
+
+The moment you have two or three real quotes, send them to me
+and I will build the section properly, with the person's name,
+role and plant. Until then the live demo does that job better
+than a fake quote would.

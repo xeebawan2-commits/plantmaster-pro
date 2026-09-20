@@ -1,0 +1,583 @@
+kind,on_table,name,definition
+CONSTRAINT,action_attachments,action_attachments_file_metadata_id_fkey,FOREIGN KEY (file_metadata_id) REFERENCES file_metadata(id) ON DELETE CASCADE
+CONSTRAINT,action_attachments,action_attachments_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,action_attachments,action_attachments_pkey,PRIMARY KEY (id)
+CONSTRAINT,action_attachments,action_attachments_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,action_attachments,action_attachments_uploaded_by_fkey,FOREIGN KEY (uploaded_by) REFERENCES auth.users(id)
+CONSTRAINT,admin_action_logs,admin_action_logs_admin_user_id_fkey,FOREIGN KEY (admin_user_id) REFERENCES auth.users(id) ON DELETE SET NULL
+CONSTRAINT,admin_action_logs,admin_action_logs_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE SET NULL
+CONSTRAINT,admin_action_logs,admin_action_logs_pkey,PRIMARY KEY (id)
+CONSTRAINT,ai_usage,ai_usage_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id)
+CONSTRAINT,ai_usage,ai_usage_pkey,PRIMARY KEY (id)
+CONSTRAINT,ai_usage,ai_usage_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id)
+CONSTRAINT,ai_usage,ai_usage_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,api_keys,api_keys_key_hash_key,UNIQUE (key_hash)
+CONSTRAINT,api_keys,api_keys_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,api_keys,api_keys_pkey,PRIMARY KEY (id)
+CONSTRAINT,api_keys,api_keys_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,asset_status_history,asset_status_history_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+CONSTRAINT,asset_status_history,asset_status_history_changed_by_fkey,FOREIGN KEY (changed_by) REFERENCES auth.users(id)
+CONSTRAINT,asset_status_history,asset_status_history_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,asset_status_history,asset_status_history_pkey,PRIMARY KEY (id)
+CONSTRAINT,asset_status_history,asset_status_history_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,assets,assets_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,assets,assets_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,assets,assets_parent_id_fkey,FOREIGN KEY (parent_id) REFERENCES assets(id) ON DELETE SET NULL
+CONSTRAINT,assets,assets_pkey,PRIMARY KEY (id)
+CONSTRAINT,assets,assets_plant_id_asset_code_key,"UNIQUE (plant_id, asset_code)"
+CONSTRAINT,assets,assets_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,assets,assets_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,attendance,attendance_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,attendance,attendance_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,attendance,attendance_pkey,PRIMARY KEY (id)
+CONSTRAINT,attendance,attendance_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,attendance,attendance_plant_id_user_id_work_date_key,"UNIQUE (plant_id, user_id, work_date)"
+CONSTRAINT,attendance,attendance_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,audit_logs,audit_logs_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,audit_logs,audit_logs_pkey,PRIMARY KEY (id)
+CONSTRAINT,audit_logs,audit_logs_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,audit_logs,audit_logs_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL
+CONSTRAINT,backup_jobs,backup_jobs_job_type_check,"CHECK ((job_type = ANY (ARRAY['managed_snapshot'::text, 'pitr_checkpoint'::text, 'storage_inventory'::text, 'logical_export'::text])))"
+CONSTRAINT,backup_jobs,backup_jobs_pkey,PRIMARY KEY (id)
+CONSTRAINT,backup_jobs,backup_jobs_requested_by_fkey,FOREIGN KEY (requested_by) REFERENCES auth.users(id)
+CONSTRAINT,backup_jobs,backup_jobs_status_check,"CHECK ((status = ANY (ARRAY['requested'::text, 'running'::text, 'completed'::text, 'failed'::text, 'cancelled'::text])))"
+CONSTRAINT,billing_events,billing_events_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE SET NULL
+CONSTRAINT,billing_events,billing_events_pkey,PRIMARY KEY (id)
+CONSTRAINT,billing_events,billing_events_provider_event_id_key,UNIQUE (provider_event_id)
+CONSTRAINT,checklist_items,checklist_items_pkey,PRIMARY KEY (id)
+CONSTRAINT,checklist_items,checklist_items_template_id_fkey,FOREIGN KEY (template_id) REFERENCES checklist_templates(id) ON DELETE CASCADE
+CONSTRAINT,checklist_runs,checklist_runs_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,checklist_runs,checklist_runs_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,checklist_runs,checklist_runs_performed_by_fkey,FOREIGN KEY (performed_by) REFERENCES auth.users(id)
+CONSTRAINT,checklist_runs,checklist_runs_pkey,PRIMARY KEY (id)
+CONSTRAINT,checklist_runs,checklist_runs_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,checklist_runs,checklist_runs_supervisor_approved_by_fkey,FOREIGN KEY (supervisor_approved_by) REFERENCES auth.users(id)
+CONSTRAINT,checklist_runs,checklist_runs_template_id_fkey,FOREIGN KEY (template_id) REFERENCES checklist_templates(id)
+CONSTRAINT,checklist_templates,checklist_templates_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+CONSTRAINT,checklist_templates,checklist_templates_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,checklist_templates,checklist_templates_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,checklist_templates,checklist_templates_pkey,PRIMARY KEY (id)
+CONSTRAINT,checklist_templates,checklist_templates_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,checklist_templates,checklist_templates_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,checklist_values,checklist_values_item_id_fkey,FOREIGN KEY (item_id) REFERENCES checklist_items(id)
+CONSTRAINT,checklist_values,checklist_values_pkey,PRIMARY KEY (id)
+CONSTRAINT,checklist_values,checklist_values_run_id_fkey,FOREIGN KEY (run_id) REFERENCES checklist_runs(id) ON DELETE CASCADE
+CONSTRAINT,code_registry,code_registry_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,code_registry,code_registry_organization_id_code_value_key,"UNIQUE (organization_id, code_value)"
+CONSTRAINT,code_registry,code_registry_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,code_registry,code_registry_pkey,PRIMARY KEY (id)
+CONSTRAINT,code_registry,code_registry_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,company_feature_blocks,company_feature_blocks_blocked_by_fkey,FOREIGN KEY (blocked_by) REFERENCES auth.users(id)
+CONSTRAINT,company_feature_blocks,company_feature_blocks_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,company_feature_blocks,company_feature_blocks_pkey,"PRIMARY KEY (organization_id, feature)"
+CONSTRAINT,complimentary_access,complimentary_access_access_type_check,"CHECK ((access_type = ANY (ARRAY['complimentary'::text, 'internal'::text, 'manual'::text])))"
+CONSTRAINT,complimentary_access,complimentary_access_granted_by_fkey,FOREIGN KEY (granted_by) REFERENCES auth.users(id)
+CONSTRAINT,complimentary_access,complimentary_access_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,complimentary_access,complimentary_access_pkey,PRIMARY KEY (organization_id)
+CONSTRAINT,complimentary_access,complimentary_access_revoked_by_fkey,FOREIGN KEY (revoked_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_alarms,condition_alarms_acknowledged_by_fkey,FOREIGN KEY (acknowledged_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_alarms,condition_alarms_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+CONSTRAINT,condition_alarms,condition_alarms_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,condition_alarms,condition_alarms_pkey,PRIMARY KEY (id)
+CONSTRAINT,condition_alarms,condition_alarms_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,condition_alarms,condition_alarms_recording_id_fkey,FOREIGN KEY (recording_id) REFERENCES condition_recordings(id) ON DELETE CASCADE
+CONSTRAINT,condition_alarms,condition_alarms_severity_check,"CHECK ((severity = ANY (ARRAY['info'::text, 'warning'::text, 'alarm'::text, 'critical'::text])))"
+CONSTRAINT,condition_entity_links,condition_entity_links_linked_by_fkey,FOREIGN KEY (linked_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_entity_links,condition_entity_links_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,condition_entity_links,condition_entity_links_pkey,PRIMARY KEY (id)
+CONSTRAINT,condition_entity_links,condition_entity_links_recording_id_entity_type_entity_id_r_key,"UNIQUE (recording_id, entity_type, entity_id, relation)"
+CONSTRAINT,condition_entity_links,condition_entity_links_recording_id_fkey,FOREIGN KEY (recording_id) REFERENCES condition_recordings(id) ON DELETE CASCADE
+CONSTRAINT,condition_recordings,condition_recordings_approved_by_fkey,FOREIGN KEY (approved_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_recordings,condition_recordings_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE SET NULL
+CONSTRAINT,condition_recordings,condition_recordings_baseline_id_fkey,FOREIGN KEY (baseline_id) REFERENCES condition_recordings(id) ON DELETE SET NULL
+CONSTRAINT,condition_recordings,condition_recordings_calibration_status_check,"CHECK ((calibration_status = ANY (ARRAY['uncalibrated'::text, 'relative'::text, 'calibrated'::text])))"
+CONSTRAINT,condition_recordings,condition_recordings_condition_status_check,"CHECK ((condition_status = ANY (ARRAY['normal'::text, 'changed'::text, 'warning'::text, 'alarm'::text, 'unverified'::text])))"
+CONSTRAINT,condition_recordings,condition_recordings_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_recordings,condition_recordings_measurement_point_id_fkey,FOREIGN KEY (measurement_point_id) REFERENCES measurement_points(id) ON DELETE SET NULL
+CONSTRAINT,condition_recordings,condition_recordings_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,condition_recordings,condition_recordings_pkey,PRIMARY KEY (id)
+CONSTRAINT,condition_recordings,condition_recordings_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,condition_recordings,condition_recordings_recording_type_check,"CHECK ((recording_type = ANY (ARRAY['voice_note'::text, 'machine_sound'::text, 'phone_vibration'::text, 'external_vibration'::text])))"
+CONSTRAINT,condition_recordings,condition_recordings_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,condition_recordings,condition_recordings_status_check,"CHECK ((status = ANY (ARRAY['draft'::text, 'recording'::text, 'processing'::text, 'completed'::text, 'submitted'::text, 'approved'::text, 'failed'::text])))"
+CONSTRAINT,daily_logs,daily_logs_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,daily_logs,daily_logs_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,daily_logs,daily_logs_pkey,PRIMARY KEY (id)
+CONSTRAINT,daily_logs,daily_logs_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,data_retention_policies,data_retention_policies_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,data_retention_policies,data_retention_policies_pkey,PRIMARY KEY (organization_id)
+CONSTRAINT,data_retention_policies,data_retention_policies_updated_by_fkey,FOREIGN KEY (updated_by) REFERENCES auth.users(id)
+CONSTRAINT,deletion_requests,deletion_requests_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,deletion_requests,deletion_requests_pkey,PRIMARY KEY (id)
+CONSTRAINT,deletion_requests,deletion_requests_request_type_check,"CHECK ((request_type = ANY (ARRAY['user'::text, 'organization'::text, 'export_and_delete'::text])))"
+CONSTRAINT,deletion_requests,deletion_requests_requested_by_fkey,FOREIGN KEY (requested_by) REFERENCES auth.users(id)
+CONSTRAINT,deletion_requests,deletion_requests_status_check,"CHECK ((status = ANY (ARRAY['requested'::text, 'verified'::text, 'scheduled'::text, 'cancelled'::text, 'completed'::text, 'failed'::text])))"
+CONSTRAINT,deletion_requests,deletion_requests_target_user_id_fkey,FOREIGN KEY (target_user_id) REFERENCES auth.users(id)
+CONSTRAINT,document_chunks,document_chunks_manual_id_fkey,FOREIGN KEY (manual_id) REFERENCES manuals(id) ON DELETE CASCADE
+CONSTRAINT,document_chunks,document_chunks_pkey,PRIMARY KEY (id)
+CONSTRAINT,file_metadata,file_metadata_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE SET NULL
+CONSTRAINT,file_metadata,file_metadata_object_path_key,UNIQUE (object_path)
+CONSTRAINT,file_metadata,file_metadata_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,file_metadata,file_metadata_pkey,PRIMARY KEY (id)
+CONSTRAINT,file_metadata,file_metadata_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,file_metadata,file_metadata_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,file_metadata,file_metadata_uploaded_by_fkey,FOREIGN KEY (uploaded_by) REFERENCES auth.users(id)
+CONSTRAINT,inventory_transactions,inventory_transactions_performed_by_fkey,FOREIGN KEY (performed_by) REFERENCES auth.users(id)
+CONSTRAINT,inventory_transactions,inventory_transactions_pkey,PRIMARY KEY (id)
+CONSTRAINT,inventory_transactions,inventory_transactions_spare_id_fkey,FOREIGN KEY (spare_id) REFERENCES spares(id)
+CONSTRAINT,invitations,invitations_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,invitations,invitations_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,invitations,invitations_pkey,PRIMARY KEY (id)
+CONSTRAINT,invitations,invitations_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,legal_acceptances,legal_acceptances_document_id_fkey,FOREIGN KEY (document_id) REFERENCES legal_documents(id)
+CONSTRAINT,legal_acceptances,legal_acceptances_document_id_user_id_key,"UNIQUE (document_id, user_id)"
+CONSTRAINT,legal_acceptances,legal_acceptances_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,legal_acceptances,legal_acceptances_pkey,PRIMARY KEY (id)
+CONSTRAINT,legal_acceptances,legal_acceptances_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,legal_documents,legal_acceptance_scope_check,"CHECK ((acceptance_scope = ANY (ARRAY['all_users'::text, 'owners'::text, 'platform_admins'::text])))"
+CONSTRAINT,legal_documents,legal_documents_document_type_version_key,"UNIQUE (document_type, version)"
+CONSTRAINT,legal_documents,legal_documents_pkey,PRIMARY KEY (id)
+CONSTRAINT,legal_documents,legal_documents_published_by_fkey,FOREIGN KEY (published_by) REFERENCES auth.users(id)
+CONSTRAINT,loto_procedures,loto_procedures_applied_by_fkey,FOREIGN KEY (applied_by) REFERENCES auth.users(id)
+CONSTRAINT,loto_procedures,loto_procedures_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+CONSTRAINT,loto_procedures,loto_procedures_pkey,PRIMARY KEY (id)
+CONSTRAINT,loto_procedures,loto_procedures_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,loto_procedures,loto_procedures_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,loto_procedures,loto_procedures_work_order_id_fkey,FOREIGN KEY (work_order_id) REFERENCES work_orders(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_completions,maintenance_completions_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_completions,maintenance_completions_pkey,PRIMARY KEY (id)
+CONSTRAINT,maintenance_completions,maintenance_completions_plan_id_fkey,FOREIGN KEY (plan_id) REFERENCES maintenance_plans(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_completions,maintenance_completions_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_completions,maintenance_completions_supervisor_approved_by_fkey,FOREIGN KEY (supervisor_approved_by) REFERENCES auth.users(id)
+CONSTRAINT,maintenance_completions,maintenance_completions_worker_id_fkey,FOREIGN KEY (worker_id) REFERENCES auth.users(id)
+CONSTRAINT,maintenance_plans,maintenance_plans_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,maintenance_plans,maintenance_plans_assigned_to_fkey,FOREIGN KEY (assigned_to) REFERENCES auth.users(id)
+CONSTRAINT,maintenance_plans,maintenance_plans_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,maintenance_plans,maintenance_plans_last_completed_by_fkey,FOREIGN KEY (last_completed_by) REFERENCES auth.users(id)
+CONSTRAINT,maintenance_plans,maintenance_plans_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_plans,maintenance_plans_pkey,PRIMARY KEY (id)
+CONSTRAINT,maintenance_plans,maintenance_plans_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,maintenance_plans,maintenance_plans_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,manuals,manuals_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,manuals,manuals_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,manuals,manuals_pkey,PRIMARY KEY (id)
+CONSTRAINT,manuals,manuals_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id)
+CONSTRAINT,manuals,manuals_uploaded_by_fkey,FOREIGN KEY (uploaded_by) REFERENCES auth.users(id)
+CONSTRAINT,material_requests,material_requests_managed_by_fkey,FOREIGN KEY (managed_by) REFERENCES auth.users(id)
+CONSTRAINT,material_requests,material_requests_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,material_requests,material_requests_pkey,PRIMARY KEY (id)
+CONSTRAINT,material_requests,material_requests_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,material_requests,material_requests_purchase_order_id_fkey,FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id) ON DELETE SET NULL
+CONSTRAINT,material_requests,material_requests_requested_by_fkey,FOREIGN KEY (requested_by) REFERENCES auth.users(id)
+CONSTRAINT,material_requests,material_requests_spare_id_fkey,FOREIGN KEY (spare_id) REFERENCES spares(id) ON DELETE CASCADE
+CONSTRAINT,measurement_points,measurement_points_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE CASCADE
+CONSTRAINT,measurement_points,measurement_points_asset_id_name_direction_key,"UNIQUE (asset_id, name, direction)"
+CONSTRAINT,measurement_points,measurement_points_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,measurement_points,measurement_points_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,measurement_points,measurement_points_pkey,PRIMARY KEY (id)
+CONSTRAINT,measurement_points,measurement_points_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,notifications,notifications_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,notifications,notifications_pkey,PRIMARY KEY (id)
+CONSTRAINT,notifications,notifications_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id)
+CONSTRAINT,notifications,notifications_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,organization_entitlements,organization_entitlements_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,organization_entitlements,organization_entitlements_pkey,"PRIMARY KEY (organization_id, entitlement)"
+CONSTRAINT,organization_entitlements,organization_entitlements_updated_by_fkey,FOREIGN KEY (updated_by) REFERENCES auth.users(id)
+CONSTRAINT,organization_members,organization_members_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,organization_members,organization_members_pkey,"PRIMARY KEY (organization_id, user_id)"
+CONSTRAINT,organization_members,organization_members_role_check,"CHECK ((role = ANY (ARRAY['owner'::text, 'manager'::text, 'deputy_manager'::text, 'assistant_manager'::text, 'supervisor'::text, 'engineer'::text, 'mechanical_engineer'::text, 'electrical_engineer'::text, 'production_engineer'::text, 'utility_engineer'::text, 'power_house_engineer'::text, 'technical_officer'::text, 'senior_technical_officer'::text, 'technician'::text, 'senior_technician'::text, 'operator'::text, 'assistant_operator'::text, 'senior_operator'::text, 'worker'::text, 'checker'::text, 'quality_control_officer'::text, 'store'::text, 'admin_officer'::text, 'time_officer'::text, 'viewer'::text])))"
+CONSTRAINT,organization_members,organization_members_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,organization_settings,organization_settings_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,organization_settings,organization_settings_pkey,PRIMARY KEY (organization_id)
+CONSTRAINT,organization_subscriptions,organization_subscription_status_check,"CHECK ((status = ANY (ARRAY['trial'::text, 'active'::text, 'past_due'::text, 'suspended'::text, 'cancelled'::text])))"
+CONSTRAINT,organization_subscriptions,organization_subscriptions_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,organization_subscriptions,organization_subscriptions_organization_id_key,UNIQUE (organization_id)
+CONSTRAINT,organization_subscriptions,organization_subscriptions_pkey,PRIMARY KEY (id)
+CONSTRAINT,organization_subscriptions,organization_subscriptions_plan_id_fkey,FOREIGN KEY (plan_id) REFERENCES subscription_plans(id)
+CONSTRAINT,organizations,organizations_commercial_status_check,"CHECK ((commercial_status = ANY (ARRAY['trial'::text, 'active'::text, 'past_due'::text, 'suspended'::text, 'cancelled'::text, 'deletion_pending'::text])))"
+CONSTRAINT,organizations,organizations_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,organizations,organizations_pkey,PRIMARY KEY (id)
+CONSTRAINT,organizations,organizations_slug_key,UNIQUE (slug)
+CONSTRAINT,permits,permits_approved_by_fkey,FOREIGN KEY (approved_by) REFERENCES auth.users(id)
+CONSTRAINT,permits,permits_pkey,PRIMARY KEY (id)
+CONSTRAINT,permits,permits_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,permits,permits_requested_by_fkey,FOREIGN KEY (requested_by) REFERENCES auth.users(id)
+CONSTRAINT,permits,permits_work_order_id_fkey,FOREIGN KEY (work_order_id) REFERENCES work_orders(id) ON DELETE CASCADE
+CONSTRAINT,plant_members,plant_members_pkey,"PRIMARY KEY (plant_id, user_id)"
+CONSTRAINT,plant_members,plant_members_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,plant_members,plant_members_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,plantmaster_sync,plantmaster_sync_pkey,PRIMARY KEY (site_id)
+CONSTRAINT,plants,plants_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,plants,plants_pkey,PRIMARY KEY (id)
+CONSTRAINT,platform_admins,platform_admin_role_check,"CHECK ((admin_role = ANY (ARRAY['super_admin'::text, 'operations'::text, 'support'::text, 'billing'::text, 'auditor'::text])))"
+CONSTRAINT,platform_admins,platform_admins_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,platform_admins,platform_admins_pkey,PRIMARY KEY (user_id)
+CONSTRAINT,platform_admins,platform_admins_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,platform_notifications,platform_notifications_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,platform_notifications,platform_notifications_pkey,PRIMARY KEY (id)
+CONSTRAINT,platform_notifications,platform_notifications_severity_check,"CHECK ((severity = ANY (ARRAY['info'::text, 'warning'::text, 'error'::text, 'critical'::text])))"
+CONSTRAINT,platform_support_messages,platform_support_messages_pkey,PRIMARY KEY (id)
+CONSTRAINT,platform_support_messages,platform_support_messages_ticket_id_fkey,FOREIGN KEY (ticket_id) REFERENCES platform_support_tickets(id) ON DELETE CASCADE
+CONSTRAINT,platform_support_messages,platform_support_messages_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,platform_support_tickets,platform_support_tickets_assigned_to_fkey,FOREIGN KEY (assigned_to) REFERENCES auth.users(id)
+CONSTRAINT,platform_support_tickets,platform_support_tickets_opened_by_fkey,FOREIGN KEY (opened_by) REFERENCES auth.users(id)
+CONSTRAINT,platform_support_tickets,platform_support_tickets_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE SET NULL
+CONSTRAINT,platform_support_tickets,platform_support_tickets_pkey,PRIMARY KEY (id)
+CONSTRAINT,platform_support_tickets,platform_support_tickets_priority_check,"CHECK ((priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'critical'::text])))"
+CONSTRAINT,platform_support_tickets,platform_support_tickets_related_incident_id_fkey,FOREIGN KEY (related_incident_id) REFERENCES system_incidents(id) ON DELETE SET NULL
+CONSTRAINT,platform_support_tickets,platform_support_tickets_status_check,"CHECK ((status = ANY (ARRAY['new'::text, 'acknowledged'::text, 'investigating'::text, 'waiting_customer'::text, 'resolved'::text, 'closed'::text])))"
+CONSTRAINT,platform_support_tickets,platform_support_tickets_ticket_number_key,UNIQUE (ticket_number)
+CONSTRAINT,problem_cases,problem_cases_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,problem_cases,problem_cases_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,problem_cases,problem_cases_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,problem_cases,problem_cases_pkey,PRIMARY KEY (id)
+CONSTRAINT,problem_cases,problem_cases_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,profiles,profiles_id_fkey,FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,profiles,profiles_pkey,PRIMARY KEY (id)
+CONSTRAINT,purchase_order_lines,purchase_order_lines_pkey,PRIMARY KEY (id)
+CONSTRAINT,purchase_order_lines,purchase_order_lines_purchase_order_id_fkey,FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id) ON DELETE CASCADE
+CONSTRAINT,purchase_order_lines,purchase_order_lines_quantity_check,CHECK ((quantity > (0)::numeric))
+CONSTRAINT,purchase_order_lines,purchase_order_lines_spare_id_fkey,FOREIGN KEY (spare_id) REFERENCES spares(id) ON DELETE SET NULL
+CONSTRAINT,purchase_orders,purchase_orders_approved_by_fkey,FOREIGN KEY (approved_by) REFERENCES auth.users(id)
+CONSTRAINT,purchase_orders,purchase_orders_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,purchase_orders,purchase_orders_organization_id_po_number_key,"UNIQUE (organization_id, po_number)"
+CONSTRAINT,purchase_orders,purchase_orders_pkey,PRIMARY KEY (id)
+CONSTRAINT,purchase_orders,purchase_orders_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,purchase_orders,purchase_orders_requested_by_fkey,FOREIGN KEY (requested_by) REFERENCES auth.users(id)
+CONSTRAINT,purchase_orders,purchase_orders_status_check,"CHECK ((status = ANY (ARRAY['draft'::text, 'pending_approval'::text, 'approved'::text, 'sent'::text, 'partially_received'::text, 'received'::text, 'cancelled'::text])))"
+CONSTRAINT,purchase_orders,purchase_orders_supplier_id_fkey,FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL
+CONSTRAINT,push_cursors,push_cursors_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,push_cursors,push_cursors_pkey,PRIMARY KEY (organization_id)
+CONSTRAINT,push_subscriptions,push_subscriptions_endpoint_key,UNIQUE (endpoint)
+CONSTRAINT,push_subscriptions,push_subscriptions_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,push_subscriptions,push_subscriptions_pkey,PRIMARY KEY (id)
+CONSTRAINT,push_subscriptions,push_subscriptions_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,qa_environments,qa_environments_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,qa_environments,qa_environments_isolation_organization_id_fkey,FOREIGN KEY (isolation_organization_id) REFERENCES organizations(id) ON DELETE SET NULL
+CONSTRAINT,qa_environments,qa_environments_name_key,UNIQUE (name)
+CONSTRAINT,qa_environments,qa_environments_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE SET NULL
+CONSTRAINT,qa_environments,qa_environments_pkey,PRIMARY KEY (id)
+CONSTRAINT,qa_environments,qa_environments_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE SET NULL
+CONSTRAINT,qa_environments,qa_environments_status_check,"CHECK ((status = ANY (ARRAY['creating'::text, 'ready'::text, 'testing'::text, 'failed'::text, 'deleting'::text, 'deleted'::text])))"
+CONSTRAINT,qa_manual_checks,qa_manual_checks_pkey,PRIMARY KEY (id)
+CONSTRAINT,qa_manual_checks,qa_manual_checks_run_id_fkey,FOREIGN KEY (run_id) REFERENCES qa_test_runs(id) ON DELETE CASCADE
+CONSTRAINT,qa_manual_checks,qa_manual_checks_status_check,"CHECK ((status = ANY (ARRAY['pending'::text, 'passed'::text, 'failed'::text, 'not_available'::text])))"
+CONSTRAINT,qa_manual_checks,qa_manual_checks_tested_by_fkey,FOREIGN KEY (tested_by) REFERENCES auth.users(id)
+CONSTRAINT,qa_test_results,qa_test_results_pkey,PRIMARY KEY (id)
+CONSTRAINT,qa_test_results,qa_test_results_run_id_fkey,FOREIGN KEY (run_id) REFERENCES qa_test_runs(id) ON DELETE CASCADE
+CONSTRAINT,qa_test_results,qa_test_results_status_check,"CHECK ((status = ANY (ARRAY['passed'::text, 'failed'::text, 'blocked'::text, 'manual_required'::text])))"
+CONSTRAINT,qa_test_runs,qa_test_runs_environment_id_fkey,FOREIGN KEY (environment_id) REFERENCES qa_environments(id) ON DELETE CASCADE
+CONSTRAINT,qa_test_runs,qa_test_runs_pkey,PRIMARY KEY (id)
+CONSTRAINT,qa_test_runs,qa_test_runs_started_by_fkey,FOREIGN KEY (started_by) REFERENCES auth.users(id)
+CONSTRAINT,qa_test_runs,qa_test_runs_status_check,"CHECK ((status = ANY (ARRAY['running'::text, 'passed'::text, 'failed'::text, 'partial'::text, 'cancelled'::text])))"
+CONSTRAINT,quota_overrides,quota_overrides_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,quota_overrides,quota_overrides_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,quota_overrides,quota_overrides_override_type_check,"CHECK ((override_type = ANY (ARRAY['absolute'::text, 'bonus'::text, 'block'::text])))"
+CONSTRAINT,quota_overrides,quota_overrides_pkey,PRIMARY KEY (id)
+CONSTRAINT,report_dispatches,report_dispatches_approved_by_fkey,FOREIGN KEY (approved_by) REFERENCES auth.users(id)
+CONSTRAINT,report_dispatches,report_dispatches_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,report_dispatches,report_dispatches_pkey,PRIMARY KEY (id)
+CONSTRAINT,report_dispatches,report_dispatches_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id)
+CONSTRAINT,restore_drills,restore_drills_backup_job_id_fkey,FOREIGN KEY (backup_job_id) REFERENCES backup_jobs(id) ON DELETE SET NULL
+CONSTRAINT,restore_drills,restore_drills_performed_by_fkey,FOREIGN KEY (performed_by) REFERENCES auth.users(id)
+CONSTRAINT,restore_drills,restore_drills_pkey,PRIMARY KEY (id)
+CONSTRAINT,restore_drills,restore_drills_status_check,"CHECK ((status = ANY (ARRAY['planned'::text, 'running'::text, 'passed'::text, 'failed'::text, 'cancelled'::text])))"
+CONSTRAINT,scan_entity_links,scan_entity_links_linked_by_fkey,FOREIGN KEY (linked_by) REFERENCES auth.users(id)
+CONSTRAINT,scan_entity_links,scan_entity_links_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,scan_entity_links,scan_entity_links_pkey,PRIMARY KEY (id)
+CONSTRAINT,scan_entity_links,scan_entity_links_scan_session_id_entity_type_entity_id_rel_key,"UNIQUE (scan_session_id, entity_type, entity_id, relation)"
+CONSTRAINT,scan_entity_links,scan_entity_links_scan_session_id_fkey,FOREIGN KEY (scan_session_id) REFERENCES scan_sessions(id) ON DELETE CASCADE
+CONSTRAINT,scan_pages,scan_pages_pkey,PRIMARY KEY (id)
+CONSTRAINT,scan_pages,scan_pages_session_id_fkey,FOREIGN KEY (session_id) REFERENCES scan_sessions(id) ON DELETE CASCADE
+CONSTRAINT,scan_pages,scan_pages_session_id_page_number_key,"UNIQUE (session_id, page_number)"
+CONSTRAINT,scan_sessions,scan_sessions_approved_by_fkey,FOREIGN KEY (approved_by) REFERENCES auth.users(id)
+CONSTRAINT,scan_sessions,scan_sessions_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,scan_sessions,scan_sessions_mode_check,"CHECK ((mode = ANY (ARRAY['qr_barcode'::text, 'document'::text, 'nameplate'::text, 'identify'::text, 'import'::text])))"
+CONSTRAINT,scan_sessions,scan_sessions_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,scan_sessions,scan_sessions_pkey,PRIMARY KEY (id)
+CONSTRAINT,scan_sessions,scan_sessions_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,scan_sessions,scan_sessions_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,scan_sessions,scan_sessions_source_type_check,"CHECK ((source_type = ANY (ARRAY['camera'::text, 'gallery'::text, 'file'::text, 'offline'::text])))"
+CONSTRAINT,scan_sessions,scan_sessions_status_check,"CHECK ((status = ANY (ARRAY['draft'::text, 'processing'::text, 'completed'::text, 'failed'::text, 'submitted'::text, 'approved'::text])))"
+CONSTRAINT,sensor_devices,sensor_devices_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,sensor_devices,sensor_devices_pkey,PRIMARY KEY (id)
+CONSTRAINT,sensor_devices,sensor_devices_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,sensor_devices,sensor_devices_sensor_type_check,"CHECK ((sensor_type = ANY (ARRAY['phone'::text, 'bluetooth_accelerometer'::text, 'usb_sensor'::text, 'industrial_monitor'::text])))"
+CONSTRAINT,shift_assignments,shift_assignments_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,shift_assignments,shift_assignments_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,shift_assignments,shift_assignments_pkey,PRIMARY KEY (id)
+CONSTRAINT,shift_assignments,shift_assignments_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,shift_assignments,shift_assignments_plant_id_user_id_work_date_key,"UNIQUE (plant_id, user_id, work_date)"
+CONSTRAINT,shift_assignments,shift_assignments_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,shift_handovers,shift_handovers_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,shift_handovers,shift_handovers_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,shift_handovers,shift_handovers_pkey,PRIMARY KEY (id)
+CONSTRAINT,shift_handovers,shift_handovers_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,spares,spares_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,spares,spares_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,spares,spares_pkey,PRIMARY KEY (id)
+CONSTRAINT,spares,spares_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,spares,spares_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,storage_reservations,storage_reservations_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,storage_reservations,storage_reservations_pkey,PRIMARY KEY (id)
+CONSTRAINT,storage_reservations,storage_reservations_status_check,"CHECK ((status = ANY (ARRAY['reserved'::text, 'completed'::text, 'cancelled'::text, 'expired'::text])))"
+CONSTRAINT,storage_reservations,storage_reservations_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+CONSTRAINT,storage_usage_events,storage_usage_events_event_type_check,"CHECK ((event_type = ANY (ARRAY['upload'::text, 'download'::text, 'delete'::text, 'reconcile'::text, 'restore'::text])))"
+CONSTRAINT,storage_usage_events,storage_usage_events_file_metadata_id_fkey,FOREIGN KEY (file_metadata_id) REFERENCES file_metadata(id) ON DELETE SET NULL
+CONSTRAINT,storage_usage_events,storage_usage_events_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,storage_usage_events,storage_usage_events_pkey,PRIMARY KEY (id)
+CONSTRAINT,storage_usage_events,storage_usage_events_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL
+CONSTRAINT,subscription_plans,subscription_plans_code_key,UNIQUE (code)
+CONSTRAINT,subscription_plans,subscription_plans_pkey,PRIMARY KEY (id)
+CONSTRAINT,suppliers,suppliers_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,suppliers,suppliers_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,suppliers,suppliers_pkey,PRIMARY KEY (id)
+CONSTRAINT,suppliers,suppliers_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE SET NULL
+CONSTRAINT,suppliers,suppliers_rating_check,CHECK (((rating >= (0)::numeric) AND (rating <= (5)::numeric)))
+CONSTRAINT,support_messages,support_messages_pkey,PRIMARY KEY (id)
+CONSTRAINT,support_messages,support_messages_thread_id_fkey,FOREIGN KEY (thread_id) REFERENCES support_threads(id) ON DELETE CASCADE
+CONSTRAINT,support_messages,support_messages_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id)
+CONSTRAINT,support_threads,support_threads_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,support_threads,support_threads_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,support_threads,support_threads_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,support_threads,support_threads_pkey,PRIMARY KEY (id)
+CONSTRAINT,support_threads,support_threads_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,system_incidents,system_incidents_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,system_incidents,system_incidents_pkey,PRIMARY KEY (id)
+CONSTRAINT,system_incidents,system_incidents_severity_check,"CHECK ((severity = ANY (ARRAY['info'::text, 'warning'::text, 'error'::text, 'critical'::text])))"
+CONSTRAINT,system_incidents,system_incidents_status_check,"CHECK ((status = ANY (ARRAY['open'::text, 'acknowledged'::text, 'resolved'::text])))"
+CONSTRAINT,technical_experiences,technical_experiences_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id)
+CONSTRAINT,technical_experiences,technical_experiences_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,technical_experiences,technical_experiences_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,technical_experiences,technical_experiences_pkey,PRIMARY KEY (id)
+CONSTRAINT,technical_experiences,technical_experiences_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,tool_transactions,tool_transactions_holder_id_fkey,FOREIGN KEY (holder_id) REFERENCES auth.users(id)
+CONSTRAINT,tool_transactions,tool_transactions_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,tool_transactions,tool_transactions_performed_by_fkey,FOREIGN KEY (performed_by) REFERENCES auth.users(id)
+CONSTRAINT,tool_transactions,tool_transactions_pkey,PRIMARY KEY (id)
+CONSTRAINT,tool_transactions,tool_transactions_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,tool_transactions,tool_transactions_tool_id_fkey,FOREIGN KEY (tool_id) REFERENCES tools(id) ON DELETE CASCADE
+CONSTRAINT,tool_transactions,tool_transactions_transaction_type_check,"CHECK ((transaction_type = ANY (ARRAY['checkout'::text, 'return'::text, 'calibration'::text, 'inspection'::text])))"
+CONSTRAINT,tools,tools_holder_id_fkey,FOREIGN KEY (holder_id) REFERENCES auth.users(id)
+CONSTRAINT,tools,tools_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,tools,tools_pkey,PRIMARY KEY (id)
+CONSTRAINT,tools,tools_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,tools,tools_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,usage_adjustments,usage_adjustments_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,usage_adjustments,usage_adjustments_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,usage_adjustments,usage_adjustments_pkey,PRIMARY KEY (id)
+CONSTRAINT,usage_counters,usage_counters_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,usage_counters,usage_counters_pkey,"PRIMARY KEY (organization_id, metric, period_start)"
+CONSTRAINT,usage_events,usage_events_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,usage_events,usage_events_pkey,PRIMARY KEY (id)
+CONSTRAINT,usage_events,usage_events_user_id_fkey,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL
+CONSTRAINT,work_orders,work_orders_asset_id_fkey,FOREIGN KEY (asset_id) REFERENCES assets(id) ON DELETE SET NULL
+CONSTRAINT,work_orders,work_orders_assigned_to_fkey,FOREIGN KEY (assigned_to) REFERENCES auth.users(id)
+CONSTRAINT,work_orders,work_orders_completed_by_fkey,FOREIGN KEY (completed_by) REFERENCES auth.users(id)
+CONSTRAINT,work_orders,work_orders_created_by_fkey,FOREIGN KEY (created_by) REFERENCES auth.users(id)
+CONSTRAINT,work_orders,work_orders_organization_id_fkey,FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+CONSTRAINT,work_orders,work_orders_pkey,PRIMARY KEY (id)
+CONSTRAINT,work_orders,work_orders_plant_id_fkey,FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE CASCADE
+CONSTRAINT,work_orders,work_orders_removed_by_fkey,FOREIGN KEY (removed_by) REFERENCES auth.users(id)
+CONSTRAINT,work_orders,work_orders_supervisor_approved_by_fkey,FOREIGN KEY (supervisor_approved_by) REFERENCES auth.users(id)
+INDEX,action_attachments,action_attachments_pkey,CREATE UNIQUE INDEX action_attachments_pkey ON public.action_attachments USING btree (id)
+INDEX,admin_action_logs,admin_action_logs_pkey,CREATE UNIQUE INDEX admin_action_logs_pkey ON public.admin_action_logs USING btree (id)
+INDEX,admin_action_logs,admin_action_time_idx,CREATE INDEX admin_action_time_idx ON public.admin_action_logs USING btree (created_at DESC)
+INDEX,ai_usage,ai_usage_org_time_idx,"CREATE INDEX ai_usage_org_time_idx ON public.ai_usage USING btree (organization_id, created_at DESC)"
+INDEX,ai_usage,ai_usage_pkey,CREATE UNIQUE INDEX ai_usage_pkey ON public.ai_usage USING btree (id)
+INDEX,ai_usage,ai_usage_request_id_idx,CREATE UNIQUE INDEX ai_usage_request_id_idx ON public.ai_usage USING btree (request_id)
+INDEX,api_keys,api_keys_hash_idx,CREATE INDEX api_keys_hash_idx ON public.api_keys USING btree (key_hash)
+INDEX,api_keys,api_keys_key_hash_key,CREATE UNIQUE INDEX api_keys_key_hash_key ON public.api_keys USING btree (key_hash)
+INDEX,api_keys,api_keys_org_idx,CREATE INDEX api_keys_org_idx ON public.api_keys USING btree (organization_id)
+INDEX,api_keys,api_keys_pkey,CREATE UNIQUE INDEX api_keys_pkey ON public.api_keys USING btree (id)
+INDEX,asset_status_history,asset_status_history_pkey,CREATE UNIQUE INDEX asset_status_history_pkey ON public.asset_status_history USING btree (id)
+INDEX,assets,assets_pkey,CREATE UNIQUE INDEX assets_pkey ON public.assets USING btree (id)
+INDEX,assets,assets_plant_id_asset_code_key,"CREATE UNIQUE INDEX assets_plant_id_asset_code_key ON public.assets USING btree (plant_id, asset_code)"
+INDEX,assets,assets_plant_updated_idx,"CREATE INDEX assets_plant_updated_idx ON public.assets USING btree (plant_id, updated_at DESC)"
+INDEX,attendance,attendance_pkey,CREATE UNIQUE INDEX attendance_pkey ON public.attendance USING btree (id)
+INDEX,attendance,attendance_plant_id_user_id_work_date_key,"CREATE UNIQUE INDEX attendance_plant_id_user_id_work_date_key ON public.attendance USING btree (plant_id, user_id, work_date)"
+INDEX,audit_logs,audit_logs_pkey,CREATE UNIQUE INDEX audit_logs_pkey ON public.audit_logs USING btree (id)
+INDEX,backup_jobs,backup_jobs_pkey,CREATE UNIQUE INDEX backup_jobs_pkey ON public.backup_jobs USING btree (id)
+INDEX,billing_events,billing_events_pkey,CREATE UNIQUE INDEX billing_events_pkey ON public.billing_events USING btree (id)
+INDEX,billing_events,billing_events_provider_event_id_key,CREATE UNIQUE INDEX billing_events_provider_event_id_key ON public.billing_events USING btree (provider_event_id)
+INDEX,checklist_items,checklist_items_pkey,CREATE UNIQUE INDEX checklist_items_pkey ON public.checklist_items USING btree (id)
+INDEX,checklist_runs,checklist_runs_pkey,CREATE UNIQUE INDEX checklist_runs_pkey ON public.checklist_runs USING btree (id)
+INDEX,checklist_templates,checklist_templates_pkey,CREATE UNIQUE INDEX checklist_templates_pkey ON public.checklist_templates USING btree (id)
+INDEX,checklist_values,checklist_values_pkey,CREATE UNIQUE INDEX checklist_values_pkey ON public.checklist_values USING btree (id)
+INDEX,code_registry,code_registry_entity_idx,"CREATE INDEX code_registry_entity_idx ON public.code_registry USING btree (organization_id, entity_type, entity_id)"
+INDEX,code_registry,code_registry_organization_id_code_value_key,"CREATE UNIQUE INDEX code_registry_organization_id_code_value_key ON public.code_registry USING btree (organization_id, code_value)"
+INDEX,code_registry,code_registry_pkey,CREATE UNIQUE INDEX code_registry_pkey ON public.code_registry USING btree (id)
+INDEX,company_feature_blocks,company_feature_blocks_pkey,"CREATE UNIQUE INDEX company_feature_blocks_pkey ON public.company_feature_blocks USING btree (organization_id, feature)"
+INDEX,complimentary_access,complimentary_access_pkey,CREATE UNIQUE INDEX complimentary_access_pkey ON public.complimentary_access USING btree (organization_id)
+INDEX,condition_alarms,condition_alarms_org_time_idx,"CREATE INDEX condition_alarms_org_time_idx ON public.condition_alarms USING btree (organization_id, created_at DESC)"
+INDEX,condition_alarms,condition_alarms_pkey,CREATE UNIQUE INDEX condition_alarms_pkey ON public.condition_alarms USING btree (id)
+INDEX,condition_entity_links,condition_entity_links_pkey,CREATE UNIQUE INDEX condition_entity_links_pkey ON public.condition_entity_links USING btree (id)
+INDEX,condition_entity_links,condition_entity_links_recording_id_entity_type_entity_id_r_key,"CREATE UNIQUE INDEX condition_entity_links_recording_id_entity_type_entity_id_r_key ON public.condition_entity_links USING btree (recording_id, entity_type, entity_id, relation)"
+INDEX,condition_recordings,condition_recordings_asset_time_idx,"CREATE INDEX condition_recordings_asset_time_idx ON public.condition_recordings USING btree (asset_id, created_at DESC)"
+INDEX,condition_recordings,condition_recordings_baseline_idx,"CREATE INDEX condition_recordings_baseline_idx ON public.condition_recordings USING btree (asset_id, measurement_point_id, is_baseline) WHERE (removed_at IS NULL)"
+INDEX,condition_recordings,condition_recordings_org_time_idx,"CREATE INDEX condition_recordings_org_time_idx ON public.condition_recordings USING btree (organization_id, created_at DESC)"
+INDEX,condition_recordings,condition_recordings_pkey,CREATE UNIQUE INDEX condition_recordings_pkey ON public.condition_recordings USING btree (id)
+INDEX,daily_logs,daily_logs_pkey,CREATE UNIQUE INDEX daily_logs_pkey ON public.daily_logs USING btree (id)
+INDEX,daily_logs,daily_logs_plant_date_idx,"CREATE INDEX daily_logs_plant_date_idx ON public.daily_logs USING btree (plant_id, log_date DESC)"
+INDEX,data_retention_policies,data_retention_policies_pkey,CREATE UNIQUE INDEX data_retention_policies_pkey ON public.data_retention_policies USING btree (organization_id)
+INDEX,deletion_requests,deletion_requests_pkey,CREATE UNIQUE INDEX deletion_requests_pkey ON public.deletion_requests USING btree (id)
+INDEX,document_chunks,document_chunks_embedding_idx,CREATE INDEX document_chunks_embedding_idx ON public.document_chunks USING hnsw (embedding vector_cosine_ops)
+INDEX,document_chunks,document_chunks_pkey,CREATE UNIQUE INDEX document_chunks_pkey ON public.document_chunks USING btree (id)
+INDEX,file_metadata,file_metadata_object_path_key,CREATE UNIQUE INDEX file_metadata_object_path_key ON public.file_metadata USING btree (object_path)
+INDEX,file_metadata,file_metadata_pkey,CREATE UNIQUE INDEX file_metadata_pkey ON public.file_metadata USING btree (id)
+INDEX,inventory_transactions,inventory_transactions_pkey,CREATE UNIQUE INDEX inventory_transactions_pkey ON public.inventory_transactions USING btree (id)
+INDEX,invitations,invitations_pkey,CREATE UNIQUE INDEX invitations_pkey ON public.invitations USING btree (id)
+INDEX,legal_acceptances,legal_acceptances_document_id_user_id_key,"CREATE UNIQUE INDEX legal_acceptances_document_id_user_id_key ON public.legal_acceptances USING btree (document_id, user_id)"
+INDEX,legal_acceptances,legal_acceptances_pkey,CREATE UNIQUE INDEX legal_acceptances_pkey ON public.legal_acceptances USING btree (id)
+INDEX,legal_documents,legal_documents_document_type_version_key,"CREATE UNIQUE INDEX legal_documents_document_type_version_key ON public.legal_documents USING btree (document_type, version)"
+INDEX,legal_documents,legal_documents_pkey,CREATE UNIQUE INDEX legal_documents_pkey ON public.legal_documents USING btree (id)
+INDEX,loto_procedures,loto_procedures_pkey,CREATE UNIQUE INDEX loto_procedures_pkey ON public.loto_procedures USING btree (id)
+INDEX,maintenance_completions,maintenance_completion_plan_idx,"CREATE INDEX maintenance_completion_plan_idx ON public.maintenance_completions USING btree (plan_id, completed_at DESC)"
+INDEX,maintenance_completions,maintenance_completions_pkey,CREATE UNIQUE INDEX maintenance_completions_pkey ON public.maintenance_completions USING btree (id)
+INDEX,maintenance_plans,maintenance_plans_pkey,CREATE UNIQUE INDEX maintenance_plans_pkey ON public.maintenance_plans USING btree (id)
+INDEX,manuals,manuals_pkey,CREATE UNIQUE INDEX manuals_pkey ON public.manuals USING btree (id)
+INDEX,material_requests,material_requests_pkey,CREATE UNIQUE INDEX material_requests_pkey ON public.material_requests USING btree (id)
+INDEX,measurement_points,measurement_points_asset_id_name_direction_key,"CREATE UNIQUE INDEX measurement_points_asset_id_name_direction_key ON public.measurement_points USING btree (asset_id, name, direction)"
+INDEX,measurement_points,measurement_points_pkey,CREATE UNIQUE INDEX measurement_points_pkey ON public.measurement_points USING btree (id)
+INDEX,notifications,notifications_org_created_idx,"CREATE INDEX notifications_org_created_idx ON public.notifications USING btree (organization_id, created_at)"
+INDEX,notifications,notifications_pkey,CREATE UNIQUE INDEX notifications_pkey ON public.notifications USING btree (id)
+INDEX,organization_entitlements,organization_entitlements_pkey,"CREATE UNIQUE INDEX organization_entitlements_pkey ON public.organization_entitlements USING btree (organization_id, entitlement)"
+INDEX,organization_members,organization_members_pkey,"CREATE UNIQUE INDEX organization_members_pkey ON public.organization_members USING btree (organization_id, user_id)"
+INDEX,organization_settings,organization_settings_pkey,CREATE UNIQUE INDEX organization_settings_pkey ON public.organization_settings USING btree (organization_id)
+INDEX,organization_subscriptions,organization_subscriptions_organization_id_key,CREATE UNIQUE INDEX organization_subscriptions_organization_id_key ON public.organization_subscriptions USING btree (organization_id)
+INDEX,organization_subscriptions,organization_subscriptions_pkey,CREATE UNIQUE INDEX organization_subscriptions_pkey ON public.organization_subscriptions USING btree (id)
+INDEX,organizations,organizations_pkey,CREATE UNIQUE INDEX organizations_pkey ON public.organizations USING btree (id)
+INDEX,organizations,organizations_slug_key,CREATE UNIQUE INDEX organizations_slug_key ON public.organizations USING btree (slug)
+INDEX,permits,permits_pkey,CREATE UNIQUE INDEX permits_pkey ON public.permits USING btree (id)
+INDEX,plant_members,plant_members_pkey,"CREATE UNIQUE INDEX plant_members_pkey ON public.plant_members USING btree (plant_id, user_id)"
+INDEX,plantmaster_sync,plantmaster_sync_pkey,CREATE UNIQUE INDEX plantmaster_sync_pkey ON public.plantmaster_sync USING btree (site_id)
+INDEX,plants,plants_pkey,CREATE UNIQUE INDEX plants_pkey ON public.plants USING btree (id)
+INDEX,platform_admins,platform_admins_pkey,CREATE UNIQUE INDEX platform_admins_pkey ON public.platform_admins USING btree (user_id)
+INDEX,platform_notifications,platform_notifications_pkey,CREATE UNIQUE INDEX platform_notifications_pkey ON public.platform_notifications USING btree (id)
+INDEX,platform_support_messages,platform_support_messages_pkey,CREATE UNIQUE INDEX platform_support_messages_pkey ON public.platform_support_messages USING btree (id)
+INDEX,platform_support_tickets,platform_support_tickets_pkey,CREATE UNIQUE INDEX platform_support_tickets_pkey ON public.platform_support_tickets USING btree (id)
+INDEX,platform_support_tickets,platform_support_tickets_ticket_number_key,CREATE UNIQUE INDEX platform_support_tickets_ticket_number_key ON public.platform_support_tickets USING btree (ticket_number)
+INDEX,platform_support_tickets,platform_tickets_status_priority_idx,"CREATE INDEX platform_tickets_status_priority_idx ON public.platform_support_tickets USING btree (status, priority, updated_at DESC)"
+INDEX,problem_cases,problem_cases_pkey,CREATE UNIQUE INDEX problem_cases_pkey ON public.problem_cases USING btree (id)
+INDEX,profiles,profiles_pkey,CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)
+INDEX,purchase_order_lines,pol_po_idx,CREATE INDEX pol_po_idx ON public.purchase_order_lines USING btree (purchase_order_id)
+INDEX,purchase_order_lines,purchase_order_lines_pkey,CREATE UNIQUE INDEX purchase_order_lines_pkey ON public.purchase_order_lines USING btree (id)
+INDEX,purchase_orders,po_plant_idx,CREATE INDEX po_plant_idx ON public.purchase_orders USING btree (plant_id) WHERE (removed_at IS NULL)
+INDEX,purchase_orders,po_status_idx,CREATE INDEX po_status_idx ON public.purchase_orders USING btree (status) WHERE (removed_at IS NULL)
+INDEX,purchase_orders,po_supplier_idx,CREATE INDEX po_supplier_idx ON public.purchase_orders USING btree (supplier_id) WHERE (removed_at IS NULL)
+INDEX,purchase_orders,purchase_orders_organization_id_po_number_key,"CREATE UNIQUE INDEX purchase_orders_organization_id_po_number_key ON public.purchase_orders USING btree (organization_id, po_number)"
+INDEX,purchase_orders,purchase_orders_pkey,CREATE UNIQUE INDEX purchase_orders_pkey ON public.purchase_orders USING btree (id)
+INDEX,push_cursors,push_cursors_pkey,CREATE UNIQUE INDEX push_cursors_pkey ON public.push_cursors USING btree (organization_id)
+INDEX,push_subscriptions,push_subs_org_idx,CREATE INDEX push_subs_org_idx ON public.push_subscriptions USING btree (organization_id)
+INDEX,push_subscriptions,push_subscriptions_endpoint_key,CREATE UNIQUE INDEX push_subscriptions_endpoint_key ON public.push_subscriptions USING btree (endpoint)
+INDEX,push_subscriptions,push_subscriptions_pkey,CREATE UNIQUE INDEX push_subscriptions_pkey ON public.push_subscriptions USING btree (id)
+INDEX,qa_environments,qa_environments_name_key,CREATE UNIQUE INDEX qa_environments_name_key ON public.qa_environments USING btree (name)
+INDEX,qa_environments,qa_environments_pkey,CREATE UNIQUE INDEX qa_environments_pkey ON public.qa_environments USING btree (id)
+INDEX,qa_manual_checks,qa_manual_checks_pkey,CREATE UNIQUE INDEX qa_manual_checks_pkey ON public.qa_manual_checks USING btree (id)
+INDEX,qa_test_results,qa_results_run_status_idx,"CREATE INDEX qa_results_run_status_idx ON public.qa_test_results USING btree (run_id, status, category)"
+INDEX,qa_test_results,qa_test_results_pkey,CREATE UNIQUE INDEX qa_test_results_pkey ON public.qa_test_results USING btree (id)
+INDEX,qa_test_runs,qa_test_runs_pkey,CREATE UNIQUE INDEX qa_test_runs_pkey ON public.qa_test_runs USING btree (id)
+INDEX,quota_overrides,quota_overrides_org_metric_idx,"CREATE INDEX quota_overrides_org_metric_idx ON public.quota_overrides USING btree (organization_id, metric, active)"
+INDEX,quota_overrides,quota_overrides_pkey,CREATE UNIQUE INDEX quota_overrides_pkey ON public.quota_overrides USING btree (id)
+INDEX,report_dispatches,report_dispatches_pkey,CREATE UNIQUE INDEX report_dispatches_pkey ON public.report_dispatches USING btree (id)
+INDEX,restore_drills,restore_drills_pkey,CREATE UNIQUE INDEX restore_drills_pkey ON public.restore_drills USING btree (id)
+INDEX,scan_entity_links,scan_entity_links_pkey,CREATE UNIQUE INDEX scan_entity_links_pkey ON public.scan_entity_links USING btree (id)
+INDEX,scan_entity_links,scan_entity_links_scan_session_id_entity_type_entity_id_rel_key,"CREATE UNIQUE INDEX scan_entity_links_scan_session_id_entity_type_entity_id_rel_key ON public.scan_entity_links USING btree (scan_session_id, entity_type, entity_id, relation)"
+INDEX,scan_pages,scan_pages_pkey,CREATE UNIQUE INDEX scan_pages_pkey ON public.scan_pages USING btree (id)
+INDEX,scan_pages,scan_pages_session_id_page_number_key,"CREATE UNIQUE INDEX scan_pages_session_id_page_number_key ON public.scan_pages USING btree (session_id, page_number)"
+INDEX,scan_sessions,scan_sessions_link_idx,"CREATE INDEX scan_sessions_link_idx ON public.scan_sessions USING btree (organization_id, linked_entity_type, linked_entity_id)"
+INDEX,scan_sessions,scan_sessions_org_time_idx,"CREATE INDEX scan_sessions_org_time_idx ON public.scan_sessions USING btree (organization_id, created_at DESC)"
+INDEX,scan_sessions,scan_sessions_pkey,CREATE UNIQUE INDEX scan_sessions_pkey ON public.scan_sessions USING btree (id)
+INDEX,scan_sessions,scan_sessions_plant_mode_idx,"CREATE INDEX scan_sessions_plant_mode_idx ON public.scan_sessions USING btree (plant_id, mode, status)"
+INDEX,sensor_devices,sensor_devices_pkey,CREATE UNIQUE INDEX sensor_devices_pkey ON public.sensor_devices USING btree (id)
+INDEX,shift_assignments,shift_assignments_pkey,CREATE UNIQUE INDEX shift_assignments_pkey ON public.shift_assignments USING btree (id)
+INDEX,shift_assignments,shift_assignments_plant_id_user_id_work_date_key,"CREATE UNIQUE INDEX shift_assignments_plant_id_user_id_work_date_key ON public.shift_assignments USING btree (plant_id, user_id, work_date)"
+INDEX,shift_handovers,handovers_plant_date_idx,"CREATE INDEX handovers_plant_date_idx ON public.shift_handovers USING btree (plant_id, work_date DESC)"
+INDEX,shift_handovers,shift_handovers_pkey,CREATE UNIQUE INDEX shift_handovers_pkey ON public.shift_handovers USING btree (id)
+INDEX,spares,spares_pkey,CREATE UNIQUE INDEX spares_pkey ON public.spares USING btree (id)
+INDEX,storage_reservations,storage_reservations_org_status_idx,"CREATE INDEX storage_reservations_org_status_idx ON public.storage_reservations USING btree (organization_id, status, expires_at)"
+INDEX,storage_reservations,storage_reservations_pkey,CREATE UNIQUE INDEX storage_reservations_pkey ON public.storage_reservations USING btree (id)
+INDEX,storage_usage_events,storage_usage_events_pkey,CREATE UNIQUE INDEX storage_usage_events_pkey ON public.storage_usage_events USING btree (id)
+INDEX,storage_usage_events,storage_usage_org_time_idx,"CREATE INDEX storage_usage_org_time_idx ON public.storage_usage_events USING btree (organization_id, created_at DESC)"
+INDEX,subscription_plans,subscription_plans_code_key,CREATE UNIQUE INDEX subscription_plans_code_key ON public.subscription_plans USING btree (code)
+INDEX,subscription_plans,subscription_plans_pkey,CREATE UNIQUE INDEX subscription_plans_pkey ON public.subscription_plans USING btree (id)
+INDEX,suppliers,suppliers_org_idx,CREATE INDEX suppliers_org_idx ON public.suppliers USING btree (organization_id) WHERE (removed_at IS NULL)
+INDEX,suppliers,suppliers_pkey,CREATE UNIQUE INDEX suppliers_pkey ON public.suppliers USING btree (id)
+INDEX,suppliers,suppliers_plant_idx,CREATE INDEX suppliers_plant_idx ON public.suppliers USING btree (plant_id) WHERE (removed_at IS NULL)
+INDEX,support_messages,support_messages_pkey,CREATE UNIQUE INDEX support_messages_pkey ON public.support_messages USING btree (id)
+INDEX,support_threads,support_threads_pkey,CREATE UNIQUE INDEX support_threads_pkey ON public.support_threads USING btree (id)
+INDEX,system_incidents,incidents_status_severity_idx,"CREATE INDEX incidents_status_severity_idx ON public.system_incidents USING btree (status, severity, last_seen_at DESC)"
+INDEX,system_incidents,system_incidents_pkey,CREATE UNIQUE INDEX system_incidents_pkey ON public.system_incidents USING btree (id)
+INDEX,technical_experiences,technical_experiences_pkey,CREATE UNIQUE INDEX technical_experiences_pkey ON public.technical_experiences USING btree (id)
+INDEX,tool_transactions,tool_transactions_pkey,CREATE UNIQUE INDEX tool_transactions_pkey ON public.tool_transactions USING btree (id)
+INDEX,tool_transactions,tool_transactions_tool_idx,"CREATE INDEX tool_transactions_tool_idx ON public.tool_transactions USING btree (tool_id, created_at DESC)"
+INDEX,tools,tools_pkey,CREATE UNIQUE INDEX tools_pkey ON public.tools USING btree (id)
+INDEX,usage_adjustments,usage_adjustments_pkey,CREATE UNIQUE INDEX usage_adjustments_pkey ON public.usage_adjustments USING btree (id)
+INDEX,usage_counters,usage_counters_org_period_idx,"CREATE INDEX usage_counters_org_period_idx ON public.usage_counters USING btree (organization_id, period_start DESC)"
+INDEX,usage_counters,usage_counters_pkey,"CREATE UNIQUE INDEX usage_counters_pkey ON public.usage_counters USING btree (organization_id, metric, period_start)"
+INDEX,usage_events,usage_events_org_metric_time_idx,"CREATE INDEX usage_events_org_metric_time_idx ON public.usage_events USING btree (organization_id, metric, created_at DESC)"
+INDEX,usage_events,usage_events_pkey,CREATE UNIQUE INDEX usage_events_pkey ON public.usage_events USING btree (id)
+INDEX,usage_events,usage_events_user_metric_time_idx,"CREATE INDEX usage_events_user_metric_time_idx ON public.usage_events USING btree (user_id, metric, created_at DESC)"
+INDEX,work_orders,work_orders_pkey,CREATE UNIQUE INDEX work_orders_pkey ON public.work_orders USING btree (id)
+INDEX,work_orders,work_orders_plant_updated_idx,"CREATE INDEX work_orders_plant_updated_idx ON public.work_orders USING btree (plant_id, updated_at DESC)"
+TRIGGER,action_attachments,commercial_write_guard_action_attachments,CREATE TRIGGER commercial_write_guard_action_attachments BEFORE INSERT OR DELETE OR UPDATE ON public.action_attachments FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,admin_action_logs,admin_logs_append_only,CREATE TRIGGER admin_logs_append_only BEFORE DELETE OR UPDATE ON public.admin_action_logs FOR EACH ROW EXECUTE FUNCTION deny_admin_log_mutation()
+TRIGGER,assets,bump_version_assets,CREATE TRIGGER bump_version_assets BEFORE UPDATE ON public.assets FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,assets,commercial_write_guard_assets,CREATE TRIGGER commercial_write_guard_assets BEFORE INSERT OR DELETE OR UPDATE ON public.assets FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,assets,owner_hard_delete_assets,CREATE TRIGGER owner_hard_delete_assets BEFORE DELETE ON public.assets FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,attendance,commercial_write_guard_attendance,CREATE TRIGGER commercial_write_guard_attendance BEFORE INSERT OR DELETE OR UPDATE ON public.attendance FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,checklist_runs,commercial_write_guard_checklist_runs,CREATE TRIGGER commercial_write_guard_checklist_runs BEFORE INSERT OR DELETE OR UPDATE ON public.checklist_runs FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,checklist_templates,bump_version_checklist_templates,CREATE TRIGGER bump_version_checklist_templates BEFORE UPDATE ON public.checklist_templates FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,checklist_templates,commercial_write_guard_checklist_templates,CREATE TRIGGER commercial_write_guard_checklist_templates BEFORE INSERT OR DELETE OR UPDATE ON public.checklist_templates FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,checklist_templates,owner_hard_delete_checklist_templates,CREATE TRIGGER owner_hard_delete_checklist_templates BEFORE DELETE ON public.checklist_templates FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,code_registry,commercial_write_guard_code_registry,CREATE TRIGGER commercial_write_guard_code_registry BEFORE INSERT OR DELETE OR UPDATE ON public.code_registry FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,condition_alarms,commercial_write_guard_condition_alarms,CREATE TRIGGER commercial_write_guard_condition_alarms BEFORE INSERT OR DELETE OR UPDATE ON public.condition_alarms FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,condition_entity_links,commercial_write_guard_condition_entity_links,CREATE TRIGGER commercial_write_guard_condition_entity_links BEFORE INSERT OR DELETE OR UPDATE ON public.condition_entity_links FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,condition_recordings,commercial_write_guard_condition_recordings,CREATE TRIGGER commercial_write_guard_condition_recordings BEFORE INSERT OR DELETE OR UPDATE ON public.condition_recordings FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,condition_recordings,owner_hard_delete_condition_recordings,CREATE TRIGGER owner_hard_delete_condition_recordings BEFORE DELETE ON public.condition_recordings FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,condition_recordings,protect_condition_baseline,CREATE TRIGGER protect_condition_baseline BEFORE INSERT OR UPDATE OF is_baseline ON public.condition_recordings FOR EACH ROW EXECUTE FUNCTION protect_condition_baseline()
+TRIGGER,daily_logs,commercial_write_guard_daily_logs,CREATE TRIGGER commercial_write_guard_daily_logs BEFORE INSERT OR DELETE OR UPDATE ON public.daily_logs FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,file_metadata,commercial_write_guard_file_metadata,CREATE TRIGGER commercial_write_guard_file_metadata BEFORE INSERT OR DELETE OR UPDATE ON public.file_metadata FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,file_metadata,owner_hard_delete_file_metadata,CREATE TRIGGER owner_hard_delete_file_metadata BEFORE DELETE ON public.file_metadata FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,invitations,commercial_write_guard_invitations,CREATE TRIGGER commercial_write_guard_invitations BEFORE INSERT OR DELETE OR UPDATE ON public.invitations FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,invitations,invitation_plan_limit,"CREATE TRIGGER invitation_plan_limit BEFORE INSERT OR UPDATE OF accepted_at, expires_at ON public.invitations FOR EACH ROW EXECUTE FUNCTION enforce_worker_plan_limit()"
+TRIGGER,invitations,protect_invitation_owner_role,CREATE TRIGGER protect_invitation_owner_role BEFORE INSERT OR UPDATE ON public.invitations FOR EACH ROW EXECUTE FUNCTION protect_owner_role()
+TRIGGER,maintenance_completions,commercial_write_guard_maintenance_completions,CREATE TRIGGER commercial_write_guard_maintenance_completions BEFORE INSERT OR DELETE OR UPDATE ON public.maintenance_completions FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,maintenance_plans,bump_version_maintenance_plans,CREATE TRIGGER bump_version_maintenance_plans BEFORE UPDATE ON public.maintenance_plans FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,maintenance_plans,commercial_write_guard_maintenance_plans,CREATE TRIGGER commercial_write_guard_maintenance_plans BEFORE INSERT OR DELETE OR UPDATE ON public.maintenance_plans FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,maintenance_plans,owner_hard_delete_maintenance_plans,CREATE TRIGGER owner_hard_delete_maintenance_plans BEFORE DELETE ON public.maintenance_plans FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,manuals,commercial_write_guard_manuals,CREATE TRIGGER commercial_write_guard_manuals BEFORE INSERT OR DELETE OR UPDATE ON public.manuals FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,measurement_points,commercial_write_guard_measurement_points,CREATE TRIGGER commercial_write_guard_measurement_points BEFORE INSERT OR DELETE OR UPDATE ON public.measurement_points FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,notifications,commercial_write_guard_notifications,CREATE TRIGGER commercial_write_guard_notifications BEFORE INSERT OR DELETE OR UPDATE ON public.notifications FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,organization_members,member_plan_limit,CREATE TRIGGER member_plan_limit BEFORE INSERT OR UPDATE OF active ON public.organization_members FOR EACH ROW EXECUTE FUNCTION enforce_worker_plan_limit()
+TRIGGER,organization_members,protect_member_owner_role,CREATE TRIGGER protect_member_owner_role BEFORE UPDATE ON public.organization_members FOR EACH ROW EXECUTE FUNCTION protect_owner_role()
+TRIGGER,organization_settings,commercial_write_guard_organization_settings,CREATE TRIGGER commercial_write_guard_organization_settings BEFORE INSERT OR DELETE OR UPDATE ON public.organization_settings FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,organizations,organization_commercial_defaults,CREATE TRIGGER organization_commercial_defaults AFTER INSERT ON public.organizations FOR EACH ROW EXECUTE FUNCTION create_default_commercial_records()
+TRIGGER,organizations,organizations_push_cursor,CREATE TRIGGER organizations_push_cursor AFTER INSERT ON public.organizations FOR EACH ROW EXECUTE FUNCTION new_push_cursor()
+TRIGGER,plantmaster_sync,plantmaster_sync_updated_at,CREATE TRIGGER plantmaster_sync_updated_at BEFORE UPDATE ON public.plantmaster_sync FOR EACH ROW EXECUTE FUNCTION set_plantmaster_updated_at()
+TRIGGER,plants,plant_plan_limit,CREATE TRIGGER plant_plan_limit BEFORE INSERT OR UPDATE OF organization_id ON public.plants FOR EACH ROW EXECUTE FUNCTION enforce_plant_plan_limit()
+TRIGGER,platform_support_tickets,ticket_platform_alert,CREATE TRIGGER ticket_platform_alert AFTER INSERT ON public.platform_support_tickets FOR EACH ROW EXECUTE FUNCTION create_platform_alert()
+TRIGGER,problem_cases,commercial_write_guard_problem_cases,CREATE TRIGGER commercial_write_guard_problem_cases BEFORE INSERT OR DELETE OR UPDATE ON public.problem_cases FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,purchase_order_lines,trg_po_line_aid,CREATE TRIGGER trg_po_line_aid AFTER INSERT OR DELETE OR UPDATE ON public.purchase_order_lines FOR EACH ROW EXECUTE FUNCTION po_line_after_change()
+TRIGGER,purchase_order_lines,trg_po_line_biu,CREATE TRIGGER trg_po_line_biu BEFORE INSERT OR UPDATE ON public.purchase_order_lines FOR EACH ROW EXECUTE FUNCTION po_line_after_change()
+TRIGGER,report_dispatches,commercial_write_guard_report_dispatches,CREATE TRIGGER commercial_write_guard_report_dispatches BEFORE INSERT OR DELETE OR UPDATE ON public.report_dispatches FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,scan_entity_links,commercial_write_guard_scan_entity_links,CREATE TRIGGER commercial_write_guard_scan_entity_links BEFORE INSERT OR DELETE OR UPDATE ON public.scan_entity_links FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,scan_sessions,commercial_write_guard_scan_sessions,CREATE TRIGGER commercial_write_guard_scan_sessions BEFORE INSERT OR DELETE OR UPDATE ON public.scan_sessions FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,scan_sessions,owner_hard_delete_scan_sessions,CREATE TRIGGER owner_hard_delete_scan_sessions BEFORE DELETE ON public.scan_sessions FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,sensor_devices,commercial_write_guard_sensor_devices,CREATE TRIGGER commercial_write_guard_sensor_devices BEFORE INSERT OR DELETE OR UPDATE ON public.sensor_devices FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,shift_assignments,commercial_write_guard_shift_assignments,CREATE TRIGGER commercial_write_guard_shift_assignments BEFORE INSERT OR DELETE OR UPDATE ON public.shift_assignments FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,shift_handovers,commercial_write_guard_shift_handovers,CREATE TRIGGER commercial_write_guard_shift_handovers BEFORE INSERT OR DELETE OR UPDATE ON public.shift_handovers FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,spares,bump_version_spares,CREATE TRIGGER bump_version_spares BEFORE UPDATE ON public.spares FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,spares,commercial_write_guard_spares,CREATE TRIGGER commercial_write_guard_spares BEFORE INSERT OR DELETE OR UPDATE ON public.spares FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,spares,owner_hard_delete_spares,CREATE TRIGGER owner_hard_delete_spares BEFORE DELETE ON public.spares FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,support_threads,commercial_write_guard_support_threads,CREATE TRIGGER commercial_write_guard_support_threads BEFORE INSERT OR DELETE OR UPDATE ON public.support_threads FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,system_incidents,incident_platform_alert,CREATE TRIGGER incident_platform_alert AFTER INSERT ON public.system_incidents FOR EACH ROW EXECUTE FUNCTION create_platform_alert()
+TRIGGER,technical_experiences,commercial_write_guard_technical_experiences,CREATE TRIGGER commercial_write_guard_technical_experiences BEFORE INSERT OR DELETE OR UPDATE ON public.technical_experiences FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,tool_transactions,commercial_write_guard_tool_transactions,CREATE TRIGGER commercial_write_guard_tool_transactions BEFORE INSERT OR DELETE OR UPDATE ON public.tool_transactions FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,tools,bump_version_tools,CREATE TRIGGER bump_version_tools BEFORE UPDATE ON public.tools FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,tools,commercial_write_guard_tools,CREATE TRIGGER commercial_write_guard_tools BEFORE INSERT OR DELETE OR UPDATE ON public.tools FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,tools,owner_hard_delete_tools,CREATE TRIGGER owner_hard_delete_tools BEFORE DELETE ON public.tools FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()
+TRIGGER,usage_adjustments,usage_adjustments_append_only,CREATE TRIGGER usage_adjustments_append_only BEFORE DELETE OR UPDATE ON public.usage_adjustments FOR EACH ROW EXECUTE FUNCTION deny_admin_log_mutation()
+TRIGGER,work_orders,bump_version_work_orders,CREATE TRIGGER bump_version_work_orders BEFORE UPDATE ON public.work_orders FOR EACH ROW EXECUTE FUNCTION bump_row_version()
+TRIGGER,work_orders,commercial_write_guard_work_orders,CREATE TRIGGER commercial_write_guard_work_orders BEFORE INSERT OR DELETE OR UPDATE ON public.work_orders FOR EACH ROW EXECUTE FUNCTION require_commercial_write_access()
+TRIGGER,work_orders,owner_hard_delete_work_orders,CREATE TRIGGER owner_hard_delete_work_orders BEFORE DELETE ON public.work_orders FOR EACH ROW EXECUTE FUNCTION require_owner_for_hard_delete()

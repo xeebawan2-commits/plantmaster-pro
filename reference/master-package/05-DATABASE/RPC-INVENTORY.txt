@@ -1,0 +1,115 @@
+DATABASE FUNCTIONS (RPCs) — PlantMaster Pro
+Project: dpmmenwziplixrgylapy
+Checked live: 15 September 2026
+
+All of these are CONFIRMED PRESENT and in use by the apps.
+
+A note on testing them: Postgres matches a function by its
+ARGUMENT NAMES, not just its name. Calling one with an empty
+request gives a misleading "404 not found" even when it exists.
+Always send the real arguments.
+
+
+-------------------------------------------------------------
+CONTROL CENTRE  (admin.hsbfix.org)
+-------------------------------------------------------------
+
+control_dashboard()
+    Returns: companies_total, companies_active, companies_trial,
+    companies_past_due, companies_suspended, complimentary,
+    workers, owners, storage_bytes, files, ai_requests_month,
+    open_tickets, critical_tickets, open_incidents,
+    critical_incidents, pending_requests
+
+control_companies(p_search, p_status)
+    Returns per company: organization_id, name, status, plan_code,
+    plan_name, owners, workers, plants, files, storage_bytes,
+    ai_requests_month, open_tickets, open_incidents, access_type,
+    complimentary_ends_at, created_at
+
+control_accounts(p_search)
+    Returns: user_id, email, full_name, companies[], created_at,
+    last_sign_in_at, banned_until
+
+control_admins()
+    Returns: user_id, email, full_name, admin_role, active,
+    last_login_at, permissions
+    NOTE: rebuilt on 15 Sep 2026 by 02-FIX-v2.sql. The original
+    was broken ("structure of query does not match function
+    result type").
+
+control_usage(p_organization_id)
+control_storage(p_organization_id)
+control_ai_usage(p_organization_id)
+
+control_invite_owner(p_email, p_company_name, p_plant_name,
+                     p_plan_code, p_trial_days, p_request_id,
+                     p_notes)
+control_delete_company(p_org, p_confirmation)
+control_delete_signup_request(p_id)
+control_purge_signup_requests(p_status)
+control_revoke_owner_invitation(p_id)
+control_delete_owner_invitation(p_id)
+
+control_save_plan(p_code, p_name, p_description, p_price_monthly,
+                  p_price_yearly, p_max_workers, p_max_plants,
+                  p_storage, p_bandwidth, p_max_files, p_max_file,
+                  p_ai_month, p_ai_day, p_ai_minute,
+                  p_input_tokens, p_output_tokens, p_retention,
+                  p_features, p_active)
+
+control_set_complimentary(p_organization_id, p_access_type,
+                          p_ends_at, p_reason, p_never_suspend)
+control_adjust_usage(p_organization_id, p_metric, p_quantity,
+                     p_reason)
+control_save_admin(p_user_id, p_role, p_active, p_permissions,
+                   p_display_name)
+control_update_manual_check(p_check_id, p_status, p_notes)
+control_qa_overview()
+control_qa_environment_runs(p_environment_id)
+control_qa_run_detail(p_run_id)
+
+
+-------------------------------------------------------------
+PLATFORM
+-------------------------------------------------------------
+
+platform_set_company(p_organization_id, p_status, p_plan_code,
+                     p_reason)
+platform_ban_user(p_user_id, p_reason, p_ban)
+platform_delete_user(p_user_id, p_reason)
+platform_update_incident(p_incident_id, p_status)
+platform_tenant_overview()
+is_platform_admin()          <- returns true for you
+
+
+-------------------------------------------------------------
+CUSTOMER APP  (app.hsbfix.org)
+-------------------------------------------------------------
+
+organization_plan_summary(p_organization_id)
+create_organization(...)
+submit_app_complaint(...)
+owner_app_complaints(...)
+owner_app_complaint_messages(...)
+reply_app_complaint(...)
+reserve_storage_upload(...)
+finalize_storage_upload(...)
+cancel_storage_reservation(...)
+record_storage_download(...)
+pending_legal_documents(...)
+accept_legal_document(...)
+
+
+-------------------------------------------------------------
+THE 16 PERMISSION KEYS
+-------------------------------------------------------------
+Stored as JSON on platform_admins.permissions. All 16 are
+granted to xeebawan2@gmail.com.
+
+companies.manage    plans.manage       accounts.view
+accounts.manage     usage.view         usage.manage
+storage.view        storage.manage     ai.view
+ai.manage           support.manage     incidents.manage
+backups.manage      legal.manage       audit.view
+admins.manage

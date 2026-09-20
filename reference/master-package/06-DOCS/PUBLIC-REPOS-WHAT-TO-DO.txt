@@ -1,0 +1,225 @@
+===============================================================
+  "MY REPOSITORIES ARE PUBLIC — HOW DO I MAKE THEM PRIVATE?"
+  16 September 2026
+===============================================================
+
+  SHORT ANSWER
+
+  Do not make them private. If you do, all three of your
+  sites go offline immediately.
+
+  You are on the free GitHub plan. Free GitHub Pages only
+  serves from PUBLIC repositories. The moment a repo goes
+  private, Pages is switched off and hsbfix.org,
+  app.hsbfix.org and admin.hsbfix.org start returning 404.
+
+  Worse: switching back to public does NOT automatically
+  turn Pages back on. You have to re-enable it by hand,
+  re-add the custom domain, and check the CNAME file
+  survived. People lose hours to this.
+
+  There are two real jobs here and they get confused with
+  each other:
+
+    1. Are my SECRETS exposed?        <- this is what matters
+    2. Is my SOURCE CODE visible?     <- this barely matters
+
+  I checked number 1 today. You are clean.
+
+
+===============================================================
+  WHAT I ACTUALLY CHECKED, 16 SEPTEMBER 2026
+===============================================================
+
+  SECRET SCAN — searched every file in the website, the
+  customer app, the admin panel and the whole master project
+  for service role keys, Resend keys, Gemini keys and
+  anything shaped like a password.
+
+      RESULT: nothing found. Not one secret.
+
+  Every edge function reads its keys with Deno.env.get(),
+  which pulls them from Supabase's secret store at runtime.
+  They are not in the code. That is exactly right, and it is
+  why your repos being public is survivable.
+
+  The word "service_role" does appear in some files, but
+  only as the NAME of a role in a SQL grant, or as the name
+  of an environment variable. Names are harmless. The key
+  itself is nowhere.
+
+  RLS TEST — I took your publishable key, the one sitting in
+  config.js that anybody can read, and tried to pull data
+  from nine tables the way an attacker would:
+
+      profiles            blocked
+      organizations       blocked
+      subscription_plans  blocked
+      work_orders         blocked
+      manuals             blocked
+      platform_admins     blocked
+      signup_requests     blocked
+      invitations         blocked
+      audit_logs          blocked
+
+  All nine refused. Row Level Security is doing its job.
+  This is the real lock on your business, not repo
+  visibility.
+
+
+===============================================================
+  WHY A PUBLIC KEY IN config.js IS NOT A LEAK
+===============================================================
+
+  It is worth understanding this properly, because it is the
+  thing that makes the whole free-hosting setup safe.
+
+  The key in config.js is called the PUBLISHABLE key. It is
+  designed to be public. It identifies your project; it does
+  not grant access to anything. Every Supabase app in the
+  world ships it in the browser, because the browser has to
+  have it to connect at all.
+
+  What stops a stranger reading your customers' data is Row
+  Level Security — rules inside the database that check who
+  is asking before returning a single row. I tested those
+  above. They hold.
+
+  The key that WOULD be a disaster is the SERVICE ROLE key,
+  which bypasses RLS entirely. That one lives only in
+  Supabase's secret store, and I confirmed it is not in any
+  file. Never put it in config.js, never put it in any
+  front-end file, never paste it into a repo.
+
+  Rule of thumb: sb_publishable_... is fine in public.
+  sb_secret_... or service_role is never fine anywhere
+  except Supabase Edge Function secrets.
+
+
+===============================================================
+  ONE REAL FINDING — TWO STRAY FILES TO DELETE
+===============================================================
+
+  Your secrets are safe, but I found two old files still
+  being served publicly from app.hsbfix.org:
+
+      https://app.hsbfix.org/schema.sql   (8,940 bytes)
+      https://app.hsbfix.org/README.md    (1,297 bytes)
+
+  Neither contains a password. But schema.sql is the full
+  blueprint of your database — every table, every column,
+  every relationship. There is no reason for a competitor or
+  an attacker to be handed that. It is reconnaissance
+  material, and it makes probing for weaknesses much easier.
+
+  They are leftovers from the very first version. They are
+  not in your local upload folder, nothing in your app links
+  to them, and deleting them breaks nothing.
+
+  TO DELETE THEM
+
+    1. Open the GitHub repo for app.hsbfix.org
+    2. Click schema.sql
+    3. The three dots at the top right > Delete file
+    4. Commit
+    5. Repeat for README.md
+
+  Give it two or three minutes, then check they are gone:
+  open both URLs in your browser. You want "404".
+
+  While you are there, look for anything else that is not
+  needed to run the app — old .sql files, notes, backups,
+  zips. If it is not one of the files the app loads, it
+  should not be in the repo that faces the internet.
+
+
+===============================================================
+  IF YOU STILL WANT THE CODE PRIVATE
+===============================================================
+
+  Understandable — it is your work, and you are selling it.
+  There are three honest options.
+
+  OPTION 1 — LEAVE IT. Free. Recommended for now.
+
+    Your competitors cannot use your code without your
+    database, and your database is locked. Anyone can
+    already read your front-end code anyway, whatever you
+    do: browsers download JavaScript to run it, so
+    "View Source" on app.hsbfix.org shows it regardless of
+    whether the repo is public. Making the repo private
+    hides the commit history, not the running code.
+
+    This is the part most people miss. For a static site,
+    private repo buys you very little.
+
+  OPTION 2 — CLOUDFLARE PAGES. Free, and it does work.
+
+    Cloudflare Pages will serve a site from a PRIVATE GitHub
+    repo on its free plan. Same deal as GitHub Pages: you
+    push to the repo, it deploys. Custom domains included.
+
+    Cost: nothing. Effort: about an hour to move three
+    sites and re-point DNS, plus the risk of downtime while
+    domains propagate.
+
+    Do this when you have a calm afternoon. Not today, and
+    not while something else is broken.
+
+  OPTION 3 — GITHUB PRO. Paid.
+
+    Lets private repos publish to Pages. You told me you did
+    not want more monthly costs, so I am listing it only for
+    completeness. It also does NOT make the published site
+    private — the site stays public either way. You would be
+    paying purely to hide the source, which Option 2 does
+    for free.
+
+  MY ADVICE: Option 1 now, delete the two stray files today,
+  and consider Option 2 later if it still bothers you.
+
+
+===============================================================
+  WHAT TO DO IF A REAL KEY EVER LEAKS
+===============================================================
+
+  Worth knowing before it happens. If a service role key,
+  Resend key or Gemini key ever ends up in a public repo:
+
+  Deleting the file is NOT enough. Git keeps history, and
+  bots scrape public repos within minutes of a push.
+
+  You must ROTATE the key — generate a new one and revoke
+  the old:
+
+    Supabase service role  Settings > API > roll the key,
+                           then update the Edge Function
+                           secret
+    Resend                 API Keys > revoke > create new,
+                           update Supabase SMTP password
+    Gemini                 Google AI Studio > delete key >
+                           create new > update the
+                           GEMINI_API_KEY secret
+
+  Assume any key that touched a public repo is burned.
+  Rotating takes ten minutes. Cleaning up after a stolen
+  service role key takes days.
+
+
+===============================================================
+  SUMMARY
+===============================================================
+
+  Making the repos private       breaks all three sites, and
+                                 is not the fix you want
+
+  Your secrets                   clean, verified today
+
+  Your database                  locked, nine tables tested
+
+  Action needed today            delete schema.sql and
+                                 README.md from the
+                                 app.hsbfix.org repo
+
+  Optional, later                Cloudflare Pages if you
+                                 want private source, free

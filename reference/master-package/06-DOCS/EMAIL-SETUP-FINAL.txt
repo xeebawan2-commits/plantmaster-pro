@@ -1,0 +1,116 @@
+================================================================
+ YOUR EMAIL FORWARDS — ONE CHANGE NEEDED
+================================================================
+
+WHAT YOU HAVE NOW
+-----------------
+  hello@hsbfix.org    -> hsbfix.pk@gmail.com
+  info@hsbfix.org     -> hsbfix.pk@gmail.com
+  sales@hsbfix.org    -> hsbfix.pk@gmail.com
+  support@hsbfix.org  -> xeebawan2@gmail.com    <-- odd one out
+
+All four work. MX records are healthy. Nothing is broken.
+
+
+THE ONE PROBLEM
+---------------
+support@hsbfix.org is printed on ALL SEVEN pages of your
+website. It is the address customers will actually use. It is
+also the address you will give Capterra and G2.
+
+Right now it is the ONLY one landing in a different inbox from
+the other three. Your customer mail is split across two Gmail
+accounts, and the most important address is the one that is
+separated.
+
+That is exactly how a first enquiry gets missed.
+
+
+THE FIX — 60 SECONDS
+--------------------
+Point support@ at the business Gmail, same as the rest.
+
+  1. In Porkbun, click the trash icon next to
+     support@hsbfix.org -> xeebawan2@gmail.com
+  2. In "Add Forwarding Address":
+       When someone sends an email to:  support
+       Deliver it to:                   hsbfix.pk@gmail.com
+  3. Create Email Forward
+
+Result — one inbox, everything in it:
+
+  hello@    -> hsbfix.pk@gmail.com
+  info@     -> hsbfix.pk@gmail.com
+  sales@    -> hsbfix.pk@gmail.com
+  support@  -> hsbfix.pk@gmail.com
+
+
+WHY THE BUSINESS GMAIL, NOT THE PERSONAL ONE
+--------------------------------------------
+  - hsbfix.pk@gmail.com is the business account. If you ever
+    hand support to someone else, you hand over one login.
+  - xeebawan2@gmail.com is your personal account and is also
+    your Supabase super-admin login. Keep customer traffic
+    away from it.
+  - One inbox means one place to check. Four addresses feeding
+    two inboxes is how things get missed.
+
+KEEP xeebawan2@gmail.com FOR:
+  Supabase, GitHub, Porkbun, billing. Your admin identity.
+  Not customer mail.
+
+
+DO NOT ADD demo@hsbfix.org
+--------------------------
+demo@hsbfix.org appears on demo.html, but it is a LOGIN for
+the read-only demo account, not a mailbox. It never needs to
+receive anything. Adding a forward for it would be harmless
+but pointless.
+
+
+AFTER YOU MAKE THE CHANGE
+-------------------------
+Set ONE Gmail filter in hsbfix.pk@gmail.com that covers all
+four addresses at once:
+
+  Gmail -> Settings -> Filters and Blocked Addresses
+  -> Create a new filter
+     To:  hsbfix.org
+          (just the domain — this matches every address on it)
+  -> Create filter
+  -> tick "Never send it to Spam"
+  -> tick "Always mark it as important"
+  -> Create filter
+
+That single filter covers hello@, info@, sales@, support@ and
+anything you add later. It also solves the spam problem you
+saw earlier, permanently.
+
+Then send one test to support@hsbfix.org from an address that
+is NOT hsbfix.pk@gmail.com, and confirm it lands in the inbox
+rather than spam.
+
+
+WHAT TO GIVE THE DIRECTORIES
+----------------------------
+  Capterra / Gartner form:  support@hsbfix.org
+  G2:                       support@hsbfix.org
+
+Both are on your own domain, which is what they require. Do
+not give them a raw Gmail address.
+
+
+OPTIONAL, NOT NOW
+-----------------
+Forwarding lets you RECEIVE as support@hsbfix.org, but replies
+will show your Gmail address as the sender. That is fine for
+verification links and early customer mail.
+
+If you later want replies to come FROM support@hsbfix.org, you
+have two routes:
+  - Zoho Mail free tier (1 user, real mailbox), or
+  - Gmail "Send mail as" using Resend's SMTP
+      host smtp.resend.com, port 465,
+      username: the literal word  resend
+      password: your Resend API key
+Both are jobs for after the listings are filed.

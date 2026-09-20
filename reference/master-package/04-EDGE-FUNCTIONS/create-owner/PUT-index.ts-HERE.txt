@@ -1,0 +1,35 @@
+THE ONE MISSING PIECE
+
+This function is LIVE and WORKING on your Supabase project.
+Only its source code is missing — it was not in any backup
+or archive.
+
+Nothing is broken. But if you ever rebuilt from scratch, this
+is the single file you could not restore. Get it back:
+
+    npx supabase login
+    npx supabase link --project-ref dpmmenwziplixrgylapy
+    npx supabase functions download create-owner
+
+That writes index.ts into this folder. Then delete this note
+and your backup is complete.
+
+
+WHAT IT DOES, if you ever have to rewrite it
+
+The Control Center calls it when you invite a company owner:
+
+    POST {SUPABASE_URL}/functions/v1/create-owner
+    { "email": "...", "invitation_id": "..." }
+
+It creates the login in Supabase Auth, generates a password,
+links the user to the company from the invitation record, and
+returns:
+
+    { "email": "...", "password": "...", "app_url": "..." }
+
+which the panel shows you once, to pass to the customer.
+
+It needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, and must
+use the service role client — creating auth users is not
+possible with the publishable key.

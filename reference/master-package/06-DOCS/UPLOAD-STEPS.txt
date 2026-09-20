@@ -1,0 +1,151 @@
+===============================================================
+  UPLOAD INSTRUCTIONS — paid company branding
+  15 September 2026
+===============================================================
+
+  Everything is done. Two repositories to update.
+  Do the ADMIN one first, then the CUSTOMER APP.
+
+
+===============================================================
+  REPOSITORY 1 — ADMIN PANEL  (admin.hsbfix.org)
+===============================================================
+
+  Folder in the zip:  upload-admin-panel
+
+  Upload all 4 files, replacing what is there:
+
+      index.html
+      app.js          <- the only one that changed
+      admin.css
+      config.js
+
+  What changed: one new feature called
+  "Company branding (own logo, name & colours)".
+
+  Wait about a minute, then hard refresh the panel
+  (long-press reload, then "Reload without cache").
+
+
+===============================================================
+  REPOSITORY 2 — CUSTOMER APP  (app.hsbfix.org)
+===============================================================
+
+  Folder in the zip:  upload-customer-app
+
+  Upload these 3 files, replacing what is there:
+
+      app.js               <- the branding lock
+      index.html           <- version bumped to 4.42.0
+      service-worker.js    <- cache bumped to v4.43.0
+
+  DO NOT skip index.html and service-worker.js.
+
+  This matters. The app stores itself on the phone so it can
+  work offline. If you only replace app.js, every existing
+  customer keeps running the OLD file from their phone's
+  cache and the lock never reaches them. The version bump is
+  what forces phones to collect the new version.
+
+  Files you must NOT upload (unchanged):
+      config.js, styles.css, and every other module.
+
+
+===============================================================
+  STEP 3 — SWITCH THE FEATURE ON WHERE YOU WANT IT
+===============================================================
+
+  After BOTH repositories are uploaded:
+
+  1. Open admin.hsbfix.org
+  2. Go to Packages
+  3. Open Professional
+  4. Tick  "Company branding (own logo, name & colours)"
+  5. Save
+
+  Repeat for Enterprise if you want it there.
+
+  LEAVE IT UNTICKED on Trial, Basic and Essential. Those
+  customers will now see the locked fields and the upgrade
+  button.
+
+
+===============================================================
+  HOW TO TEST IT WORKS
+===============================================================
+
+  Pakistan Synthetic Limited is on a plan without branding
+  until you tick it, so you can test with the real account.
+
+  BEFORE ticking the box:
+    Open app.hsbfix.org, go to Company Profile.
+    Expect: a blue notice saying branding is a paid feature,
+    with a green WhatsApp button. Logo, application name,
+    both colours, theme and pattern are greyed out and
+    cannot be changed. Address, contact, email, report time,
+    plant name and footer still work normally.
+
+  AFTER ticking the box in Packages:
+    Hard refresh the customer app.
+    Expect: everything unlocked, notice gone, live colour
+    preview working again.
+
+  If it does not change, the phone is still using the old
+  cached file. Close every tab of the app and reopen it, or
+  clear the site data for app.hsbfix.org.
+
+
+===============================================================
+  WHAT THE LOCK ACTUALLY DOES
+===============================================================
+
+  Three layers, so it cannot be worked around casually:
+
+  1. The six paid fields are disabled in the form.
+
+  2. On save, the app checks the plan again and strips the
+     branding values out of what gets sent. So even if
+     someone re-enables the fields using browser developer
+     tools, nothing branded is saved.
+
+  3. On login, branding is only applied if the plan allows
+     it. So if a customer stops paying and you untick the
+     feature, their logo and colours stop appearing — but
+     their address, contact details and footer stay intact.
+
+  Note: this is enforced in the app, not in the database. A
+  determined technical person could still write to the
+  database directly. Proper enforcement is a database rule,
+  which is worth adding once this is earning money. For
+  plant managers, this is fine.
+
+
+===============================================================
+  ONE LIMITATION TO KNOW BEFORE YOU SELL
+===============================================================
+
+  The per-company editor can only take a feature AWAY, not
+  add one. So ticking branding for a single company whose
+  package does not include it will NOT switch it on.
+
+  For a one-off customer who wants to pay for branding:
+    - move them up to Professional, or
+    - copy their package, tick branding on the copy, name it
+      something like "Essential + Branding", and move that
+      one customer onto it.
+
+  Also: this brands the app INSIDE, and brands their reports
+  and documents. It does NOT change the icon and name on the
+  phone home screen — that is still PlantMaster Pro for
+  everyone. Sell it as "your branding inside the app and on
+  your reports", never as "your own app".
+
+
+===============================================================
+  SUMMARY
+===============================================================
+
+  1. Upload 4 files to the admin repository.
+  2. Upload 3 files to the customer app repository.
+  3. Tick the box on Professional in Packages.
+  4. Test on Pakistan Synthetic Limited before and after.

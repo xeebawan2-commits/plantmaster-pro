@@ -1,0 +1,79 @@
+REBRAND UPLOAD — new logo + blue/amber palette
+==============================================
+
+Your hexagon logo is now the icon everywhere, and the whole
+product has been recoloured from teal/cyan to the blues in it.
+
+  website  teal   #0F9B8E  ->  blue  #2563EB
+  app      cyan   #22D3EE  ->  blue  #3B82F6
+  admin    teal   #13B8A8  ->  blue  #3B82F6
+  accent                       amber #D97706  (from the wrench)
+  success                      green #10B981  (from the dot)
+
+43 colour swaps. Zero teal or cyan left anywhere.
+
+Colours were chosen with contrast maths, not by eye:
+  #2563EB on white    5.2:1  passes, white button text passes
+  #3B82F6 on #0D1117  5.1:1  passes
+  #F59E0B on white    2.1:1  FAILS - so amber is never used for
+                             text or buttons on the light site.
+                             It survives as the PRO wordmark, a
+                             divider rule, and the dark-mode
+                             warning colour only.
+
+
+UPLOAD — THREE SEPARATE REPOS, DO NOT MIX THEM
+----------------------------------------------
+
+1. website/  ->  the hsbfix.org repo root
+     styles.css
+     demo.html  guide.html  index.html  pricing.html
+     privacy.html  signup.html  terms.html
+     favicon.ico  favicon-16.png  favicon-32.png
+     apple-touch-icon.png
+
+2. app/  ->  the app.hsbfix.org repo root
+     index.html  styles.css  theme-pro.css  ui-v4.5.css
+     service-worker.js
+     favicon.ico  favicon-32.png  apple-touch-icon.png
+     icons/icon-192.png  icons/icon-512.png
+                  ^ these two go in the icons SUBFOLDER,
+                    not the root. Getting this wrong is why
+                    the icons broke last time.
+
+3. admin/  ->  the admin.hsbfix.org repo root
+     index.html  admin.css
+     favicon.ico  favicon-32.png  apple-touch-icon.png
+
+
+CACHE VERSIONS - ALREADY HANDLED
+--------------------------------
+  app    4.47.4 -> 4.48.0  (index.html + service-worker.js)
+  admin  admin.css and app.js were UNVERSIONED, so browsers
+         would have kept serving the old teal forever. Both
+         now carry ?v=1.8.0.
+
+The website has no service worker, so a normal refresh is
+enough there.
+
+
+AFTER UPLOADING
+---------------
+Hard-refresh each site once (or use incognito):
+  hsbfix.org        buttons blue, no teal anywhere
+  app.hsbfix.org    accents blue, ribbon still shows for demo
+  admin.hsbfix.org  brand blue
+
+Phone home-screen icons only change after you remove and
+re-add the shortcut - that is Android caching, not a fault.
+
+
+DIRECTORY LISTINGS
+------------------
+LISTING-ASSETS/logo-300x300.png is the new hexagon. Use it
+for Capterra, GetApp, Software Advice and G2.
+
+The 11 product screenshots still show the OLD cyan interface.
+They are still honest and still usable - but once this upload
+is live, retaking the six listed in SUBMIT-TODAY.txt would
+make the profile match the product. Not urgent.
