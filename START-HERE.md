@@ -7,6 +7,11 @@ because it needs your accounts, your passwords and your signing key.
 There are **6 tasks**. Total hands-on time is roughly **2–3 hours**, plus
 Google's review wait (typically 1–7 days for a first submission).
 
+> **Wondering what to upload where, or whether you need a new account or
+> database?** Read **`WHAT-GOES-WHERE.md`** first — short answer: no new
+> accounts, and there is almost no manual uploading. Three commands publish
+> everything.
+
 Do them in order. Task 4 depends on Task 3, and Task 6 depends on all of them.
 
 ---

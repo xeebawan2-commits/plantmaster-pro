@@ -96,6 +96,8 @@ supply chain and no CDN fetch at cold start.
 
 | Document | Contents |
 |---|---|
+| [`START-HERE.md`](START-HERE.md) | The 6 remaining owner tasks, in order |
+| [`WHAT-GOES-WHERE.md`](WHAT-GOES-WHERE.md) | What deploys where; new vs existing accounts |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Full runbook: migrations, function secrets, DNS, smoke tests, rollback |
 | [`docs/DATABASE.md`](docs/DATABASE.md) | The schema/policy audit, what the 66 tests assert, bugs found |
 | [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md) | Keystore, asset links, listing copy, data safety form, release checklist |
