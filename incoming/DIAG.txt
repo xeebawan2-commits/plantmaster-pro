@@ -7,23 +7,24 @@ CSRF len=0
 --- POST https://wetransfer.com/api/v4/transfers/c07735dd2c450f9ae6b4693e0c8f685120260920153714/download
     body={"intent":"entire_transfer","security_hash":"31ed15"}
     http=200 resp={
-  "direct_link": "https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a4925c8/Compressedfile.zip?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3ODk5MTk4NDMsImlhdCI6MTc4OTkxOTI0MywiZG93bmxvYWRfaWQiOiJiOTcxYjlhNi1hNzdlLTQxMDAtYTQzZS1iOWU1MGZmYWVjOTEiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.Zqk5q-LTqJPufxvYoNDgjxStJSQ2CNcmdzoHLMP4vw8"
+  "direct_link": "https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a4925c8/Compressedfile.zip?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3ODk5MTk5MTUsImlhdCI6MTc4OTkxOTMxNSwiZG93bmxvYWRfaWQiOiI4ZDI3NjNkMi0xN2JjLTRkYWQtYjc2NC0yOTc0YmQ2MmYzMWUiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.DynJYn9Zdnh08a7YdUlnVc7-rqKGzbuGIHtz8rC01WY"
 }
---- POST https://wetransfer.com/api/v4/transfers/c07735dd2c450f9ae6b4693e0c8f685120260920153714/download
-    body={"intent":"entire_transfer","security_hash":"31ed15","domain_user_id":"63ad5fc2-855b-4dfb-832c-721c45e9bb54"}
-    http=200 resp={
-  "direct_link": "https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a4925c8/Compressedfile.zip?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3ODk5MTk4NDQsImlhdCI6MTc4OTkxOTI0NCwiZG93bmxvYWRfaWQiOiJmNDViZWZiZi0yYjViLTQxZTEtYTg3Ni00MGMzYzBmMjczYmMiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.wpV0hMaIc3O7RiduTjx3SuEbeGeabUj8wLS1vjBYaMQ"
-}
---- POST https://wetransfer.com/api/v4/transfers/c07735dd2c450f9ae6b4693e0c8f685120260920153714/download?security_hash=31ed15
-    body={"intent":"entire_transfer","security_hash":"31ed15"}
-    http=200 resp={
-  "direct_link": "https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a4925c8/Compressedfile.zip?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3ODk5MTk4NDQsImlhdCI6MTc4OTkxOTI0NCwiZG93bmxvYWRfaWQiOiI0MDE1ZTdlNC1iYmYwLTQzYWQtODBlYS1kMjgwNGU3ZDlkMmEiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.3dEIzddBdPvl1ewkQtwbvHpo7isxONFSbS8eefYwQUA"
-}
---- POST https://wetransfer.com/api/v4/transfers/c07735dd2c450f9ae6b4693e0c8f685120260920153714/download?security_hash=31ed15
-    body={"intent":"entire_transfer","security_hash":"31ed15","domain_user_id":"63ad5fc2-855b-4dfb-832c-721c45e9bb54"}
-    http=200 resp={
-  "direct_link": "https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a4925c8/Compressedfile.zip?cf=y&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJleHAiOjE3ODk5MTk4NDQsImlhdCI6MTc4OTkxOTI0NCwiZG93bmxvYWRfaWQiOiIzMzg1NThhNi0wM2YxLTQ5NzgtODM2Mi00ZGY4Yzc4NDk5OWQiLCJzdG9yYWdlX3NlcnZpY2UiOiJzdG9ybSJ9.Xdz1pPKgmnbCLiOEdAb2u4abLm3ePkueJ-m2vhpOnPU"
-}
-=== FAILED: no direct_link ===
---- first 2500 bytes of landing page ---
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1" data-next-head=""/><meta http-equiv="X-UA-Compatible" content="IE=edge" data-next-head=""/><meta name="pinterest" content="nopin" data-next-head=""/><meta name="referrer" content="origin" data-next-head=""/><meta property="og:title" content="Compressedfile.zip" data-next-head=""/><meta property="og:description" content="1 file sent via WeTransfer, the simplest way to send your files around the world" data-next-head=""/><meta property="og:image" content="https://wetransfer.com/unfurl/c07735dd2c450f9ae6b4693e0c8f685120260920153714/31ed15" data-next-head=""/><meta property="og:url" content="https://wetransfer.com/downloads/c07735dd2c450f9ae6b4693e0c8f685120260920153714/31ed15" data-next-head=""/><meta property="og:site_name" content="WeTransfer" data-next-head=""/><meta property="og:type" content="website" data-next-head=""/><meta property="fb:app_id" content="265125293564341" data-next-head=""/><meta name="twitter:card" content="summary_large_image" data-next-head=""/><meta name="twitter:image" content="https://wetransfer.com/unfurl/c07735dd2c450f9ae6b4693e0c8f685120260920153714/31ed15" data-next-head=""/><title dir="ltr" data-testid="page-title" data-next-head="">Unique Download Link | WeTransfer</title><meta name="description" content="The simple, quick and secure way to send your files around the world without an account. Share your files, photos, and videos today for free." data-next-head=""/><meta name="author" content="WeTransfer" data-next-head=""/><meta name="application-name" content="WeTransfer" data-next-head=""/><meta name="robots" content="noindex,nofollow" data-next-head=""/><meta name="apple-itunes-app" content="app-id=1569379048, app-argument=https%3A%2F%2Fwetransfer.com%2Fdownloads%2Fc07735dd2c450f9ae6b4693e0c8f685120260920153714%2F31ed15%3Ft_exp%3D1790005034%26t_lsid%3D4d634256-8181-4227-af29-4d4a387d10a2%26t_network%3Dlink%26t_rid%3DZW1haWx8YWRyb2l0fDYyNzEzMDUzLWRiZmUtNGYwZS05MDQ0LTk1NTZiNjBmMGZmYw%253D%253D%26t_s%3Ddownload_link%26t_ts%3D1789918635" data-next-head=""/><link rel="shortcut icon" href="/favicon.ico" data-next-head=""/><link rel="icon" sizes="16x16 32x32" href="/favicon.ico" data-next-head=""/><link rel="mask-icon" href="/favicon.svg" color="#17181A" data-next-head=""/><link rel="icon" href="/favicon.ico" data-next-head=""/><link rel="apple-touch-icon-precomposed" h
+=== 3. download payload ===
+LINK=https://download.wetransfer.com/eugv/c07735dd2c450f9ae6b4693e0c8f685120260920153714/abd05c657547ee4dd82bad768de014a75a49...
+http=200 bytes=6617858
+total 6480
+drwxr-xr-x  2 runner runner    4096 Sep 20 15:48 .
+drwxr-xr-x 17 runner runner    4096 Sep 20 15:48 ..
+-rw-r--r--  1 runner runner    1233 Sep 20 15:48 DIAG.txt
+-rw-r--r--  1 runner runner      75 Sep 20 15:48 SHA256SUMS
+-rw-r--r--  1 runner runner 6617858 Sep 20 15:48 payload.zip
+--- zip listing ---
+Archive:  incoming/payload.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+   626469  2026-08-09 14:18   index.html
+     2229  2026-08-09 14:18   service-worker.js
+  6526575  2026-09-18 22:20   PlantMasterPro-MASTER (8).zip
+---------                     -------
+  7155273                     3 files
+payload size=6617858
