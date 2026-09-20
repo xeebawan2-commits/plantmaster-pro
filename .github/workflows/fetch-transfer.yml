@@ -78,7 +78,9 @@ jobs:
                 -H "Referer: $FINAL" -H 'Origin: https://wetransfer.com' \
                 -d "$BODY" -o /tmp/api.json -w '%{http_code}' "$EP" 2>>"$D")
               log "    http=$CODE resp=$(head -c 600 /tmp/api.json)"
-              LINK=$(grep -o '"direct_link":"[^"]*"' /tmp/api.json | cut -d'"' -f4)
+              # NB: response is pretty-printed -> allow whitespace after the colon
+              LINK=$(python3 -c 'import json,sys;print(json.load(open("/tmp/api.json")).get("direct_link",""))' 2>/dev/null || true)
+              [ -z "$LINK" ] && LINK=$(grep -o '"direct_link"[[:space:]]*:[[:space:]]*"[^"]*"' /tmp/api.json | sed 's/.*"\(https[^"]*\)"/\1/')
               [ -n "$LINK" ] && break 2
             done
           done
