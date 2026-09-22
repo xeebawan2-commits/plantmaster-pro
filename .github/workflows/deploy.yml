@@ -152,7 +152,7 @@ jobs:
           # problem is they are buried in the raw log, which is painful to read
           # on a phone. Nothing secret is printed — only ids and error text.
           probe=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                    "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects?per_page=1")
+                    "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects")
 
           ok=$(printf '%s' "$probe" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).success?"1":"0")}catch(e){process.stdout.write("x")}})')
 
@@ -201,7 +201,7 @@ jobs:
           # certainly a project-name mismatch. List the real names so the
           # summary shows exactly what to target.
           projects=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                       "${api}?per_page=100" \
+                       "${api}" \
                      | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){process.stdout.write("");return}process.stdout.write((j.result||[]).map(p=>p.name).join("\n"))}catch(e){process.stdout.write("")}})')
 
           echo "Pages projects in this account:"
@@ -299,7 +299,7 @@ jobs:
             echo ""
             echo "== pages projects + their custom domains =="
             curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects?per_page=100" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("error:",JSON.stringify(j.errors));return}(j.result||[]).forEach(p=>console.log(`${p.name}\n   subdomain: ${p.subdomain}\n   domains:   ${(p.domains||[]).join(", ")||"(none)"}\n   prod br:   ${p.production_branch}\n   created:   ${p.created_on}`))}catch(e){console.log("unreadable")}})'
             echo ""
             echo "== zones (domains) on this account =="
