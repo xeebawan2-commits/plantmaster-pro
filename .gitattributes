@@ -1,0 +1,21 @@
+# Treat binary assets as binary.
+#
+# Without this, some Git clients apply text normalisation to these files and
+# silently corrupt them — a PDF committed here came back 8 bytes larger with
+# mangled bytes, which would have shipped a broken download to hsbfix.org.
+
+*.pdf  binary
+*.mp4  binary
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.ico  binary
+*.gif  binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.zip  binary
+*.jks  binary
+*.keystore binary
+*.aab  binary
+*.apk  binary
