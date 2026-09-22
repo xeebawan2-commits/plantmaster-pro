@@ -1810,6 +1810,7 @@ function showCredentials(email, password, appUrl, msg){
         <div class="actions" style="border-top:0;padding-top:0">
           <button class="primary" id="credCopy">Copy details</button>
           <button id="credWa">Send on WhatsApp</button>
+          <button id="credMail">Send by email</button>
           <button class="ghost" id="credClose">Done</button>
         </div>
       </div>
@@ -1845,6 +1846,20 @@ function showCredentials(email, password, appUrl, msg){
     try { location.href = url; return; } catch {}
     box.focus(); box.select();
     toast('Could not open WhatsApp — copy the text instead', 'bad');
+  };
+
+  /* Send by email. Opens the phone's mail app with the owner's
+     address, a subject and the same message already filled in. */
+  $('#credMail').onclick = () => {
+    const url = 'mailto:' + encodeURIComponent(email || '')
+      + '?subject=' + encodeURIComponent('Your PlantMaster Pro account is ready')
+      + '&body='    + encodeURIComponent(msg);
+    const w = window.open(url, '_blank', 'noopener');
+    if (w) return;
+    try { window.top.location.href = url; return; } catch {}
+    try { location.href = url; return; } catch {}
+    box.focus(); box.select();
+    toast('Could not open your mail app — copy the text instead', 'bad');
   };
 
   $('#credClose').onclick = closeModal;

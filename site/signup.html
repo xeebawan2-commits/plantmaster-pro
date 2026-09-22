@@ -221,6 +221,13 @@
             <a href="#" class="btn btn-wa" id="waLink">💬 Message us now</a>
             <a href="index.html" class="btn btn-ghost">Back to home</a>
           </div>
+          <p id="saveWarn" style="display:none;margin-top:18px;padding:13px 15px;text-align:left;
+             border:1px solid #D97706;border-radius:10px;background:rgba(217,119,6,.08);
+             color:var(--text);font-size:14px">
+            <b>Please send the WhatsApp message above.</b><br>
+            We could not file your details automatically just now, so messaging us
+            is the fastest way to make sure your trial is set up today.
+          </p>
         </div>
       </div>
 
@@ -244,7 +251,7 @@
           <p>Runs in the browser on any Android phone your staff already carry. No app store, no tablets to buy, no IT project.</p>
         </div>
 
-        <div class="side-note" style="background:linear-gradient(160deg,rgba(34,211,197,.08),var(--surface));border-color:rgba(34,211,197,.3)">
+        <div class="side-note" style="background:linear-gradient(160deg,rgba(37,99,235,.08),var(--surface));border-color:rgba(37,99,235,.3)">
           <h4>💬 Prefer to just talk?</h4>
           <p style="margin-bottom:14px">Skip the form. Send a WhatsApp message and we will call you back.</p>
           <a href="https://wa.me/923162364074" class="btn btn-wa btn-block">+92 316 236 4074</a>
@@ -259,7 +266,7 @@
   <div class="wrap">
     <div class="foot-bot" style="border:none;padding-top:0">
       <span>© 2026 HSB Fix Services · <a href="mailto:support@hsbfix.org" style="color:var(--brand)">support@hsbfix.org</a> · <a href="mailto:hsbfix.pk@gmail.com" style="color:var(--brand)">hsbfix.pk@gmail.com</a> · <a href="https://wa.me/923162364074" style="color:var(--brand)">+92 316 236 4074</a></span>
-      <span><a href="guide.html" style="color:var(--brand)">Guide</a> · <a href="privacy.html" style="color:var(--brand)">Privacy</a> · <a href="terms.html" style="color:var(--brand)">Terms</a> · PlantMaster Pro</span>
+      <span><a href="guide.html" style="color:var(--brand)">Guide</a> · <a href="privacy.html" style="color:var(--brand)">Privacy</a> · <a href="terms.html" style="color:var(--brand)">Terms</a> · <a href="delete-account.html" style="color:var(--brand)">Delete your account</a> · PlantMaster Pro</span>
     </div>
   </div>
 </footer>
@@ -346,9 +353,18 @@ document.getElementById('signupForm').addEventListener('submit',function(e){
         message:(f.role.value?'Role: '+f.role.value+'. ':'')
                 +(f.plants.value?'Plants: '+f.plants.value+'. ':'')
                 +(f.notes.value.trim()||''),
+        status:'new',
         source:'website'
       })
     }).then(function(res){
+      if(!res||!res.ok){
+        /* The enquiry did NOT save. Tell the visitor the truth and push
+           them to WhatsApp so the lead is not silently lost. */
+        try{
+          var w=document.getElementById('saveWarn');
+          if(w)w.style.display='block';
+        }catch(e){}
+      }
       /* Ask the server to send the acknowledgement email.
          Fire-and-forget: the enquiry is already saved, so an email
          failure must never change what the visitor sees. */
@@ -356,7 +372,7 @@ document.getElementById('signupForm').addEventListener('submit',function(e){
       return fetch('https://dpmmenwziplixrgylapy.supabase.co/functions/v1/signup-notify',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({email:email})
+        body:JSON.stringify({email:email,request_id:null})
       }).catch(function(){});
     }).catch(function(){});
   }catch(err){}
