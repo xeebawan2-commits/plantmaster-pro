@@ -196,6 +196,32 @@ jobs:
 
           echo "preflight ok — token and account id are valid"
 
+          # ---- Which Pages projects actually exist in this account? -------
+          # The credentials are good, so if a deploy still fails it is almost
+          # certainly a project-name mismatch. List the real names so the
+          # summary shows exactly what to target.
+          projects=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                       "${api}?per_page=100" \
+                     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){process.stdout.write("");return}process.stdout.write((j.result||[]).map(p=>p.name).join("\n"))}catch(e){process.stdout.write("")}})')
+
+          echo "Pages projects in this account:"
+          printf '  %s\n' $projects
+
+          {
+            echo "### Cloudflare Pages projects found in this account"
+            echo ""
+            if [ -z "$projects" ]; then
+              echo "_None._ This account has no Pages projects, so there is nothing to deploy into."
+            else
+              echo '```'
+              printf '%s\n' "$projects"
+              echo '```'
+            fi
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          have () { printf '%s\n' $projects | grep -qx "$1"; }
+
           deploy () {
             key="$1"; dir="$2"; project="$3"; host="$4"
 
@@ -206,6 +232,17 @@ jobs:
             esac
 
             echo "::group::$project  ->  $host"
+
+            # If the project does not exist in this account, create it rather
+            # than failing. A brand-new Direct Upload project is exactly what
+            # `wrangler pages deploy` expects, and the custom domain is
+            # attached separately in the dashboard, so this cannot disturb
+            # DNS or an existing site.
+            if ! have "$project"; then
+              echo "::warning::$project does not exist in this account — creating it"
+              npx wrangler@4 pages project create "$project" --production-branch=main \
+                || echo "::warning::could not create $project"
+            fi
 
             # Ask Cloudflare which branch counts as production for this project.
             branch=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
