@@ -146,6 +146,56 @@ jobs:
           api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
           rc=0
 
+          # ---- Preflight -------------------------------------------------
+          # If anything is wrong with the token or the account id, say exactly
+          # what, in the job summary. Cloudflare's own errors are precise; the
+          # problem is they are buried in the raw log, which is painful to read
+          # on a phone. Nothing secret is printed — only ids and error text.
+          probe=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                    "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects?per_page=1")
+
+          ok=$(printf '%s' "$probe" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).success?"1":"0")}catch(e){process.stdout.write("x")}})')
+
+          if [ "$ok" != "1" ]; then
+            errs=$(printf '%s' "$probe" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);process.stdout.write((j.errors||[]).map(e=>`${e.code}: ${e.message}`).join("\n")||"(no error text returned)")}catch(e){process.stdout.write("response was not JSON")}})')
+
+            # Which accounts can this token actually see? Names the real id.
+            accts=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                      "https://api.cloudflare.com/client/v4/accounts" \
+                    | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){process.stdout.write("(token cannot list accounts)");return}process.stdout.write((j.result||[]).map(a=>`| \`${a.id}\` | ${a.name} |`).join("\n")||"(none)")}catch(e){process.stdout.write("(could not read account list)")}})')
+
+            {
+              echo "## Cloudflare rejected the credentials"
+              echo ""
+              echo "The build is fine. The problem is the token or the account id."
+              echo ""
+              echo "**What Cloudflare said**"
+              echo ""
+              echo '```'
+              echo "$errs"
+              echo '```'
+              echo ""
+              echo "**Accounts this token can actually see**"
+              echo ""
+              echo "| Account ID | Name |"
+              echo "|---|---|"
+              echo "$accts"
+              echo ""
+              echo "The id currently in \`CLOUDFLARE_ACCOUNT_ID\` is \`${CLOUDFLARE_ACCOUNT_ID}\`."
+              echo "If it is not in the table above, replace that secret with one that is."
+              echo ""
+              echo "**If the table is empty or says the token cannot list accounts**,"
+              echo "the token is missing a permission. Recreate it with:"
+              echo "\`Account\` → \`Cloudflare Pages\` → \`Edit\`, and under **Account Resources**"
+              echo "choose **Include → your account**."
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            echo "::error::Cloudflare rejected the credentials — see the job summary."
+            exit 1
+          fi
+
+          echo "preflight ok — token and account id are valid"
+
           deploy () {
             key="$1"; dir="$2"; project="$3"; host="$4"
 
