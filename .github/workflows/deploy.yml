@@ -110,9 +110,36 @@ jobs:
         run: |
           set -uo pipefail
 
+          # Missing credentials is the expected first-run state. Explain it in
+          # the job summary, which is readable on a phone — unlike the raw log.
           if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are not set."
-            echo "::error::Add them under Settings -> Secrets and variables -> Actions."
+            {
+              echo "## Setup needed — one time, about 3 minutes"
+              echo ""
+              echo "The build worked. Nothing was published yet, because this"
+              echo "repository does not have your Cloudflare credentials."
+              echo ""
+              echo "**1. Get a token**"
+              echo ""
+              echo "dash.cloudflare.com -> My Profile -> API Tokens -> Create Token"
+              echo "-> use the **Edit Cloudflare Workers** template -> Continue -> Create Token."
+              echo "Copy the value; Cloudflare only shows it once."
+              echo ""
+              echo "**2. Add two secrets here**"
+              echo ""
+              echo "Settings -> Secrets and variables -> Actions -> New repository secret"
+              echo ""
+              echo "| Name | Value |"
+              echo "|---|---|"
+              echo "| \`CLOUDFLARE_API_TOKEN\` | the token you just copied |"
+              echo "| \`CLOUDFLARE_ACCOUNT_ID\` | \`0b874a65d2b8e9cce5a5a3581f9ad3f2\` |"
+              echo ""
+              echo "**3. Re-run**"
+              echo ""
+              echo "Actions -> Deploy all three sites -> Run workflow."
+              echo "After this, every push deploys on its own."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Cloudflare secrets are missing — see the job summary for the 3-minute fix."
             exit 1
           fi
 
@@ -165,13 +192,17 @@ jobs:
       - name: Summary
         if: always()
         run: |
+          # If the credentials check already wrote the setup instructions,
+          # do not bury them under an empty result table.
+          [ -f /tmp/summary.md ] || exit 0
           {
             echo "### Deploy result"
             echo ""
             echo "| Cloudflare project | Folder | Result | URL |"
             echo "|---|---|---|---|"
-            cat /tmp/summary.md 2>/dev/null || echo "| — | — | did not run | — |"
+            cat /tmp/summary.md
             echo ""
-            echo "If every row failed with an authentication error, the secrets"
-            echo "\`CLOUDFLARE_API_TOKEN\` / \`CLOUDFLARE_ACCOUNT_ID\` are missing or wrong."
+            echo "A row marked FAILED usually means the API token lacks the"
+            echo "**Cloudflare Pages / Edit** permission, or the project name"
+            echo "does not exist in this Cloudflare account."
           } >> "$GITHUB_STEP_SUMMARY"
