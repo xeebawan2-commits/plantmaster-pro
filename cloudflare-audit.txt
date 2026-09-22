@@ -1,4 +1,4 @@
-Cloudflare audit — 2026-09-22T13:19:32Z
+Cloudflare audit — 2026-09-22T13:21:12Z
 account id in secret: 0b874a65d2b8e9cce5a5a3581f9ad3f2
 
 == accounts this token can see ==
@@ -20,6 +20,14 @@ plantmaster-pro
    domains:   plantmaster-pro.pages.dev
    prod br:   main
    created:   2026-09-22T13:15:52.779255Z
+
+== DNS records for hsbfix.org ==
+cannot read DNS: [{"code":10000,"message":"Authentication error","documentation_url":"https://developers.cloudflare.com/api/resources/dns/subresources/records/methods/list"}]
+
+== workers scripts ==
+plantmaster-admin
+plantmaster-pro
+plantmaster-site
 
 == zones (domains) on this account ==
 hsbfix.org  Hsbfix.pk@gmail.com's Account
