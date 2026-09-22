@@ -1,0 +1,177 @@
+name: Deploy all three sites
+
+# ONE PUSH DEPLOYS EVERYTHING.
+#
+# This replaces the drag-and-drop-into-Cloudflare step. When you push to the
+# branch below, GitHub builds all three properties and publishes each one to
+# its own Cloudflare Pages project:
+#
+#   public/     -> plantmaster-pro    -> app.hsbfix.org
+#   dist/site   -> plantmaster-site   -> hsbfix.org
+#   dist/admin  -> plantmaster-admin  -> admin.hsbfix.org
+#
+# WHY THIS EXISTS
+#   The built files are deliberately NOT stored in Git (public/ and dist/ are
+#   in .gitignore) because they are generated — the build stamps every asset
+#   with a content hash so a deploy can never serve a stale mix of old and new
+#   files. Cloudflare's own Git integration cannot be used here either, because
+#   your three Pages projects were created as Direct Upload projects and
+#   Cloudflare does not allow converting those to Git-connected ones.
+#   This workflow gives you the same "push and it is live" behaviour anyway.
+#
+# ONE-TIME SETUP (two secrets)
+#   Settings -> Secrets and variables -> Actions -> New repository secret
+#
+#     CLOUDFLARE_API_TOKEN
+#       dash.cloudflare.com -> My Profile -> API Tokens -> Create Token
+#       -> use the "Edit Cloudflare Workers" template, or a custom token with
+#          permission:  Account / Cloudflare Pages / Edit
+#
+#     CLOUDFLARE_ACCOUNT_ID
+#       0b874a65d2b8e9cce5a5a3581f9ad3f2
+#
+#   After that, every push deploys. Nothing to upload by hand, ever again.
+
+on:
+  push:
+    branches:
+      - arena/01a0be08-plantmaster-pro
+    paths-ignore:
+      - '**.md'
+      - 'reference/**'
+      - 'supabase/**'
+      - 'android/**'
+      - 'tools/**'
+      - '.github/workflows/android-build.yml'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Which site to deploy'
+        type: choice
+        default: all
+        options: [all, app, site, admin]
+
+# Never let two deploys race each other.
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all three properties
+        run: npm run build
+
+      - name: Confirm the build produced what we expect
+        run: |
+          set -e
+          fail=0
+          for pair in "public:index.html" "dist/site:index.html" "dist/admin:index.html"; do
+            dir="${pair%%:*}"; file="${pair##*:}"
+            if [ ! -f "$dir/$file" ]; then
+              echo "::error::missing $dir/$file — refusing to deploy"
+              fail=1
+            else
+              echo "ok  $dir  ($(find "$dir" -type f | wc -l) files)"
+            fi
+          done
+          exit $fail
+
+      # THE SUBTLE TRAP, handled.
+      #
+      # Your three Pages projects are Direct Upload projects. For those,
+      # Cloudflare decides "is this production or just a preview?" by comparing
+      # the --branch value against the project's configured production branch.
+      # Get it wrong and the deploy still SUCCEEDS — it just lands on a random
+      # preview URL while the custom domain keeps serving the old build. That
+      # failure is silent and very easy to miss.
+      #
+      # So instead of hardcoding a guess, we ask the API what each project's
+      # production branch actually is, and pass exactly that.
+      - name: Deploy the three properties
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET: ${{ github.event.inputs.target }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are not set."
+            echo "::error::Add them under Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          rc=0
+
+          deploy () {
+            key="$1"; dir="$2"; project="$3"; host="$4"
+
+            case "${TARGET:-all}" in
+              ''|all) ;;
+              "$key") ;;
+              *) echo "skip $project (target=${TARGET})"; return 0 ;;
+            esac
+
+            echo "::group::$project  ->  $host"
+
+            # Ask Cloudflare which branch counts as production for this project.
+            branch=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                       "${api}/${project}" \
+                     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);process.stdout.write((j.success&&j.result&&j.result.production_branch)||"")}catch(e){}})')
+
+            if [ -z "$branch" ]; then
+              echo "::warning::could not read production_branch for $project — falling back to 'main'"
+              branch=main
+            fi
+            echo "production branch = $branch"
+
+            if npx wrangler@4 pages deploy "$dir" \
+                 --project-name="$project" \
+                 --branch="$branch" \
+                 --commit-dirty=true \
+                 --commit-hash="${GITHUB_SHA}" \
+                 --commit-message="${GITHUB_SHA:0:7} via GitHub Actions"; then
+              echo "| $project | \`$dir\` | deployed | https://$host |" >> /tmp/summary.md
+            else
+              echo "::error::$project failed to deploy"
+              echo "| $project | \`$dir\` | FAILED | https://$host |" >> /tmp/summary.md
+              rc=1
+            fi
+            echo "::endgroup::"
+          }
+
+          deploy app   public     plantmaster-pro   app.hsbfix.org
+          deploy site  dist/site  plantmaster-site  hsbfix.org
+          deploy admin dist/admin plantmaster-admin admin.hsbfix.org
+
+          exit $rc
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Deploy result"
+            echo ""
+            echo "| Cloudflare project | Folder | Result | URL |"
+            echo "|---|---|---|---|"
+            cat /tmp/summary.md 2>/dev/null || echo "| — | — | did not run | — |"
+            echo ""
+            echo "If every row failed with an authentication error, the secrets"
+            echo "\`CLOUDFLARE_API_TOKEN\` / \`CLOUDFLARE_ACCOUNT_ID\` are missing or wrong."
+          } >> "$GITHUB_STEP_SUMMARY"

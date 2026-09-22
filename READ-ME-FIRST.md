@@ -90,31 +90,64 @@ on conflict do nothing;
 
 ## Step 2 · Put the three sites online
 
-Cloudflare Pages accepts a drag-and-drop upload from a phone browser.
+**Do this once, and you never upload a folder by hand again.**
 
-1. Open [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages**.
-2. You already have three projects. For each one, open it → **Create
-   deployment** (or *Upload assets*) → select the matching folder from this zip:
+Add two secrets to GitHub, and from then on every push deploys all three
+sites automatically. No zip, no dragging, no laptop.
 
-| Cloudflare project | Upload this folder | Becomes |
-|---|---|---|
-| `plantmaster-pro` | `UPLOAD-app/` | app.hsbfix.org |
-| `plantmaster-site` | `UPLOAD-site/` | hsbfix.org |
-| `plantmaster-admin` | `UPLOAD-admin/` | admin.hsbfix.org |
+### 2a · Add the two secrets (one time, ~3 minutes)
 
-Upload the **contents** of the folder, not the folder itself. If the site
-comes up blank, that is usually the mistake — you should see `index.html` at
-the top level of what you uploaded.
+1. Get an API token: [dash.cloudflare.com](https://dash.cloudflare.com) →
+   **My Profile** → **API Tokens** → **Create Token** → use the
+   **Edit Cloudflare Workers** template (it includes Pages), → **Continue**
+   → **Create Token** → copy the value. You only see it once.
+2. In GitHub: repo → **Settings** → **Secrets and variables** → **Actions**
+   → **New repository secret**. Add these two:
+
+| Secret name | Value |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | the token you just copied |
+| `CLOUDFLARE_ACCOUNT_ID` | `0b874a65d2b8e9cce5a5a3581f9ad3f2` |
+
+### 2b · Deploy
+
+Go to **Actions** → **Deploy all three sites** → **Run workflow**.
+
+That is it. It builds and publishes all three:
+
+| Cloudflare project | Becomes |
+|---|---|
+| `plantmaster-pro` | app.hsbfix.org |
+| `plantmaster-site` | hsbfix.org |
+| `plantmaster-admin` | admin.hsbfix.org |
+
+From now on it also runs by itself whenever you push a change to the app,
+site, or admin files. Editing a `.md` file or the SQL does not trigger it.
 
 Your DNS is already correct. Nothing to change there.
 
-> **One warning about hsbfix.org.** It is currently served from a *separate*
-> GitHub repository called `hsbfix-org`, which auto-builds on push. If you
-> upload `UPLOAD-site/` to Cloudflare directly, the next push to that repo
-> will overwrite it. Pick one method and stick to it. Either:
-> - **keep using the `hsbfix-org` repo** — then copy `delete-account.html`
->   and the `img/` folder from `UPLOAD-site/` into that repo instead; or
-> - **switch to uploading** — then stop pushing to `hsbfix-org`.
+> **Why not connect the repo to Cloudflare directly?** Because your three
+> Pages projects were created as *Direct Upload* projects, and Cloudflare
+> does not allow converting those to Git-connected ones — you would have to
+> delete and recreate all three, and re-attach the custom domains. The
+> workflow above gives you identical "push and it is live" behaviour without
+> touching your working DNS. It also handles something the dashboard does
+> not: it asks Cloudflare which branch each project treats as production, so
+> a deploy can never silently land on a preview URL.
+
+> **One warning about hsbfix.org.** It is also served from a *separate*
+> GitHub repository called `hsbfix-org`. Once this workflow is live, that
+> repo is redundant and will fight with it — whichever deployed last wins.
+> Stop pushing to `hsbfix-org` and let this workflow own the site, or the
+> two will keep overwriting each other.
+
+### Still want the manual route?
+
+The zip's `UPLOAD-app/`, `UPLOAD-site/` and `UPLOAD-admin/` folders still
+work: Cloudflare → **Workers & Pages** → open the project → **Create
+deployment** → upload the folder's **contents** (you should see `index.html`
+at the top level of what you upload — if the site comes up blank, that is
+almost always the mistake). Use this only as a fallback.
 
 ### Supabase redirect URLs
 
