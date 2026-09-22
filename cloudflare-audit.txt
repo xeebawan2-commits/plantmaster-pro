@@ -1,11 +1,25 @@
-Cloudflare audit — 2026-09-22T13:18:40Z
+Cloudflare audit — 2026-09-22T13:19:32Z
 account id in secret: 0b874a65d2b8e9cce5a5a3581f9ad3f2
 
 == accounts this token can see ==
 0b874a65d2b8e9cce5a5a3581f9ad3f2  Hsbfix.pk@gmail.com's Account
 
 == pages projects + their custom domains ==
-error: [{"code":8000024,"message":"Invalid list options provided. Review the `page` or `per_page` parameter."}]
+plantmaster-admin
+   subdomain: plantmaster-admin.pages.dev
+   domains:   plantmaster-admin.pages.dev
+   prod br:   main
+   created:   2026-09-22T13:16:14.345693Z
+plantmaster-site
+   subdomain: plantmaster-site.pages.dev
+   domains:   plantmaster-site.pages.dev
+   prod br:   main
+   created:   2026-09-22T13:16:03.036601Z
+plantmaster-pro
+   subdomain: plantmaster-pro.pages.dev
+   domains:   plantmaster-pro.pages.dev
+   prod br:   main
+   created:   2026-09-22T13:15:52.779255Z
 
 == zones (domains) on this account ==
 hsbfix.org  Hsbfix.pk@gmail.com's Account
