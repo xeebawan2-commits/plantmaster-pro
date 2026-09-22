@@ -302,6 +302,23 @@ jobs:
               "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("error:",JSON.stringify(j.errors));return}(j.result||[]).forEach(p=>console.log(`${p.name}\n   subdomain: ${p.subdomain}\n   domains:   ${(p.domains||[]).join(", ")||"(none)"}\n   prod br:   ${p.production_branch}\n   created:   ${p.created_on}`))}catch(e){console.log("unreadable")}})'
             echo ""
+            echo "== DNS records for hsbfix.org =="
+            zid=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                   "https://api.cloudflare.com/client/v4/zones" \
+                 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);const z=(j.result||[]).find(z=>z.name==="hsbfix.org");process.stdout.write(z?z.id:"")}catch(e){}})')
+            if [ -n "$zid" ]; then
+              curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                "https://api.cloudflare.com/client/v4/zones/${zid}/dns_records" \
+                | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot read DNS:",JSON.stringify(j.errors));return}(j.result||[]).forEach(r=>console.log(`${r.type.padEnd(6)} ${r.name.padEnd(28)} -> ${r.content}   proxied=${r.proxied}`))}catch(e){console.log("unreadable")}})'
+            else
+              echo "(zone id not readable)"
+            fi
+            echo ""
+            echo "== workers scripts =="
+            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list workers");return}(j.result||[]).forEach(w=>console.log(w.id))}catch(e){console.log("unreadable")}})'
+            echo ""
             echo "== zones (domains) on this account =="
             curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               "https://api.cloudflare.com/client/v4/zones?per_page=50" \
