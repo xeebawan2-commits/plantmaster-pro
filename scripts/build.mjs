@@ -173,3 +173,41 @@ const all = args.includes('--all') || args.length === 0;
 if (all || args.includes('--app')) buildApp();
 if (all || args.includes('--site')) buildStatic('site');
 if (all || args.includes('--admin')) buildStatic('admin');
+
+// --workers: prepare the same outputs for Cloudflare *Workers* static assets
+// rather than Pages.
+//
+// Workers reads _headers and _redirects natively, with one exception: the
+// Pages SPA catch-all "/* /index.html 200" is not how Workers expresses a SPA
+// fallback. Left in place the deploy fails outright with "infinite loop
+// detected" (code 100324). On Workers the equivalent is
+// assets.not_found_handling = "single-page-application", which is set in
+// wrangler.app.jsonc and wrangler.admin.jsonc.
+//
+// So strip only that one line, keep every other rule, and delete the file if
+// nothing else remains.
+if (args.includes('--workers')) {
+  const targets = [
+    path.join(repo, 'public'),
+    path.join(repo, 'dist', 'site'),
+    path.join(repo, 'dist', 'admin'),
+  ];
+  const isSpaCatchAll = line => /^\/\*\s+\/index\.html\s+200\b/.test(line.trim());
+
+  for (const dir of targets) {
+    const f = path.join(dir, '_redirects');
+    if (!fs.existsSync(f)) continue;
+
+    const before = fs.readFileSync(f, 'utf8');
+    const kept = before.split('\n').filter(l => !isSpaCatchAll(l));
+    const meaningful = kept.filter(l => l.trim() && !l.trim().startsWith('#'));
+
+    if (meaningful.length === 0) {
+      fs.rmSync(f);
+      console.log(`workers: removed ${path.relative(repo, f)} (SPA fallback is in wrangler config)`);
+    } else if (kept.join('\n') !== before) {
+      fs.writeFileSync(f, kept.join('\n'));
+      console.log(`workers: stripped SPA catch-all from ${path.relative(repo, f)}`);
+    }
+  }
+}

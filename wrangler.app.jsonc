@@ -1,0 +1,21 @@
+{
+  // app.hsbfix.org — the customer PWA.
+  //
+  // This is a Worker with static assets, matching the Workers that already
+  // serve your three domains. It is NOT a Pages project.
+  //
+  // Deployed by .github/workflows/deploy.yml with:
+  //   npx wrangler deploy --config wrangler.app.jsonc
+  //
+  // The SPA fallback is declared here as not_found_handling. The Pages-style
+  // "/* /index.html 200" line in _redirects means something different to the
+  // Workers asset router and makes the deploy fail with "infinite loop
+  // detected" (code 100324), so the build strips that line for Workers.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "plantmaster-pro",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  // admin.hsbfix.org — the Control Center.
+  //
+  // A single-page app like the customer PWA, so unknown paths render the
+  // shell and the client router takes over.
+  //
+  //   npx wrangler deploy --config wrangler.admin.jsonc
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "plantmaster-admin",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./dist/admin",
+    "not_found_handling": "single-page-application"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  // hsbfix.org and www.hsbfix.org — the marketing site.
+  //
+  // A plain multi-page site, so there is no SPA fallback: an unknown path
+  // should 404 rather than silently render the homepage. not_found_handling
+  // is left at its default ("none") deliberately.
+  //
+  //   npx wrangler deploy --config wrangler.site.jsonc
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "plantmaster-site",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./dist/site"
+  }
+}

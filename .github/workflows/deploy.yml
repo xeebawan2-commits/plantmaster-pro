@@ -2,35 +2,29 @@ name: Deploy all three sites
 
 # ONE PUSH DEPLOYS EVERYTHING.
 #
-# This replaces the drag-and-drop-into-Cloudflare step. When you push to the
-# branch below, GitHub builds all three properties and publishes each one to
-# its own Cloudflare Pages project:
+# Builds all three properties and deploys each to the Cloudflare **Worker**
+# that already owns its domain:
 #
-#   public/     -> plantmaster-pro    -> app.hsbfix.org
-#   dist/site   -> plantmaster-site   -> hsbfix.org
-#   dist/admin  -> plantmaster-admin  -> admin.hsbfix.org
+#   public/     -> worker plantmaster-pro    -> app.hsbfix.org
+#   dist/site   -> worker plantmaster-site   -> hsbfix.org + www.hsbfix.org
+#   dist/admin  -> worker plantmaster-admin  -> admin.hsbfix.org
 #
-# WHY THIS EXISTS
-#   The built files are deliberately NOT stored in Git (public/ and dist/ are
-#   in .gitignore) because they are generated — the build stamps every asset
-#   with a content hash so a deploy can never serve a stale mix of old and new
-#   files. Cloudflare's own Git integration cannot be used here either, because
-#   your three Pages projects were created as Direct Upload projects and
-#   Cloudflare does not allow converting those to Git-connected ones.
-#   This workflow gives you the same "push and it is live" behaviour anyway.
+# WHY WORKERS AND NOT PAGES
+#   Your sites have been served by Workers (created 17 Sep) since before this
+#   workflow existed, and those Workers hold the custom domains. Moving the
+#   domains to Pages would mean detaching each one first — Cloudflare locks the
+#   AAAA 100:: record a Worker owns, which is the "Unable to edit this record"
+#   error you hit. Deploying to the existing Workers changes no DNS at all.
 #
-# ONE-TIME SETUP (two secrets)
-#   Settings -> Secrets and variables -> Actions -> New repository secret
+# WHY THE BUILT FILES ARE NOT IN GIT
+#   public/ and dist/ are gitignored because they are generated: the build
+#   stamps every asset with a content hash so a deploy can never serve a stale
+#   mix of old and new files. That is why a build step is needed here.
 #
-#     CLOUDFLARE_API_TOKEN
-#       dash.cloudflare.com -> My Profile -> API Tokens -> Create Token
-#       -> use the "Edit Cloudflare Workers" template, or a custom token with
-#          permission:  Account / Cloudflare Pages / Edit
-#
-#     CLOUDFLARE_ACCOUNT_ID
-#       0b874a65d2b8e9cce5a5a3581f9ad3f2
-#
-#   After that, every push deploys. Nothing to upload by hand, ever again.
+# ONE-TIME SETUP (two secrets — already done)
+#   Settings -> Secrets and variables -> Actions
+#     CLOUDFLARE_API_TOKEN    "Edit Cloudflare Workers" template token
+#     CLOUDFLARE_ACCOUNT_ID   0b874a65d2b8e9cce5a5a3581f9ad3f2
 
 on:
   push:
@@ -42,6 +36,7 @@ on:
       - 'supabase/**'
       - 'android/**'
       - 'tools/**'
+      - 'cloudflare-audit.txt'
       - '.github/workflows/android-build.yml'
   workflow_dispatch:
     inputs:
@@ -53,11 +48,11 @@ on:
 
 # Never let two deploys race each other.
 concurrency:
-  group: deploy-pages
+  group: deploy-sites
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   deploy:
@@ -73,17 +68,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # --workers strips the Pages-style SPA catch-all from _redirects.
+      # Workers rejects "/* /index.html 200" with "infinite loop detected"
+      # (code 100324); the equivalent lives in the wrangler configs as
+      # assets.not_found_handling.
       - name: Build all three properties
-        run: npm run build
+        run: node scripts/build.mjs --all --workers
 
       - name: Confirm the build produced what we expect
         run: |
           set -e
           fail=0
-          for pair in "public:index.html" "dist/site:index.html" "dist/admin:index.html"; do
-            dir="${pair%%:*}"; file="${pair##*:}"
-            if [ ! -f "$dir/$file" ]; then
-              echo "::error::missing $dir/$file — refusing to deploy"
+          for dir in public dist/site dist/admin; do
+            if [ ! -f "$dir/index.html" ]; then
+              echo "::error::missing $dir/index.html — refusing to deploy"
               fail=1
             else
               echo "ok  $dir  ($(find "$dir" -type f | wc -l) files)"
@@ -91,18 +89,7 @@ jobs:
           done
           exit $fail
 
-      # THE SUBTLE TRAP, handled.
-      #
-      # Your three Pages projects are Direct Upload projects. For those,
-      # Cloudflare decides "is this production or just a preview?" by comparing
-      # the --branch value against the project's configured production branch.
-      # Get it wrong and the deploy still SUCCEEDS — it just lands on a random
-      # preview URL while the custom domain keeps serving the old build. That
-      # failure is silent and very easy to miss.
-      #
-      # So instead of hardcoding a guess, we ask the API what each project's
-      # production branch actually is, and pass exactly that.
-      - name: Deploy the three properties
+      - name: Deploy the three Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -110,249 +97,72 @@ jobs:
         run: |
           set -uo pipefail
 
-          # Missing credentials is the expected first-run state. Explain it in
-          # the job summary, which is readable on a phone — unlike the raw log.
           if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
             {
-              echo "## Setup needed — one time, about 3 minutes"
+              echo "## Setup needed"
               echo ""
-              echo "The build worked. Nothing was published yet, because this"
-              echo "repository does not have your Cloudflare credentials."
+              echo "Add these two repository secrets, then re-run:"
               echo ""
-              echo "**1. Get a token**"
-              echo ""
-              echo "dash.cloudflare.com -> My Profile -> API Tokens -> Create Token"
-              echo "-> use the **Edit Cloudflare Workers** template -> Continue -> Create Token."
-              echo "Copy the value; Cloudflare only shows it once."
-              echo ""
-              echo "**2. Add two secrets here**"
-              echo ""
-              echo "Settings -> Secrets and variables -> Actions -> New repository secret"
-              echo ""
-              echo "| Name | Value |"
+              echo "| Name | Where to get it |"
               echo "|---|---|"
-              echo "| \`CLOUDFLARE_API_TOKEN\` | the token you just copied |"
+              echo "| \`CLOUDFLARE_API_TOKEN\` | Cloudflare → My Profile → API Tokens → *Edit Cloudflare Workers* |"
               echo "| \`CLOUDFLARE_ACCOUNT_ID\` | \`0b874a65d2b8e9cce5a5a3581f9ad3f2\` |"
-              echo ""
-              echo "**3. Re-run**"
-              echo ""
-              echo "Actions -> Deploy all three sites -> Run workflow."
-              echo "After this, every push deploys on its own."
             } >> "$GITHUB_STEP_SUMMARY"
-            echo "::error::Cloudflare secrets are missing — see the job summary for the 3-minute fix."
+            echo "::error::Cloudflare secrets are missing — see the job summary."
             exit 1
           fi
 
-          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          # Which hostnames does each Worker actually serve? Printed in the
+          # summary so a wrong-target deploy is obvious immediately.
+          domains=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+                      "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" \
+                    | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success)return;const m={};(j.result||[]).forEach(d=>{(m[d.service]=m[d.service]||[]).push(d.hostname)});process.stdout.write(JSON.stringify(m))}catch(e){}})')
+          [ -n "$domains" ] || domains='{}'
+
+          hosts_for () {
+            printf '%s' "$domains" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const m=JSON.parse(s);process.stdout.write((m[process.argv[1]]||[]).join(", ")||"(no custom domain yet)")}catch(e){process.stdout.write("(unknown)")}})' "$1"
+          }
+
           rc=0
-
-          # ---- Preflight -------------------------------------------------
-          # If anything is wrong with the token or the account id, say exactly
-          # what, in the job summary. Cloudflare's own errors are precise; the
-          # problem is they are buried in the raw log, which is painful to read
-          # on a phone. Nothing secret is printed — only ids and error text.
-          probe=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                    "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects")
-
-          ok=$(printf '%s' "$probe" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).success?"1":"0")}catch(e){process.stdout.write("x")}})')
-
-          if [ "$ok" != "1" ]; then
-            errs=$(printf '%s' "$probe" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);process.stdout.write((j.errors||[]).map(e=>`${e.code}: ${e.message}`).join("\n")||"(no error text returned)")}catch(e){process.stdout.write("response was not JSON")}})')
-
-            # Which accounts can this token actually see? Names the real id.
-            accts=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                      "https://api.cloudflare.com/client/v4/accounts" \
-                    | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){process.stdout.write("(token cannot list accounts)");return}process.stdout.write((j.result||[]).map(a=>`| \`${a.id}\` | ${a.name} |`).join("\n")||"(none)")}catch(e){process.stdout.write("(could not read account list)")}})')
-
-            {
-              echo "## Cloudflare rejected the credentials"
-              echo ""
-              echo "The build is fine. The problem is the token or the account id."
-              echo ""
-              echo "**What Cloudflare said**"
-              echo ""
-              echo '```'
-              echo "$errs"
-              echo '```'
-              echo ""
-              echo "**Accounts this token can actually see**"
-              echo ""
-              echo "| Account ID | Name |"
-              echo "|---|---|"
-              echo "$accts"
-              echo ""
-              echo "The id currently in \`CLOUDFLARE_ACCOUNT_ID\` is \`${CLOUDFLARE_ACCOUNT_ID}\`."
-              echo "If it is not in the table above, replace that secret with one that is."
-              echo ""
-              echo "**If the table is empty or says the token cannot list accounts**,"
-              echo "the token is missing a permission. Recreate it with:"
-              echo "\`Account\` → \`Cloudflare Pages\` → \`Edit\`, and under **Account Resources**"
-              echo "choose **Include → your account**."
-            } >> "$GITHUB_STEP_SUMMARY"
-
-            echo "::error::Cloudflare rejected the credentials — see the job summary."
-            exit 1
-          fi
-
-          echo "preflight ok — token and account id are valid"
-
-          # ---- Which Pages projects actually exist in this account? -------
-          # The credentials are good, so if a deploy still fails it is almost
-          # certainly a project-name mismatch. List the real names so the
-          # summary shows exactly what to target.
-          projects=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                       "${api}" \
-                     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){process.stdout.write("");return}process.stdout.write((j.result||[]).map(p=>p.name).join("\n"))}catch(e){process.stdout.write("")}})')
-
-          echo "Pages projects in this account:"
-          printf '  %s\n' $projects
-
-          {
-            echo "### Cloudflare Pages projects found in this account"
-            echo ""
-            if [ -z "$projects" ]; then
-              echo "_None._ This account has no Pages projects, so there is nothing to deploy into."
-            else
-              echo '```'
-              printf '%s\n' "$projects"
-              echo '```'
-            fi
-            echo ""
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          have () { printf '%s\n' $projects | grep -qx "$1"; }
-
           deploy () {
-            key="$1"; dir="$2"; project="$3"; host="$4"
+            key="$1"; cfg="$2"; worker="$3"
 
             case "${TARGET:-all}" in
               ''|all) ;;
               "$key") ;;
-              *) echo "skip $project (target=${TARGET})"; return 0 ;;
+              *) echo "skip $worker (target=${TARGET})"; return 0 ;;
             esac
 
-            echo "::group::$project  ->  $host"
+            hosts=$(hosts_for "$worker")
+            echo "::group::$worker  ->  $hosts"
 
-            # If the project does not exist in this account, create it rather
-            # than failing. A brand-new Direct Upload project is exactly what
-            # `wrangler pages deploy` expects, and the custom domain is
-            # attached separately in the dashboard, so this cannot disturb
-            # DNS or an existing site.
-            if ! have "$project"; then
-              echo "::warning::$project does not exist in this account — creating it"
-              npx wrangler@4 pages project create "$project" --production-branch=main \
-                || echo "::warning::could not create $project"
-            fi
-
-            # Ask Cloudflare which branch counts as production for this project.
-            branch=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                       "${api}/${project}" \
-                     | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);process.stdout.write((j.success&&j.result&&j.result.production_branch)||"")}catch(e){}})')
-
-            if [ -z "$branch" ]; then
-              echo "::warning::could not read production_branch for $project — falling back to 'main'"
-              branch=main
-            fi
-            echo "production branch = $branch"
-
-            if npx wrangler@4 pages deploy "$dir" \
-                 --project-name="$project" \
-                 --branch="$branch" \
-                 --commit-dirty=true \
-                 --commit-hash="${GITHUB_SHA}" \
-                 --commit-message="${GITHUB_SHA:0:7} via GitHub Actions"; then
-              echo "| $project | \`$dir\` | deployed | https://$host |" >> /tmp/summary.md
+            if npx wrangler@4 deploy --config "$cfg"; then
+              echo "| \`$worker\` | $hosts | deployed |" >> /tmp/summary.md
             else
-              echo "::error::$project failed to deploy"
-              echo "| $project | \`$dir\` | FAILED | https://$host |" >> /tmp/summary.md
+              echo "::error::$worker failed to deploy"
+              echo "| \`$worker\` | $hosts | FAILED |" >> /tmp/summary.md
               rc=1
             fi
             echo "::endgroup::"
           }
 
-          deploy app   public     plantmaster-pro   app.hsbfix.org
-          deploy site  dist/site  plantmaster-site  hsbfix.org
-          deploy admin dist/admin plantmaster-admin admin.hsbfix.org
+          deploy app   wrangler.app.jsonc   plantmaster-pro
+          deploy site  wrangler.site.jsonc  plantmaster-site
+          deploy admin wrangler.admin.jsonc plantmaster-admin
 
           exit $rc
-
-      # One-off audit. The sandbox cannot reach the Cloudflare API, so the
-      # runner writes the account's real state into a committed file. This
-      # answers: which account is this, which Pages projects exist, and which
-      # custom domains are attached to each.
-      - name: Audit the Cloudflare account
-        if: always()
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set +e
-          out=cloudflare-audit.txt
-          {
-            echo "Cloudflare audit — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "account id in secret: ${CLOUDFLARE_ACCOUNT_ID}"
-            echo ""
-            echo "== accounts this token can see =="
-            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/accounts" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);(j.result||[]).forEach(a=>console.log(a.id,"",a.name))}catch(e){console.log("unreadable")}})'
-            echo ""
-            echo "== pages projects + their custom domains =="
-            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("error:",JSON.stringify(j.errors));return}(j.result||[]).forEach(p=>console.log(`${p.name}\n   subdomain: ${p.subdomain}\n   domains:   ${(p.domains||[]).join(", ")||"(none)"}\n   prod br:   ${p.production_branch}\n   created:   ${p.created_on}`))}catch(e){console.log("unreadable")}})'
-            echo ""
-            echo "== DNS records for hsbfix.org =="
-            zid=$(curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                   "https://api.cloudflare.com/client/v4/zones" \
-                 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);const z=(j.result||[]).find(z=>z.name==="hsbfix.org");process.stdout.write(z?z.id:"")}catch(e){}})')
-            if [ -n "$zid" ]; then
-              curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-                "https://api.cloudflare.com/client/v4/zones/${zid}/dns_records" \
-                | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot read DNS:",JSON.stringify(j.errors));return}(j.result||[]).forEach(r=>console.log(`${r.type.padEnd(6)} ${r.name.padEnd(28)} -> ${r.content}   proxied=${r.proxied}`))}catch(e){console.log("unreadable")}})'
-            else
-              echo "(zone id not readable)"
-            fi
-            echo ""
-            echo "== workers scripts (with dates) =="
-            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list workers");return}(j.result||[]).forEach(w=>console.log(`${(w.id||"").padEnd(22)} created=${w.created_on} modified=${w.modified_on}`))}catch(e){console.log("unreadable")}})'
-            echo ""
-            echo "== worker custom domains (what serves hsbfix.org) =="
-            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list worker domains:",JSON.stringify(j.errors));return}(j.result||[]).forEach(d=>console.log(`${(d.hostname||"").padEnd(26)} -> ${d.service}  env=${d.environment}`))}catch(e){console.log("unreadable")}})'
-            echo ""
-            echo "== zones (domains) on this account =="
-            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-              "https://api.cloudflare.com/client/v4/zones?per_page=50" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list zones (token has no zone scope) — not a problem");return}(j.result||[]).forEach(z=>console.log(z.name,"",z.account&&z.account.name))}catch(e){console.log("unreadable")}})'
-          } > "$out" 2>&1
-
-          cat "$out"
-
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "$out"
-          git commit -m "chore: cloudflare account audit [skip ci]" || exit 0
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
-          git push origin "HEAD:${GITHUB_REF_NAME}" || true
 
       - name: Summary
         if: always()
         run: |
-          # If the credentials check already wrote the setup instructions,
-          # do not bury them under an empty result table.
           [ -f /tmp/summary.md ] || exit 0
           {
             echo "### Deploy result"
             echo ""
-            echo "| Cloudflare project | Folder | Result | URL |"
-            echo "|---|---|---|---|"
+            echo "| Worker | Serves | Result |"
+            echo "|---|---|---|"
             cat /tmp/summary.md
             echo ""
-            echo "A row marked FAILED usually means the API token lacks the"
-            echo "**Cloudflare Pages / Edit** permission, or the project name"
-            echo "does not exist in this Cloudflare account."
+            echo "These are Cloudflare **Workers**, not Pages projects — the"
+            echo "custom domains stay exactly where they are, so no DNS changes."
           } >> "$GITHUB_STEP_SUMMARY"
