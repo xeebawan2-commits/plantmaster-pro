@@ -25,6 +25,22 @@ create table if not exists public.subscription_plans (
   updated_at        timestamptz not null default now()
 );
 
+-- ---------------------------------------------------------------------------
+-- SUPERSEDED PRICING — seeds only, never re-prices.
+--
+-- These were the original tiers (Starter 15,000 / Professional 45,000 /
+-- Enterprise 120,000). Published pricing is now Basic 7,500 / Essential
+-- 12,000 / Professional 24,000 / Enterprise 40,000, matching
+-- site/pricing.html and the signed Subscription Agreement.
+--
+-- The `on conflict ... do update` below used to REPRICE every existing plan
+-- back to the old figures, so re-running this migration would bill a live
+-- customer against a tier they never agreed to. It is now `do nothing`:
+-- the block still seeds a brand-new database, but can never overwrite a
+-- price that is already set.
+--
+-- supabase/repairs/R5-final-pricing.sql is the current source of truth.
+-- ---------------------------------------------------------------------------
 insert into public.subscription_plans
   (code, name, price_monthly, max_users, max_plants, max_assets, storage_gb,
    ai_requests_month, sort_order, features)
@@ -37,17 +53,7 @@ values
    '{"branding":true,"ai":true,"condition_monitoring":true,"procurement":true,"api":false}'),
   ('enterprise','Enterprise',120000, null, null, null, 200, 10000, 3,
    '{"branding":true,"ai":true,"condition_monitoring":true,"procurement":true,"api":true}')
-on conflict (code) do update
-  set name              = excluded.name,
-      price_monthly     = excluded.price_monthly,
-      max_users         = excluded.max_users,
-      max_plants        = excluded.max_plants,
-      max_assets        = excluded.max_assets,
-      storage_gb        = excluded.storage_gb,
-      ai_requests_month = excluded.ai_requests_month,
-      features          = excluded.features,
-      sort_order        = excluded.sort_order,
-      updated_at        = now();
+on conflict (code) do nothing;
 
 -- Per-tenant overrides negotiated outside the standard plans.
 create table if not exists public.organization_features (
