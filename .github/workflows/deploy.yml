@@ -314,10 +314,15 @@ jobs:
               echo "(zone id not readable)"
             fi
             echo ""
-            echo "== workers scripts =="
+            echo "== workers scripts (with dates) =="
             curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
               "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts" \
-              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list workers");return}(j.result||[]).forEach(w=>console.log(w.id))}catch(e){console.log("unreadable")}})'
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list workers");return}(j.result||[]).forEach(w=>console.log(`${(w.id||"").padEnd(22)} created=${w.created_on} modified=${w.modified_on}`))}catch(e){console.log("unreadable")}})'
+            echo ""
+            echo "== worker custom domains (what serves hsbfix.org) =="
+            curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);if(!j.success){console.log("cannot list worker domains:",JSON.stringify(j.errors));return}(j.result||[]).forEach(d=>console.log(`${(d.hostname||"").padEnd(26)} -> ${d.service}  env=${d.environment}`))}catch(e){console.log("unreadable")}})'
             echo ""
             echo "== zones (domains) on this account =="
             curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
