@@ -37,10 +37,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -108,7 +108,7 @@ jobs:
           echo "which is usually DIFFERENT from the upload key above." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: plantmaster-aab
           path: android/app/build/outputs/bundle/release/*.aab
