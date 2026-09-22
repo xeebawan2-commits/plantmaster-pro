@@ -90,7 +90,7 @@ await db.exec(strip('supabase/repairs/R5-final-pricing.sql'));
 
 console.log('\nAfter R5 — database matches the published price');
 const rows = await db.query(`select code, price_monthly, max_workers, max_plants,
-                                    max_storage_bytes, active
+                                    max_storage_bytes, max_files, active
                                from public.subscription_plans order by code`);
 const byCode = Object.fromEntries(rows.rows.map(r => [r.code, r]));
 
@@ -105,19 +105,33 @@ for (const plan of ['basic','essential','professional','enterprise']) {
 
 // Limits a customer is sold must be the limits enforced.
 const limits = {
-  basic:        { users: 5,   plants: 1, gb: 5   },
-  essential:    { users: 10,  plants: 1, gb: 10  },
-  professional: { users: 25,  plants: 1, gb: 30  },
-  enterprise:   { users: 100, plants: 2, gb: 100 },
+  basic:        { users: 5,   plants: 1, gb: 5,   files: 2000  },
+  essential:    { users: 10,  plants: 1, gb: 10,  files: 5000  },
+  professional: { users: 25,  plants: 1, gb: 30,  files: 20000 },
+  enterprise:   { users: 100, plants: 2, gb: 100, files: 50000 },
 };
 console.log('\nPlan limits');
 for (const [code, want] of Object.entries(limits)) {
   const r = byCode[code];
   if (!r) { bad(`${code} missing`); continue; }
   const gb = Math.round(Number(r.max_storage_bytes) / 1073741824);
-  (r.max_workers === want.users && r.max_plants === want.plants && gb === want.gb)
-    ? ok(`${code.padEnd(12)} ${want.users} users · ${want.plants} plant(s) · ${want.gb} GB`)
-    : bad(`${code}: got ${r.max_workers}u/${r.max_plants}p/${gb}GB, want ${want.users}u/${want.plants}p/${want.gb}GB`);
+  (r.max_workers === want.users && r.max_plants === want.plants && gb === want.gb && r.max_files === want.files)
+    ? ok(`${code.padEnd(12)} ${want.users} users · ${want.plants} plant(s) · ${want.gb} GB · ${want.files.toLocaleString()} files`)
+    : bad(`${code}: got ${r.max_workers}u/${r.max_plants}p/${gb}GB/${r.max_files}f, want ${want.users}u/${want.plants}p/${want.gb}GB/${want.files}f`);
+}
+
+console.log('\nPricing page is internally consistent');
+{
+  const html = readFileSync(join(root,'site','pricing.html'),'utf8');
+  const pageFiles = [...html.matchAll(/up to ([0-9,]+) files/g)].map(m=>Number(m[1].replace(/,/g,'')));
+  const rising = pageFiles.every((v,i)=> i===0 || v >= pageFiles[i-1]);
+  rising
+    ? ok(`file allowance never drops as the price rises (${pageFiles.join(' → ')})`)
+    : bad(`a cheaper plan advertises more files than a dearer one: ${pageFiles.join(' → ')}`);
+  const want = [limits.basic.files, limits.essential.files, limits.professional.files, limits.enterprise.files];
+  JSON.stringify(pageFiles) === JSON.stringify(want)
+    ? ok('advertised file counts equal the enforced max_files')
+    : bad(`page says ${pageFiles.join('/')} but database enforces ${want.join('/')}`);
 }
 
 console.log('\nHousekeeping');

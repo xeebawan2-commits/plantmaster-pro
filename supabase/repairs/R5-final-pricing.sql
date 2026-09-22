@@ -34,11 +34,8 @@
 --    Professional     25       1    30 GB  20,000
 --    Enterprise      100       2   100 GB  50,000
 --
---  Note: the pricing page advertises "up to 1,500 files" for Essential and
---  "5,000" for Enterprise. Those read as marketing floors rather than hard
---  caps, and the pre-existing database values (5,000 / 20,000) are more
---  generous, so the generous number is kept — a customer is never blocked
---  below what the page promised.
+--  These file limits are also what site/pricing.html advertises; R5's test
+--  reads the page so the two can never drift apart again.
 --
 --  Trial is deliberately left untouched: 7 days of full Professional access,
 --  which is what the page and the agreement both promise.
@@ -88,6 +85,7 @@ update public.subscription_plans set
   max_workers   = 100,
   max_plants    = 2,
   max_storage_bytes = 107374182400,
+  max_files     = 50000,
   active        = true,
   updated_at    = now()
 where code = 'enterprise';
@@ -103,6 +101,7 @@ update public.subscription_plans set
   max_workers   = 10,
   max_plants    = 1,
   max_storage_bytes = 10737418240,
+  max_files     = 5000,
   active        = true,
   updated_at    = now()
 where code = 'essential';
@@ -114,6 +113,7 @@ update public.subscription_plans set
   max_workers   = 25,
   max_plants    = 1,
   max_storage_bytes = 32212254720,
+  max_files     = 20000,
   active        = true,
   updated_at    = now()
 where code = 'professional';
