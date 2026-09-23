@@ -1512,7 +1512,11 @@ const ACTIONS = {
     if (turningOff && !await confirmAction('Deactivate package',
       'New customers will not be offered this package. Existing customers keep it.','Deactivate')) return;
     const f = p.features || {};
-    await savePlanFrom({
+    /* savePlanFrom rebuilds features from the mod_<key> fields, so we must
+       supply one per module or every module is silently wiped when a package
+       is toggled. Carry the plan's current features across unchanged; only
+       `active` changes here. */
+    const fields = {
       code:p.code, name:p.name, description:p.description||'',
       monthly:p.price_monthly, yearly:p.price_yearly,
       workers:p.max_workers, plants:p.max_plants,
@@ -1520,11 +1524,10 @@ const ACTIONS = {
       files:p.max_files, file_size:(p.max_file_bytes||0)/MB, retention:p.retention_days,
       ai_month:p.ai_requests_month, ai_day:p.ai_requests_day, ai_minute:p.ai_requests_minute_user,
       input_tokens:p.ai_input_tokens_month, output_tokens:p.ai_output_tokens_month,
-      feat_analytics:!!f.analytics, feat_safety:!!f.safety_loto,
-      feat_predictive:!!f.predictive_maintenance, feat_finance:!!f.finance_labor,
-      feat_procurement:!!f.procurement_requests,
       active: !turningOff
-    }, p);
+    };
+    MODULES.forEach(m => { fields['mod_'+m.key] = !!f[m.key]; });
+    await savePlanFrom(fields, p);
     toast(turningOff ? 'Package deactivated' : 'Package activated');
     await safeRender(pagePlans);
   },
