@@ -22,7 +22,7 @@
     "deploy:site": "npm run build:site && wrangler pages deploy dist/site --project-name=plantmaster-site",
     "deploy:admin": "npm run build:admin && wrangler pages deploy dist/admin --project-name=plantmaster-admin",
     "deploy:all": "npm run deploy && npm run deploy:site && npm run deploy:admin",
-    "verify:repairs": "node tools/db-verify/repair-test.mjs && node tools/db-verify/repair2-test.mjs && node tools/db-verify/repair4-test.mjs && node tools/db-verify/repair5-test.mjs"
+    "verify:repairs": "node tools/db-verify/repair-test.mjs && node tools/db-verify/repair2-test.mjs && node tools/db-verify/repair4-test.mjs && node tools/db-verify/repair5-test.mjs && node tools/db-verify/edit-company-test.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
