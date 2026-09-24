@@ -65,7 +65,7 @@ function pmShowDemoSwitch(currentEmail){
   };
 }
 async function init(){setSync();const{data}=await sb.auth.getSession();session=data.session;$('#boot').hidden=true;if(pmWantsDemo()){const em=session?.user?.email||'';if(session&&em.toLowerCase()!==PM_DEMO_EMAIL){return pmShowDemoSwitch(em)}pmStripDemoParam();if(!session){showAuth();const f=$('#email');if(f)f.value=PM_DEMO_EMAIL;const am=$('#authMsg');if(am)am.textContent='Demo workspace — enter the password shown on the website.';return}}if(!session)return showAuth();await loadWorkspace()}
-function showAuth(){$('#auth').hidden=false;$('#app').hidden=true;const r=$('#resetPw');if(r)r.hidden=true;const o=$('#onboard');if(o)o.hidden=true;document.body.classList.add('pm-auth');document.body.classList.remove('pm-demo-readonly')}
+function showAuth(){$('#auth').hidden=false;$('#app').hidden=true;const r=$('#resetPw');if(r)r.hidden=true;const o=$('#onboard');if(o)o.hidden=true;document.body.classList.add('pm-auth');document.body.classList.remove('pm-demo-readonly');const am=$('#authMsg');if(am&&window.pmAuthLinkError){am.textContent=window.pmAuthLinkError;window.pmAuthLinkError=''}}
 function authCredentials(){const email=$('#email').value.trim(),password=$('#password').value;if(!email){$('#authMsg').textContent='Enter your work email first.';$('#email').focus();return null}if(!/^\S+@\S+\.\S+$/.test(email)){ $('#authMsg').textContent='Enter a valid email address.';return null}if(password.length<8){$('#authMsg').textContent='Password must contain at least 8 characters.';$('#password').focus();return null}return{email,password}}
 $('#authForm').onsubmit=async e=>{e.preventDefault();const credentials=authCredentials();if(!credentials)return;$('#authMsg').textContent='Signing in…';const{error}=await sb.auth.signInWithPassword(credentials);$('#authMsg').textContent=error?.message||''};
 const _su=$('#signUp');if(_su)_su.onclick=async()=>{const credentials=authCredentials();if(!credentials)return;$('#authMsg').textContent='Creating account…';const{data:result,error}=await sb.auth.signUp({email:credentials.email,password:credentials.password,options:{emailRedirectTo:location.origin+location.pathname}});if(error){$('#authMsg').textContent=error.message;return}$('#authMsg').textContent=result.session?'Account created and signed in.':'Account created. Check your email confirmation link, then return and sign in.'};
@@ -79,6 +79,18 @@ let pmRecovery=false;try{
   const q=location.search||'',h=location.hash||'';
   pmRecovery=q.includes('type=recovery')||q.includes('code=')||
              (h.includes('type=recovery'))||(h.includes('access_token')&&h.includes('recovery'));
+  /* A recovery link that was already opened (often by an email scanner) or has
+     expired comes back as #error=access_denied&error_code=otp_expired&...
+     Detect it, clear the dead hash, and show a clear message so the user can tap
+     "Forgot password?" for a fresh link — instead of the confusing
+     "Invalid login credentials" they got when retrying with the old link. */
+  const eh=new URLSearchParams((h||'').replace(/^#/,'')),es=new URLSearchParams(q||'');
+  const errCode=eh.get('error_code')||es.get('error_code'),errName=eh.get('error')||es.get('error');
+  if(errCode==='otp_expired'||errName==='access_denied'){
+    window.pmAuthLinkError='That password-reset link has expired or was already opened. Enter your email below and tap “Forgot password?” to get a fresh link, then open it right away.';
+    pmRecovery=false;
+    try{history.replaceState({},'',location.origin+location.pathname)}catch(_){}
+  }
 }catch(_){}
 function showResetPw(){$('#auth').hidden=true;$('#onboard').hidden=true;$('#resetPw').hidden=false;document.body.classList.add('pm-auth')}
 $('#resetPwForm').onsubmit=async e=>{e.preventDefault();const p1=$('#rpw1').value,p2=$('#rpw2').value;if(p1.length<8)return toast('Password must be at least 8 characters');if(p1!==p2)return toast('Passwords do not match');$('#rpwMsg').textContent='Setting…';const{error}=await sb.auth.updateUser({password:p1});if(error){$('#rpwMsg').textContent=error.message;return}$('#rpwMsg').textContent='';
