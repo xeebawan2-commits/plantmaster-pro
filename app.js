@@ -266,7 +266,8 @@ async function dashboard() {
   
   $('#toolbar').hidden=false; $('#add').hidden=true; $('#search').placeholder='Search assets, work, manuals, people…';
   
-  const tile=(label,icon,target)=>`<button type="button" class="kpi kpi-link" onclick="window.${target.includes('(') ? target : `go('${target}')`}"><span>${label}</span><strong style="font-size:36px;margin:8px 0">${icon}</strong><small>Open module →</small></button>`;
+  const ic=(n,s)=>window.PMIcon?window.PMIcon(n,s||24):'';
+  const tile=(label,iconName,target)=>`<button type="button" class="kpi kpi-link" onclick="window.${target.includes('(') ? target : `go('${target}')`}">${ic(iconName,24)}<span>${label}</span><small>Open module →</small></button>`;
   
   $('#content').innerHTML=`
     <section class="module-head dashboard-head">
@@ -276,22 +277,22 @@ async function dashboard() {
     <div id="notifBarWrap">${notifBar()}</div>
     
     <div class="kpis" style="margin-bottom: 20px;">
-      ${tile('Analytics & KPIs', '📈', 'analytics')}
-      ${tile('Scanner', '📷', 'qr')}
-      ${tile('Daily Logs', '📋', "openPeopleSection('logs')")}
-      ${tile('Condition Monitoring', '∿', 'condition')}
-      ${tile('Problem Solver', '🧠', 'solver')}
-      ${tile('Reports', '📊', 'reports')}
+      ${tile('Analytics & KPIs', 'analytics', 'analytics')}
+      ${tile('Scanner', 'qr', 'qr')}
+      ${tile('Daily Logs', 'logs', "openPeopleSection('logs')")}
+      ${tile('Condition Monitoring', 'condition', 'condition')}
+      ${tile('Problem Solver', 'solver', 'solver')}
+      ${tile('Reports', 'reports', 'reports')}
     </div>
     
     <div class="grid dashboard-grid">
-      <button type="button" class="card dashboard-link" onclick="window.go('assets')"><h3>🏭 Assets</h3><p>Equipment register, state and QR records</p><span>Open Assets →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('work')"><h3>🧰 Work Orders</h3><p>Assigned corrective work and completion</p><span>Open Work Orders →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('checklists')"><h3>✅ Checklists</h3><p>Templates and completed runs</p><span>Open Checklists →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('maintenance')"><h3>🛠 Maintenance</h3><p>Weekly, monthly and yearly plans</p><span>Open Maintenance →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('inventory')"><h3>📦 Spares & Tools</h3><p>Stock, custody and calibration</p><span>Open Inventory →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('procurement')"><h3>🧾 Purchase Orders</h3><p>Requests, approvals and goods receipt</p><span>Open Purchase Orders →</span></button>
-      <button type="button" class="card dashboard-link" onclick="window.go('suppliers')"><h3>🏷 Suppliers</h3><p>Vendors, NTN/STRN and payment terms</p><span>Open Suppliers →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('assets')"><h3>${ic('assets',18)}Assets</h3><p>Equipment register, state and QR records</p><span>Open Assets →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('work')"><h3>${ic('work',18)}Work Orders</h3><p>Assigned corrective work and completion</p><span>Open Work Orders →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('checklists')"><h3>${ic('checklists',18)}Checklists</h3><p>Templates and completed runs</p><span>Open Checklists →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('maintenance')"><h3>${ic('maintenance',18)}Maintenance</h3><p>Weekly, monthly and yearly plans</p><span>Open Maintenance →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('inventory')"><h3>${ic('inventory',18)}Spares & Tools</h3><p>Stock, custody and calibration</p><span>Open Inventory →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('procurement')"><h3>${ic('procurement',18)}Purchase Orders</h3><p>Requests, approvals and goods receipt</p><span>Open Purchase Orders →</span></button>
+      <button type="button" class="card dashboard-link" onclick="window.go('suppliers')"><h3>${ic('suppliers',18)}Suppliers</h3><p>Vendors, NTN/STRN and payment terms</p><span>Open Suppliers →</span></button>
     </div>
   `;
   renderNotifBar();
@@ -481,7 +482,7 @@ async function applyBranding(x={}){
   const palettes={industrial:['#2563eb','#60a5fa'],corporate:['#2563eb','#7c3aed'],green:['#059669','#84cc16'],steel:['#64748b','#38bdf8'],light:['#2563eb','#0891b2']};
   const fallback=palettes[x.theme]||palettes.industrial,primary=x.primary_color||fallback[0],secondary=x.secondary_color||fallback[1];
   document.documentElement.style.setProperty('--brand-primary',primary);document.documentElement.style.setProperty('--brand-secondary',secondary);
-  document.body.dataset.theme=x.theme||'industrial';document.body.dataset.pattern=x.pattern||'grid';
+  document.body.dataset.theme=x.theme||'industrial';document.body.dataset.pattern=x.pattern||'grid';if(window.PMTheme){window.PMTheme.apply();window.PMTheme.paintToggle()}
   document.title=x.app_name||'PlantMaster Pro';if($('#plantLabel'))$('#plantLabel').textContent=x.plant_display_name||plant?.name||'';
   if(x.logo_path&&$('#brandLogo')){const r=await sb.storage.from(FILE_BUCKET).createSignedUrl(x.logo_path,3600);if(!r.error){$('#brandLogo').src=r.data.signedUrl;$('#brandLogo').hidden=false}}
 }

@@ -1,0 +1,156 @@
+/* =====================================================================
+   PlantMaster Pro — Design System v2
+   Loaded LAST. Refines the palette for a polished DARK look and a proper
+   LIGHT look, and remaps the three legacy token families (--pro-*, --pm-*,
+   and the styles.css --surface/--line/... set) so existing components adopt
+   the new colours automatically. Also adds elevation, spacing, SVG-icon
+   styling, a fixed (non-clipping) scanner mode selector, and micro-motion.
+   Appearance is switched via body[data-theme="light"] (personal toggle in
+   the sidebar, persisted per device). Any non-"light" theme = refined dark.
+   ===================================================================== */
+
+/* ---------------- DARK (default) — refined navy palette ---------------- */
+:root{
+  /* pro family */
+  --pro-bg:#0b1220; --pro-surface:#141d30; --pro-surface-2:#1b2740;
+  --pro-line:#26344c; --pro-line-2:#35486a; --pro-text:#e9eefb; --pro-muted:#93a6c4;
+  --pro-accent:#3b82f6; --pro-accent-2:#2563eb; --pro-radius:16px;
+  --pro-shadow:0 12px 34px rgba(0,0,0,.45);
+  --pro-grad:linear-gradient(135deg,var(--brand-primary,#2563eb),var(--brand-secondary,#3b82f6));
+  --pro-glow:0 0 0 3px rgba(59,130,246,.18);
+  /* pm family */
+  --pm-bg:#0b1220; --pm-panel:#141d30; --pm-panel-2:#1b2740; --pm-panel-3:#233559;
+  --pm-line:#26344c; --pm-text:#e9eefb; --pm-muted:#93a6c4; --pm-header:#0e1728;
+  --pm-shadow:0 12px 34px rgba(0,0,0,.4); --pm-radius:16px;
+  /* legacy styles.css family */
+  --surface:#141d30; --surface-2:#1b2740; --line:#26344c; --muted:#93a6c4;
+  --text:#e9eefb; --primary:#3b82f6; --primary-strong:#2563eb;
+  /* new design tokens */
+  --ds-elev-1:0 1px 2px rgba(0,0,0,.30), 0 1px 3px rgba(0,0,0,.22);
+  --ds-elev-2:0 8px 20px rgba(0,0,0,.34);
+  --ds-elev-3:0 22px 48px rgba(0,0,0,.5);
+  --ds-hover:rgba(255,255,255,.05);
+  color-scheme:dark;
+}
+
+/* ---------------- LIGHT — clean, bright palette ---------------- */
+body[data-theme="light"]{
+  --pro-bg:#f4f7fc; --pro-surface:#ffffff; --pro-surface-2:#eef2f9;
+  --pro-line:#e3e9f2; --pro-line-2:#d2dbe9; --pro-text:#0f1b2e; --pro-muted:#5a6b84;
+  --pro-accent:#2563eb; --pro-accent-2:#1d4ed8;
+  --pro-shadow:0 12px 30px rgba(30,50,90,.12);
+  --pro-glow:0 0 0 3px rgba(37,99,235,.15);
+  --pm-bg:#f4f7fc; --pm-panel:#ffffff; --pm-panel-2:#eef2f9; --pm-panel-3:#e4eaf4;
+  --pm-line:#e3e9f2; --pm-text:#0f1b2e; --pm-muted:#5a6b84; --pm-header:#ffffff;
+  --pm-shadow:0 12px 30px rgba(30,50,90,.12);
+  --surface:#ffffff; --surface-2:#eef2f9; --line:#e3e9f2; --muted:#5a6b84;
+  --text:#0f1b2e; --primary:#2563eb; --primary-strong:#1d4ed8;
+  --ds-elev-1:0 1px 2px rgba(30,50,90,.08), 0 1px 3px rgba(30,50,90,.05);
+  --ds-elev-2:0 8px 22px rgba(30,50,90,.10);
+  --ds-elev-3:0 22px 48px rgba(30,50,90,.16);
+  --ds-hover:rgba(15,30,60,.04);
+  color-scheme:light;
+}
+
+/* Body background + base text follow the tokens in both themes */
+body,body[data-pattern]{background:var(--pro-bg)!important;color:var(--pro-text)}
+
+/* ---------------- LIGHT: shell + component overrides for hard-coded darks ---------------- */
+body[data-theme="light"] header{background:var(--pm-header)!important;border-bottom:1px solid var(--pro-line);box-shadow:0 4px 18px rgba(30,50,90,.06)}
+body[data-theme="light"] #app aside#drawer{background:#ffffff;border-right:1px solid var(--pro-line);color:var(--pro-text)}
+body[data-theme="light"] #drawer nav button{color:var(--pro-text)}
+body[data-theme="light"] #drawer nav button:hover{background:var(--ds-hover)}
+body[data-theme="light"] .mobile-bottom{background:#ffffffee!important;border-top:1px solid var(--pro-line);color:var(--pro-muted)}
+body[data-theme="light"] .icon-btn{background:var(--pro-surface)!important;color:var(--pro-text)}
+body[data-theme="light"] #logout{color:var(--pro-muted);border-color:var(--pro-line)}
+body[data-theme="light"] h1{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:currentColor!important;color:var(--pro-text)!important}
+body[data-theme="light"] th{background:var(--pro-surface-2);color:var(--pro-muted)}
+body[data-theme="light"] tr:nth-child(even) td{background:rgba(30,50,90,.03)}
+body[data-theme="light"] tr:hover td{background:rgba(37,99,235,.06)}
+body[data-theme="light"] td{border-bottom:1px solid var(--pro-line)}
+body[data-theme="light"] .source-item,body[data-theme="light"] .message{background:var(--pro-surface-2)}
+body[data-theme="light"] #boot{color:var(--pro-muted)}
+body[data-theme="light"] .secure-chip{color:var(--pro-muted)}
+
+/* ================================================================
+   COMPONENT POLISH (theme-agnostic — drives off tokens)
+   ================================================================ */
+
+/* SVG icons */
+.pm-ico{flex:0 0 auto;display:inline-block;vertical-align:middle}
+
+/* Sidebar: icon colour + refined active/hover */
+#drawer nav button{transition:background .14s ease,color .14s ease}
+#drawer nav button .pm-ico{color:var(--pro-muted);transition:color .14s ease}
+#drawer nav button:hover .pm-ico{color:var(--pro-text)}
+#drawer [data-view].active .pm-ico{color:var(--pro-accent)}
+.nav-theme-btn .pm-ico{color:var(--pro-accent)!important}
+
+/* Header polish */
+header{box-shadow:var(--ds-elev-1)}
+
+/* Cards & KPIs: real elevation + smooth hover lift */
+.card,.kpi,.record-card,.dashboard-link,.format-card,.report-controls,.profile-shell{
+  border-radius:var(--pro-radius);
+  box-shadow:var(--ds-elev-1);
+  transition:transform .16s cubic-bezier(.4,0,.2,1),box-shadow .16s ease,border-color .16s ease;
+}
+.card:hover,.kpi:hover,.record-card:hover,.dashboard-link:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--ds-elev-2);
+  border-color:color-mix(in srgb,var(--brand-primary,#2563eb) 45%,var(--pro-line));
+}
+.kpi strong{letter-spacing:-.02em}
+
+/* Dashboard tiles: icon chip + tidy layout */
+.kpi-link{display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;min-height:132px;padding:18px}
+.kpi-link .pm-ico{
+  color:var(--pro-accent);background:color-mix(in srgb,var(--brand-primary,#2563eb) 15%,transparent);
+  padding:10px;border-radius:12px;box-sizing:content-box;
+}
+.kpi-link span{font-weight:700;font-size:15px}
+.kpi-link small{color:var(--pro-muted);margin-top:auto}
+
+/* Module cards on dashboard: icon chip in the heading */
+.dashboard-link h3{display:flex;align-items:center;gap:10px;font-size:15.5px}
+.dashboard-link h3 .pm-ico{
+  color:var(--pro-accent);background:color-mix(in srgb,var(--brand-primary,#2563eb) 15%,transparent);
+  padding:9px;border-radius:11px;box-sizing:content-box;
+}
+
+/* Scanner mode selector: responsive grid that never clips, on every width */
+.scanner-modes{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;
+  gap:10px!important;overflow:visible!important;padding-bottom:0!important;
+}
+.scanner-modes button{border-radius:14px;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
+.scanner-modes button:hover{transform:translateY(-1px);box-shadow:var(--ds-elev-1)}
+.scanner-modes button i{background:color-mix(in srgb,var(--brand-primary,#2563eb) 16%,transparent)!important;color:var(--brand-secondary,#3b82f6)}
+.scanner-modes button i .pm-ico{width:20px;height:20px}
+.scanner-modes button small{font-size:10.5px!important;line-height:1.25!important}
+
+/* Buttons: consistent radius + gentle press feedback */
+button,.primary,#add,.secondary,.danger{transition:transform .12s ease,filter .14s ease,background .14s ease,border-color .14s ease}
+button:active{transform:translateY(1px)}
+.primary,#add{box-shadow:var(--ds-elev-1)}
+.primary:hover,#add:hover{filter:brightness(1.06)}
+
+/* Sidebar footer controls (theme + tour) */
+.nav-theme-btn,.nav-tour-btn{display:flex!important;align-items:center;gap:11px;width:100%}
+.nav-theme-btn{color:var(--pro-text)!important;font-weight:600}
+.nav-theme-btn:hover{background:var(--ds-hover)!important}
+
+/* Floating help button already styled in help.css; give it the shared elevation */
+#pmHelpBtn{box-shadow:var(--ds-elev-2),0 0 0 5px rgba(59,130,246,.12)}
+
+/* Inputs: unified focus ring in both themes */
+input:focus,select:focus,textarea:focus{outline:none}
+
+/* Empty/processing states a touch softer */
+.scanner-empty,.empty-state{color:var(--pro-muted)}
+
+/* Respect reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}

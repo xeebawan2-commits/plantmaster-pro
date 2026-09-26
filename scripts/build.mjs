@@ -28,7 +28,7 @@ const APP_FILES = [
   'smart-select.js', 'voice-input.js', 'designation-options.js', 'push-client.js',
   'help.js',
   'styles.css', 'ui-v4.5.css', 'scanner-v4.8.css', 'condition-v4.9.css',
-  'solver-v4.11.css', 'theme-pro.css', 'help.css',
+  'solver-v4.11.css', 'theme-pro.css', 'help.css', 'design-system.css',
   'favicon.ico', 'favicon-32.png', 'apple-touch-icon.png',
   '_headers', '_redirects', 'robots.txt',
 ];

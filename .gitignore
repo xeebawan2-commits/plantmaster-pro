@@ -18,3 +18,6 @@ public/
 dist/
 android/keystore.properties
 plantmaster-pro-launch-package.zip
+
+# design concepts & scratch previews (regenerable, not deployed)
+design/

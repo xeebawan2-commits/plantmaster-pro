@@ -28,6 +28,7 @@ const SHELL_ASSETS = [
   './solver-v4.11.css',
   './theme-pro.css',
   './help.css',
+  './design-system.css',
   './app.js',
   './help.js',
   './config.js',
