@@ -10,7 +10,7 @@
  *  - Supabase REST/Realtime/Storage traffic is never touched.
  *  - Cache is capped so a long-lived install cannot grow without bound.
  */
-const VERSION = '4.49.0-a6323da60b39';
+const VERSION = '4.49.0-d3f7c0b257b4';
 const SHELL = `plantmaster-shell-v${VERSION}`;
 const RUNTIME = `plantmaster-runtime-v${VERSION}`;
 const MAX_RUNTIME_ENTRIES = 80;
@@ -27,7 +27,9 @@ const SHELL_ASSETS = [
   './condition-v4.9.css',
   './solver-v4.11.css',
   './theme-pro.css',
+  './help.css',
   './app.js',
+  './help.js',
   './config.js',
   './offline.js',
   './operations.js',

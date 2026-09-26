@@ -26,8 +26,9 @@ const APP_FILES = [
   'app.js', 'config.js', 'offline.js', 'operations.js', 'procurement.js',
   'scanner.js', 'condition.js', 'solver.js', 'analytics.js', 'csv-import.js',
   'smart-select.js', 'voice-input.js', 'designation-options.js', 'push-client.js',
+  'help.js',
   'styles.css', 'ui-v4.5.css', 'scanner-v4.8.css', 'condition-v4.9.css',
-  'solver-v4.11.css', 'theme-pro.css',
+  'solver-v4.11.css', 'theme-pro.css', 'help.css',
   'favicon.ico', 'favicon-32.png', 'apple-touch-icon.png',
   '_headers', '_redirects', 'robots.txt',
 ];
